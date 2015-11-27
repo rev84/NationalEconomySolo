@@ -1,10 +1,5 @@
 class window.Game
-  @objs :
-    public : null
-    private : null
-    hand : null
-    log : null
-    form : null
+  @objs : {}
   @isSetObj : false
 
   @init : ->
@@ -14,11 +9,19 @@ class window.Game
   @setObj : ->
     return if @isSetObj
     @isSetObj = true
-    @objs.public = PublicSpace
-    @objs.private = PrivateSpace
-    @objs.hand = HandSpace
-    @objs.log = LogSpace
-    @objs.form = FormSpace
+    @objs.public   = PublicSpace
+    @objs.private  = PrivateSpace
+    @objs.hand     = HandSpace
+    @objs.log      = LogSpace
+    @objs.budget   = Budget
+    @objs.round    = RoundDeck
+    @objs.deck     = Deck
+    @objs.consumer = Consumer
+
+  # カードをデッキから手札に移動
+  @pull2hand:(amount = 1)->
+    @objs.hand.push @objs.deck.pull() for i in [0...amount]
+
 
 class SpaceBase
   @DIV_ID = null
@@ -33,7 +36,7 @@ class SpaceBase
 class PublicSpace extends SpaceBase
   @DIV_ID = "public"
 
-  cards:[]
+  @cards:[]
 
   @init:->
     super()
@@ -43,7 +46,7 @@ class PublicSpace extends SpaceBase
 class PrivateSpace extends SpaceBase
   @DIV_ID = "private"
 
-  cards:[]
+  @cards:[]
 
   @init:->
     super()
@@ -52,15 +55,36 @@ class LogSpace extends SpaceBase
   @DIV_ID = "log"
   @init:->
     super()
+  # ログのクリア
+  @clear:->
+    @getElement().html('')
+  # 通常のログ
+  @output:(message)->
+  # エラーログ
+  @error:(message)->
+  # 致命的なエラーログ
+  @fatal:(message)->
 
-class FormSpace extends SpaceBase
-  @DIV_ID = "form"
-  @init:->
-    super()
 class HandSpace extends SpaceBase
   @DIV_ID = "hand"
+  @cards : []
   @init:->
     super()
+  # ソートする
+  @sort:->
+    @cards.sort()
+
+  # 手札を増やす
+  @push:(cardNum)->
+    @cards.push cardNum
+    @sort()
+
+  # 描画
+  @draw:->
+
+  # 要素作成
+  @createElement:(index)->
+    e = $('<div>')
 
 class RoundDeck
   @deck : []
@@ -76,7 +100,9 @@ class RoundDeck
       11
       12
     ]
-  @draw:->
+
+  # カードを引く
+  @pull:->
     false if @deck.length is 0
     @deck.shift()
 
@@ -95,18 +121,22 @@ class Deck
 
     @grave = []
 
-  @draw:->
+  # カードを引く
+  @pull:->
     @recycle() if @deck.length is 0
     @deck.pop()
 
+  # カードを捨てる
   @trash:(cardNum)->
     @grave.push cardNum
 
+  # 墓地から山札に戻してシャッフル
   @recycle:()->
     @deck.push cardNum for cardNum in @grave
     @grave = []
     @shuffle()
 
+  # シャッフル
   @shuffle:->
     copy = []
     n = @deck.length
@@ -114,6 +144,8 @@ class Deck
       i = Math.floor(Math.random() * n--)
       copy.push @deck.splice(i, 1)[0]
     @deck = copy
+
+  # カードの枚数定義
   @getCardDefine:->
     res =
       13 : 8
@@ -141,3 +173,32 @@ class Deck
       35 : 1
       36 : 1
     res
+
+# 消費財デッキ
+class Consumer
+  @init:->
+  # カードを引く
+  @pull:->
+    99
+
+# 家計
+class Budget
+  @money : 0
+
+  @init:->
+    @money = 0
+
+  # 給料を払う
+  @push:(amount)->
+    return false if amount < 0
+    @money += amount
+
+  # 家計から徴収
+  @pull:(amount)->
+    return false if amount < 0
+    return false if @money < amount
+    @money -= amount
+
+  # 金額を知る
+  @getAmount:->
+    @money

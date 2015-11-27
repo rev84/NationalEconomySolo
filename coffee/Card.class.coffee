@@ -16,7 +16,7 @@ class CardBase
   @DESCRIPTION = null
 
 
-# No.01 採石場　一人用プレイの場合は使用しない
+# No.01 採石場 一人用プレイの場合は使用しない
 
 # No.02 鉱山
 class Card2 extends CardBase
@@ -158,3 +158,6 @@ class Card35 extends CardBase
 class Card36 extends CardBase
   @NAME = "本社ビル"
 
+# No.99 消費財
+class Card99 extends CardBase
+  @NAME = "消費財"
