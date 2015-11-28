@@ -19,6 +19,20 @@ class CardBase
   # 得点
   @PRICE = 0
 
+  # 選択時に右クリック可能か
+  @isRightClick:->
+    false
+
+  # 手札からカードを何枚選ぶ必要性があるか
+  @requireCards:->
+    [0, 0]
+
+  # 労働者を派遣した時の挙動
+  @use:(leftIndexs = [], rightIndexs = [])->
+    # 数のバリデーション
+    [leftReqNum, rightReqNum] = @requireCards
+    return false unless leftIndexs.length is leftReqNum and rightReqNum.length is rightReqNum
+
   # カード名を取得
   @getName:->
     @NAME
@@ -79,11 +93,19 @@ class Card2 extends CardBase
   @CATEGORY    = "公共"
   @DESCRIPTION = "カードを1枚引く"
 
+  @use:->
+    Game.pullDeck()
+    true
+
 # No.03 学校
 class Card3 extends CardBase
   @NAME        = "学校"
   @CATEGORY    = "公共"
   @DESCRIPTION = "労働者を1人増やす"
+  
+  @use:->
+    Game.addWorkerNum()
+    true
 
 # No.04 大工
 class Card4 extends CardBase
@@ -196,7 +218,7 @@ class Card19 extends CardBase
 class Card20 extends CardBase
   @NAME        = "倉庫"
   @CATEGORY    = "非職場"
-  @DESCRIPTION = "手札上限+4\n（所有しているだけで効果がある）\n売却不可"
+  @DESCRIPTION = "手札上限+4\n（パッシブ）\n売却不可"
   @COST        = 2
   @PRICE       = 5
 
@@ -204,7 +226,7 @@ class Card20 extends CardBase
 class Card21 extends CardBase
   @NAME        = "社宅"
   @CATEGORY    = "非職場"
-  @DESCRIPTION = "労働者上限+1\n（所有しているだけで効果がある）\n売却不可"
+  @DESCRIPTION = "労働者上限+1\n（パッシブ）\n売却不可"
   @COST        = 2
   @PRICE       = 4
 

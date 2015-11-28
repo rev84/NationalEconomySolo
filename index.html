@@ -6,8 +6,6 @@
 <title>National Economy Solo</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script src="./js/jquery.darktooltip.min.js"></script>
-<script src="./js/Game.class.js"></script>
-<script src="./js/Card.class.js"></script>
 <script src="./js/engine.js"></script>
 <script>
 </script>
@@ -50,10 +48,35 @@
   </div>
   -->
   <div id="info_space">
-    <div id="budget_space">
-      <span id="budget_label">家計</span>
-      <span id="budget"></span>
+    <div id="round_space" class="info">
+      <span id="round_label" class="info_label">ラウンド</span>
+      <span id="round" class="info_body"></span>
+      <span id="salary" class="info_body"></span>
     </div>
+    <div id="budget_space" class="info">
+      <span id="budget_label" class="info_label">家計</span>
+      <span id="budget" class="info_body"></span>
+    </div>
+    <div id="worker_space" class="info">
+      <span id="worker_label" class="info_label">労働者</span>
+      <span id="worker" class="info_body"></span>
+    </div>
+
+    <div id="stock_space" class="info">
+      <span id="stock_label" class="info_label">資金</span>
+      <span id="stock" class="info_body"></span>
+    </div>
+    <div id="point_space" class="info">
+      <span id="point_label" class="info_label">総得点</span>
+      <span id="point" class="info_body"></span>
+    </div>
+    <div id="unpaid_space" class="info">
+      <span id="unpaid_label" class="info_label">未払い賃金</span>
+      <span id="unpaid" class="info_body"></span>
+    </div>
+
+    <button id="ok">OK</button>
+    <button id="cancel">CANCEL</button>
   </div>
 </div>
 </body>

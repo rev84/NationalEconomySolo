@@ -1,1 +1,1 @@
-coffee -o js -wcb coffee
+coffee -wcb --join engine.js -o js coffee/SpaceBase.class.coffee coffee
