@@ -2,6 +2,8 @@ class ButtonOK extends SpaceBase
   @DIV_ID = 'ok'
   @init:->
     @disable()
+    @getElement().on 'click', ->
+      Game.pushOK()
 
   @enable:->
     @getElement().prop("disabled", false).removeClass "disabled"
@@ -13,6 +15,8 @@ class ButtonCANCEL extends SpaceBase
   @DIV_ID = 'cancel'
   @init:->
     @disable()
+    @getElement().on 'click', ->
+      Game.pushCANCEL()
 
   @enable:->
     @getElement().prop("disabled", false).removeClass "disabled"

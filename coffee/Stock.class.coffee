@@ -14,11 +14,12 @@ class Stock extends SpaceBase
     return false if amount < 0
     @money += amount
 
-  # 資金を失う
+  # 資金を失う（0で維持する）
   @pull:(amount)->
     return false if amount < 0
 
     @money -= amount
+    @money = if @money < 0 then 0 else @money
 
   # 金額を取得
   @getAmount:->

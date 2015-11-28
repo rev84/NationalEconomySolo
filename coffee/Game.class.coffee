@@ -6,6 +6,8 @@ class window.Game
   # false : 待ちではない
   # [kubun, index, isRightClick] : 区分、インデックス番号、右クリック有効
   @waitChoice : false
+  # 建物売り期間
+  @isSell : false
 
   @init : ->
     @setObj()
@@ -21,6 +23,7 @@ class window.Game
     @objs.unpaid.redraw()
     @objs.point.redraw()
     @objs.worker.redraw()
+    @objs.round.redraw()
 
   @setObj : ->
     return if @isSetObj
@@ -53,6 +56,49 @@ class window.Game
 
     @isClickable = true
 
+  # ラウンドの終了処理
+  @roundEnd:->
+    # 給料
+    minusSalary = @objs.worker.getTotal() * @objs.round.getSalary()
+    # 不足
+    penalty = minusSalary - @objs.stock.getAmount()
+    penalty = if penalty > 0 then penalty else 0
+
+    alertStr = "ラウンド終了"
+    alertStr += "\n\n"
+    alertStr += "給料 $"+minusSalary+" を支払います\n"
+    alertStr += "支払えなかった $"+penalty+" が未払いになります" if penalty isnt 0
+
+    alert alertStr
+
+    # 資金を減らす
+    @objs.stock.pull minusSalary
+    # 未払いを増やす
+    @objs.unpaid.push penalty
+    # ラウンドを進める
+    @objs.round.addRound()
+    # ラウンドカードを置く
+    @pullPublic()
+    # 公共カード・所有カードを使用可能にする
+    @objs.public.resetStatus()
+    @objs.private.resetStatus()
+    # 労働者を開腹
+    @objs.worker.wake()
+    # 再描画
+    @refresh()
+
+  # ターンの終了処理（建物）
+  @turnEnd:(kubun, index)->
+    spaceClass = @kubun2class(kubun)
+
+    @objs.worker.work() # 労働者を減らす
+    spaceClass.setWorked index # 労働者を置く
+    PublicSpace.disableLastest()  # 最新の職場を潰す
+    @refresh()
+    # 終わったら
+    if @objs.worker.getActive() <= 0
+      @roundEnd()
+
   # ハンド選択
   @handClickLeft:(index)->
     # 選択待ちでなければならない
@@ -67,21 +113,49 @@ class window.Game
     # 
     @objs.hand.clickRight()
 
+  # ボタンを押した時
+  @pushOK:->
+    return false if @waitChoice is false
+    # 選択状態解除
+    [kubun, cardIndex, _] = @waitChoice
+    @waitChoice = false
+    # ハンドのリストを作成
+    left = []
+    right = []
+    for index in [0...@objs.hand.getAmount()]
+      left.push index if @objs.hand.getSelect() is @objs.hand.SELECT_LEFT
+      right.push index if @objs.hand.getSelect() is @objs.hand.SELECT_RIGHT
+    @objs.hand.select = []
+
+    # 使用する
+    spaceClass = @kubun2class(kubun)
+    cardClass = spaceClass.getCardClass cardIndex
+    res = cardClass.use(left, right)
+    # 使えた
+    if res is true
+
+    # 使えなかった
+    else
+      alert res
+      return false
+
+
+  @pushCANCEL:->
+    return false if @waitChoice is false
+
   # 働かせる
   @work:(kubun, index)->
     # クリック不可
     return false unless @isClickable
-    return false unless @isClickable
     # 置けない
-    return false if kubun is "public" and not PublicSpace.isUsable index
-    return false if kubun is "private" and not PrivateSpace.isUsable index
+    return false unless @kubun2class(kubun).isUsable index
     # 労働者がいない
     return false if Worker.getActive() <= 0
 
     @isClickable = false
 
     # クラス
-    spaceClass = if kubun is "public" then PublicSpace else PrivateSpace
+    spaceClass = @kubun2class(kubun)
 
     # 実行する
     cardClass = spaceClass.getCardClass index
@@ -97,13 +171,7 @@ class window.Game
         @isClickable = true
         return false
       # 正常終了
-      @objs.worker.work() # 労働者を減らす
-      spaceClass.setWorked index # 労働者を置く
-      PublicSpace.disableLastest()  # 最新の職場を潰す
-      @refresh()
-      # 終わったら
-      if @objs.worker.getActive() <= 0
-        alert "労働者終わり"
+      @turnEnd(kubun, index)
       @isClickable = true
 
 
@@ -150,5 +218,16 @@ class window.Game
     point += @objs.stock.getAmount()
     # 建造物の合計価値を加算
     point += @objs.private.getPoint()
+    # 未払いを引く
+    unpaidNum = @objs.unpaid.getAmount()
+    if @objs.private.isExistHouritu()
+      unpaidNum -= 5
+    unpaidNum = if unpaidNum < 0 then 0 else unpaidNum
+    point -= unpaidNum
 
     point
+
+  # 区分 -> クラス
+  @kubun2class:(kubun)->
+    return PublicSpace if kubun is "public"
+    PrivateSpace

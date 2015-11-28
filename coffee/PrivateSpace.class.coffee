@@ -14,6 +14,10 @@ class PrivateSpace extends SpaceBase
     @cards = []
     @status = []
 
+  # すべて使用可能にする
+  @resetStatus:->
+    @status[index] = @STATUS_USABLE for index in [0...@cards.length]
+
   # カードクラスの取得
   @getCardClass:(index)->
     return Card.getClass(@cards[index])
@@ -119,3 +123,9 @@ class PrivateSpace extends SpaceBase
     e.append categorySpan
     e.append pointSpan
     e
+
+  # 法律事務所が存在するか（No.22）
+  @isExistHouritu:->
+    for cardNum in @cards
+      return true if cardNum is 22
+    false

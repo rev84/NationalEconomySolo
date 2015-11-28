@@ -35,6 +35,10 @@ class HandSpace extends SpaceBase
     @select = []
     @select.push @SELECT_NOT for i in [0...@cards.length]
 
+  # 手札の数を取得
+  @getAmount:->
+    @cards.length
+
   # 手札を増やす
   @push:(cardNum)->
     @cards.push Number cardNum

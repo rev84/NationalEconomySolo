@@ -10,6 +10,10 @@ class PublicSpace extends SpaceBase
     @cards = []
     @status = []
 
+  # すべて使用可能にする
+  @resetStatus:->
+    @status[index] = @STATUS_USABLE for index in [0...@cards.length]
+
   # カードクラスの取得
   @getCardClass:(index)->
     return Card.getClass(@cards[index])
