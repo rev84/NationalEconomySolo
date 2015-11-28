@@ -10,6 +10,8 @@ class window.Game
   @isHandTrash : false
   # 建物売り期間
   @isSell : false
+  # ゲーム終了フラグ
+  @isGameEnd : false
   # 焼畑フラグ
   @flagYakihata : false
 
@@ -23,6 +25,7 @@ class window.Game
     @waitChoice   = false
     @isHandTrash  = false
     @isSell       = false
+    @isGameEnd    = false
     @flagYakihata = false
     @isClickable  = true
 
@@ -55,6 +58,7 @@ class window.Game
     @objs.ok       = ButtonOK
     @objs.cancel   = ButtonCANCEL
 
+  # ゲーム開始
   @gameStart:->
     @isClickable = false
 
@@ -68,6 +72,56 @@ class window.Game
 
     @clickable()
 
+  # ゲーム終了
+  @gameEnd:->
+    @isGameEnd = true
+    @refresh()
+    @logScore()
+
+  # 最終スコアを出力
+  @logScore:->
+    # 終了スコア発表
+    [
+      stock
+      buildPoint
+      unpaid
+      hourituNum
+      hudousanNum
+      buildNum
+      noukyouNum
+      consumerNum
+      rousoNum
+      workerNum
+      railNum
+      industryNum
+      honsyaNum
+      unworkNum
+      point
+    ] = @getPoint true
+    unpaidPoint = unpaid*5
+    hourituOnkei = if unpaid > hourituNum*5 then hourituNum*5*3 else unpaid*3
+    hudousanPoint = hudousanNum * buildNum*3
+    noukyouPoint = noukyouNum * consumerNum*3
+    rousoPoint = rousoNum * consumerNum*6
+    railPoint = railNum * industryNum*3
+    honsyaPoint = honsyaNum * unworkNum*3
+
+    logStr = """
+    ゲーム終了　スコア：$#{point}
+    <hr>
+    資金　　　　　　　　　　　　　　　　　　　　 $#{stock}
+    建物の価値　　　　　　　　　　　　　　　　　 $#{buildPoint}
+    未払い賃金　　　　　　　　　　$#{unpaid}　×　3　=> -$#{unpaidPoint}
+    法律事務所　　#{hourituNum}件　×　未払い　$#{unpaid}　×　3　=>　$#{hourituOnkei}
+    不動産屋　　　#{hudousanNum}件　×　建物　 #{buildNum}件　×　3　=>　$#{hudousanPoint}
+    農協　　　　　#{noukyouNum}件　×　消費財 #{consumerNum}枚　×　3　=>　$#{noukyouPoint}
+    労働組合　　　#{rousoNum}件　×　労働者 #{workerNum}人　×　6　=>　$#{rousoPoint}
+    鉄道　　　　　#{railNum}件　×　工業　 #{industryNum}件　×　3　=>　$#{railPoint}
+    本社ビル　　　#{honsyaNum}件　×　非職場 #{unworkNum}件　×　3　=>　$#{honsyaPoint}
+    <hr>
+    <button id="start" onclick="Game.gameStart()">もう一度やる</button>
+    """.replace /\n/g, '<br>'
+    LogSpace.addWarn logStr
 
   # ラウンドの終了判定
   @roundEnd:->
@@ -120,12 +174,17 @@ class window.Game
     Unpaid.push penalty
     # ラウンドを進める
     RoundDeck.addRound()
+
+    # ゲーム終了
+    if RoundDeck.getRound() >= 10
+      return @gameEnd()
+
     # ラウンドカードを置く
     @pullPublic()
     # 公共カード・所有カードを使用可能にする
     PublicSpace.resetStatus()
     PrivateSpace.resetStatus()
-    # 労働者を開腹
+    # 労働者を回復
     Worker.wake()
     # 再描画
     @refresh()
@@ -161,6 +220,8 @@ class window.Game
 
   # ハンドのクリック判定
   @handClickLeft:(index)->
+    # ゲーム終了
+    return false if @isGameEnd
     # 選択待ちでなければならない
     return false if @waitChoice is false
     # 
@@ -168,6 +229,8 @@ class window.Game
     HandSpace.redraw()
 
   @handClickRight:(index)->
+    # ゲーム終了
+    return false if @isGameEnd
     # 選択待ちでなければならない
     return false if @waitChoice is false
     # 右クリック可能でなければならない
@@ -177,6 +240,8 @@ class window.Game
     HandSpace.redraw()
 
   @handDoubleClick:(index)->
+    # ゲーム終了
+    return false if @isGameEnd
     # 手札を捨てる時以外使わない
     return false unless @isHandTrash
     HandSpace.trash [index]
@@ -185,6 +250,9 @@ class window.Game
 
   # ボタンを押した時
   @pushOK:->
+    # ゲーム終了
+    return false if @isGameEnd
+    # 選択状態ではない
     return false if @waitChoice is false
     # 選択状態解除
     [kubun, cardIndex, _] = @waitChoice
@@ -219,6 +287,9 @@ class window.Game
     res is true
 
   @pushCANCEL:->
+    # ゲーム終了
+    return false if @isGameEnd
+    # 選択状態ではない
     return false if @waitChoice is false
     @waitChoice = false
     HandSpace.selectReset()
@@ -231,7 +302,9 @@ class window.Game
 
   # 働かせる
   @work:(kubun, index)->
-    # クリック不可
+    # ゲーム終了
+    return false if @isGameEnd
+     # クリック不可
     return false unless @isClickable
     # 置けない
     return false unless @kubun2class(kubun).isUsable index
@@ -312,7 +385,23 @@ class window.Game
 
 
   # 得点の再計算・表示
-  @getPoint:->
+  # getDetail = true なら
+  # [0] 所持金
+  # [1] 建造物の価値
+  # [2] 未払い賃金
+  # [3] 法律事務所の数
+  # [4] 不動産屋の数
+  # [5] 所有する建物の数
+  # [6] 農協の数
+  # [7] 手札の消費財の数
+  # [8] 労働組合の数
+  # [9] 労働者の数
+  # [10] 鉄道の数
+  # [11] 所有する工業カテゴリの建物の数
+  # [12] 本社ビルの数
+  # [13] 所有する非職場カテゴリの建物の数
+  # [14] 合計点
+  @getPoint:(getDetail = false)->
     point = 0
 
     # 所持金*1 加点
@@ -342,7 +431,26 @@ class window.Game
     # 本社ビルの数*所有する非職場カテゴリの建物の数*3 加点
     point += PrivateSpace.getAmountBuilding()*PrivateSpace.getAmountUnworkable()*6
 
-    point
+    if getDetail
+      return [
+        Stock.getAmount()
+        PrivateSpace.getPoint()
+        Unpaid.getAmount()
+        PrivateSpace.getAmountHouritu()
+        PrivateSpace.getAmountHudousan()
+        PrivateSpace.getAmount()
+        PrivateSpace.getAmountNoukyou()
+        HandSpace.getAmountConsumer()
+        PrivateSpace.getAmountRouso()
+        Worker.getTotal()
+        PrivateSpace.getAmountRail()
+        PrivateSpace.getAmountIndustry()
+        PrivateSpace.getAmountBuilding()
+        PrivateSpace.getAmountUnworkable()
+        point
+      ]
+    else
+      return point
 
   # 区分 -> クラス
   @kubun2class:(kubun)->

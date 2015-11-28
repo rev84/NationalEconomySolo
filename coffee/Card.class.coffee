@@ -255,7 +255,7 @@ class Card7 extends CardBase
 class Card8 extends CardBase
   @NAME        = "スーパーマーケット"
   @CATEGORY    = "公共"
-  @DESCRIPTION = "手札を3枚捨てて家計から$18を得る"
+  @DESCRIPTION = "手札を3枚捨てる\n家計から$18を得る"
 
   @requireCards:->
     [3,0]
@@ -295,7 +295,7 @@ class Card9 extends CardBase
 class Card10 extends CardBase
   @NAME        = "百貨店"
   @CATEGORY    = "公共"
-  @DESCRIPTION = "手札を4枚捨てて家計から$24を得る"
+  @DESCRIPTION = "手札を4枚捨てる\n家計から$24を得る"
 
   @requireCards:->
     [4,0]
@@ -331,7 +331,7 @@ class Card11 extends CardBase
 class Card12 extends CardBase
   @NAME        = "万博"
   @CATEGORY    = "公共"
-  @DESCRIPTION = "手札を5枚捨てて家計から$30を得る"
+  @DESCRIPTION = "手札を5枚捨てる\n家計から$30を得る"
 
   @requireCards:->
     [5,0]
@@ -436,7 +436,7 @@ class Card17 extends CardBase
 # No.18 建設会社
 class Card18 extends CardBase
   @NAME        = "建設会社"
-  @DESCRIPTION = "建物を1つ少ないコストで作る\n"
+  @DESCRIPTION = "1少ないコストで建物を1つ作る\n"
   @COST        = 2
   @PRICE       = 5
   @requireCards:->
@@ -562,7 +562,7 @@ class Card25 extends CardBase
     #return "指定カードが足りません" if super()
 
     # 建物は1枚でなければならない
-    return "建物1枚選択しなければなりません" if leftIndexs.length isnt 1
+    return "建物を1枚選択しなければなりません" if leftIndexs.length isnt 1
 
     buildCardIndex = leftIndexs[0]
     buildCardNum = HandSpace.getCardNum buildCardIndex
@@ -623,7 +623,7 @@ class Card29 extends CardBase
     #return "指定カードが足りません" if super()
 
     # 右クリックの建物は1枚でなければならない
-    return "建物カードを1枚選択しなければなりません" if leftIndexs.length isnt 1
+    return "建物を1枚選択しなければなりません" if leftIndexs.length isnt 1
 
     buildCardIndex = leftIndexs[0]
     buildCardNum = HandSpace.getCardNum buildCardIndex
@@ -719,7 +719,7 @@ class Card34 extends CardBase
     #return "指定カードが足りません" if super
 
     # 建物は2枚でなければならない
-    return "建物カードを2枚選択しなければなりません" if leftIndexs.length isnt 2
+    return "建物を2枚選択しなければなりません" if leftIndexs.length isnt 2
 
     buildCardIndex0 = leftIndexs[0]
     buildCardNum0 = HandSpace.getCardNum buildCardIndex0
@@ -768,4 +768,4 @@ class Card36 extends CardBase
 class Card99 extends CardBase
   @NAME        = "消費財"
   @CATEGORY    = "消費財"
-  @DESCRIPTION = "手札やコストとして捨てられる"
+  @DESCRIPTION = "捨札や建設コストとして捨てられる"

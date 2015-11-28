@@ -236,7 +236,7 @@ body {
 }
 
 /* ボタン */
-button {
+button#ok, button#cancel {
   position:absolute;
   width:150px; height:80px;
   box-sizing:content-box;

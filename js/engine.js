@@ -501,7 +501,7 @@ Card8 = (function(superClass) {
 
   Card8.CATEGORY = "公共";
 
-  Card8.DESCRIPTION = "手札を3枚捨てて家計から$18を得る";
+  Card8.DESCRIPTION = "手札を3枚捨てる\n家計から$18を得る";
 
   Card8.requireCards = function() {
     return [3, 0];
@@ -564,7 +564,7 @@ Card10 = (function(superClass) {
 
   Card10.CATEGORY = "公共";
 
-  Card10.DESCRIPTION = "手札を4枚捨てて家計から$24を得る";
+  Card10.DESCRIPTION = "手札を4枚捨てる\n家計から$24を得る";
 
   Card10.requireCards = function() {
     return [4, 0];
@@ -627,7 +627,7 @@ Card12 = (function(superClass) {
 
   Card12.CATEGORY = "公共";
 
-  Card12.DESCRIPTION = "手札を5枚捨てて家計から$30を得る";
+  Card12.DESCRIPTION = "手札を5枚捨てる\n家計から$30を得る";
 
   Card12.requireCards = function() {
     return [5, 0];
@@ -804,7 +804,7 @@ Card18 = (function(superClass) {
 
   Card18.NAME = "建設会社";
 
-  Card18.DESCRIPTION = "建物を1つ少ないコストで作る\n";
+  Card18.DESCRIPTION = "1少ないコストで建物を1つ作る\n";
 
   Card18.COST = 2;
 
@@ -1022,7 +1022,7 @@ Card25 = (function(superClass) {
   Card25.use = function(leftIndexs) {
     var buildCardIndex, buildCardNum, cardClass;
     if (leftIndexs.length !== 1) {
-      return "建物1枚選択しなければなりません";
+      return "建物を1枚選択しなければなりません";
     }
     buildCardIndex = leftIndexs[0];
     buildCardNum = HandSpace.getCardNum(buildCardIndex);
@@ -1133,7 +1133,7 @@ Card29 = (function(superClass) {
   Card29.use = function(leftIndexs, rightIndexs) {
     var buildCardIndex, buildCardNum, cardClass, cost;
     if (leftIndexs.length !== 1) {
-      return "建物カードを1枚選択しなければなりません";
+      return "建物を1枚選択しなければなりません";
     }
     buildCardIndex = leftIndexs[0];
     buildCardNum = HandSpace.getCardNum(buildCardIndex);
@@ -1287,7 +1287,7 @@ Card34 = (function(superClass) {
   Card34.use = function(leftIndexs, rightIndexs) {
     var buildCardIndex0, buildCardIndex1, buildCardNum0, buildCardNum1, cardClass0, cardClass1, cost0, cost1;
     if (leftIndexs.length !== 2) {
-      return "建物カードを2枚選択しなければなりません";
+      return "建物を2枚選択しなければなりません";
     }
     buildCardIndex0 = leftIndexs[0];
     buildCardNum0 = HandSpace.getCardNum(buildCardIndex0);
@@ -1367,7 +1367,7 @@ Card99 = (function(superClass) {
 
   Card99.CATEGORY = "消費財";
 
-  Card99.DESCRIPTION = "手札やコストとして捨てられる";
+  Card99.DESCRIPTION = "捨札や建設コストとして捨てられる";
 
   return Card99;
 
@@ -1501,6 +1501,8 @@ window.Game = (function() {
 
   Game.isSell = false;
 
+  Game.isGameEnd = false;
+
   Game.flagYakihata = false;
 
   Game.init = function() {
@@ -1516,6 +1518,7 @@ window.Game = (function() {
     this.waitChoice = false;
     this.isHandTrash = false;
     this.isSell = false;
+    this.isGameEnd = false;
     this.flagYakihata = false;
     return this.isClickable = true;
   };
@@ -1562,6 +1565,26 @@ window.Game = (function() {
     return this.clickable();
   };
 
+  Game.gameEnd = function() {
+    this.isGameEnd = true;
+    this.refresh();
+    return this.logScore();
+  };
+
+  Game.logScore = function() {
+    var buildNum, buildPoint, consumerNum, honsyaNum, honsyaPoint, hourituNum, hourituOnkei, hudousanNum, hudousanPoint, industryNum, logStr, noukyouNum, noukyouPoint, point, railNum, railPoint, ref, rousoNum, rousoPoint, stock, unpaid, unpaidPoint, unworkNum, workerNum;
+    ref = this.getPoint(true), stock = ref[0], buildPoint = ref[1], unpaid = ref[2], hourituNum = ref[3], hudousanNum = ref[4], buildNum = ref[5], noukyouNum = ref[6], consumerNum = ref[7], rousoNum = ref[8], workerNum = ref[9], railNum = ref[10], industryNum = ref[11], honsyaNum = ref[12], unworkNum = ref[13], point = ref[14];
+    unpaidPoint = unpaid * 5;
+    hourituOnkei = unpaid > hourituNum * 5 ? hourituNum * 5 * 3 : unpaid * 3;
+    hudousanPoint = hudousanNum * buildNum * 3;
+    noukyouPoint = noukyouNum * consumerNum * 3;
+    rousoPoint = rousoNum * consumerNum * 6;
+    railPoint = railNum * industryNum * 3;
+    honsyaPoint = honsyaNum * unworkNum * 3;
+    logStr = ("ゲーム終了　スコア：$" + point + "\n<hr>\n資金　　　　　　　　　　　　　　　　　　　　 $" + stock + "\n建物の価値　　　　　　　　　　　　　　　　　 $" + buildPoint + "\n未払い賃金　　　　　　　　　　$" + unpaid + "　×　3　=> -$" + unpaidPoint + "\n法律事務所　　" + hourituNum + "件　×　未払い　$" + unpaid + "　×　3　=>　$" + hourituOnkei + "\n不動産屋　　　" + hudousanNum + "件　×　建物　 " + buildNum + "件　×　3　=>　$" + hudousanPoint + "\n農協　　　　　" + noukyouNum + "件　×　消費財 " + consumerNum + "枚　×　3　=>　$" + noukyouPoint + "\n労働組合　　　" + rousoNum + "件　×　労働者 " + workerNum + "人　×　6　=>　$" + rousoPoint + "\n鉄道　　　　　" + railNum + "件　×　工業　 " + industryNum + "件　×　3　=>　$" + railPoint + "\n本社ビル　　　" + honsyaNum + "件　×　非職場 " + unworkNum + "件　×　3　=>　$" + honsyaPoint + "\n<hr>\n<button id=\"start\" onclick=\"Game.gameStart()\">もう一度やる</button>").replace(/\n/g, '<br>');
+    return LogSpace.addWarn(logStr);
+  };
+
   Game.roundEnd = function() {
     var max, message, rest;
     this.isClickable = false;
@@ -1600,6 +1623,9 @@ window.Game = (function() {
     Budget.push(minusSalary - penalty);
     Unpaid.push(penalty);
     RoundDeck.addRound();
+    if (RoundDeck.getRound() >= 10) {
+      return this.gameEnd();
+    }
     this.pullPublic();
     PublicSpace.resetStatus();
     PrivateSpace.resetStatus();
@@ -1635,6 +1661,9 @@ window.Game = (function() {
   };
 
   Game.handClickLeft = function(index) {
+    if (this.isGameEnd) {
+      return false;
+    }
     if (this.waitChoice === false) {
       return false;
     }
@@ -1643,6 +1672,9 @@ window.Game = (function() {
   };
 
   Game.handClickRight = function(index) {
+    if (this.isGameEnd) {
+      return false;
+    }
     if (this.waitChoice === false) {
       return false;
     }
@@ -1654,6 +1686,9 @@ window.Game = (function() {
   };
 
   Game.handDoubleClick = function(index) {
+    if (this.isGameEnd) {
+      return false;
+    }
     if (!this.isHandTrash) {
       return false;
     }
@@ -1664,6 +1699,9 @@ window.Game = (function() {
 
   Game.pushOK = function() {
     var _, cardClass, cardIndex, index, j, kubun, left, ref, ref1, res, right, spaceClass;
+    if (this.isGameEnd) {
+      return false;
+    }
     if (this.waitChoice === false) {
       return false;
     }
@@ -1697,6 +1735,9 @@ window.Game = (function() {
   };
 
   Game.pushCANCEL = function() {
+    if (this.isGameEnd) {
+      return false;
+    }
     if (this.waitChoice === false) {
       return false;
     }
@@ -1712,6 +1753,9 @@ window.Game = (function() {
 
   Game.work = function(kubun, index) {
     var cardClass, leftReqNum, ref, res, rightReqNum, spaceClass;
+    if (this.isGameEnd) {
+      return false;
+    }
     if (!this.isClickable) {
       return false;
     }
@@ -1793,8 +1837,11 @@ window.Game = (function() {
     return cantPaySalary && canSell;
   };
 
-  Game.getPoint = function() {
+  Game.getPoint = function(getDetail) {
     var point, unpaidNum;
+    if (getDetail == null) {
+      getDetail = false;
+    }
     point = 0;
     point += Stock.getAmount();
     point += PrivateSpace.getPoint();
@@ -1807,7 +1854,11 @@ window.Game = (function() {
     point += PrivateSpace.getAmountRouso() * Worker.getTotal() * 6;
     point += PrivateSpace.getAmountRail() * PrivateSpace.getAmountIndustry() * 6;
     point += PrivateSpace.getAmountBuilding() * PrivateSpace.getAmountUnworkable() * 6;
-    return point;
+    if (getDetail) {
+      return [Stock.getAmount(), PrivateSpace.getPoint(), Unpaid.getAmount(), PrivateSpace.getAmountHouritu(), PrivateSpace.getAmountHudousan(), PrivateSpace.getAmount(), PrivateSpace.getAmountNoukyou(), HandSpace.getAmountConsumer(), PrivateSpace.getAmountRouso(), Worker.getTotal(), PrivateSpace.getAmountRail(), PrivateSpace.getAmountIndustry(), PrivateSpace.getAmountBuilding(), PrivateSpace.getAmountUnworkable(), point];
+    } else {
+      return point;
+    }
   };
 
   Game.kubun2class = function(kubun) {
