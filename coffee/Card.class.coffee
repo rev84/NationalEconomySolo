@@ -37,6 +37,10 @@ class CardBase
   @getDescription:->
     @DESCRIPTION
 
+  # 公共カテゴリであるか
+  @isPublicOnly:->
+    @CATEGORY is '公共'
+
   # 労働者を置けるか
   @isWorkable:->
     return false if @CATEGORY is '非職場'

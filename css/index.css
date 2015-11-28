@@ -65,18 +65,64 @@ body {
 }
 .hand_footer {
   position:absolute;
-  bottom:0px; left:0px;
-  width:120px; height:20px;
   text-align:right;
   vertical-align:middle;
   font-size:16px;
   font-weight:bold;
+  width:60px; height:20px;
+}
+.hand_category {
+  bottom:0px; left:0px;
+  text-align:left;
+}
+.hand_point {
+  bottom:0px; right:0px;
+  text-align:right;
 }
 .hand_image {
   position:absolute;
   top:20px; left:10px;
   width:100px; height:75px;
 }
+/* 公共のカード */
+.public {
+  position:relative;
+  width:120px; height:115px;
+  border:1px solid #0000ff;
+  display:inline-block;
+  margin:2px;
+}
+.public_header {
+  position:absolute;
+  top:0px; left:0px;
+  width:120px; height:20px;
+  text-align:center;
+  vertical-align:middle;
+  font-size:16px;
+  font-weight:bold;
+}
+.public_footer {
+  position:absolute;
+  text-align:right;
+  vertical-align:middle;
+  font-size:16px;
+  font-weight:bold;
+  width:60px; height:20px;
+}
+.public_category {
+  bottom:0px; left:0px;
+  text-align:left;
+}
+.public_point {
+  bottom:0px; right:0px;
+  text-align:right;
+}
+.public_image {
+  position:absolute;
+  top:20px; left:10px;
+  width:100px; height:75px;
+}
+
 .no_display {
   display:none;
 }

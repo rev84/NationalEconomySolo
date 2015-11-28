@@ -57,6 +57,10 @@ CardBase = (function() {
     return this.DESCRIPTION;
   };
 
+  CardBase.isPublicOnly = function() {
+    return this.CATEGORY === '公共';
+  };
+
   CardBase.isWorkable = function() {
     if (this.CATEGORY === '非職場') {
       return false;

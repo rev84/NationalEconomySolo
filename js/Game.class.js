@@ -38,25 +38,46 @@ window.Game = (function() {
   };
 
   Game.gameStart = function() {
-    var i, j, results;
+    var i, j;
     this.init();
-    results = [];
     for (i = j = 0; j < 3; i = ++j) {
-      results.push(this.pull2hand());
+      this.pullDeck();
     }
-    return results;
+    this.objs.deck.place(17);
+    return this.pullPublic(4);
   };
 
-  Game.pull2hand = function(amount) {
-    var i, j, ref, results;
+  Game.pullDeck = function(amount) {
+    var i, j, ref;
     if (amount == null) {
       amount = 1;
     }
-    results = [];
     for (i = j = 0, ref = amount; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-      results.push(this.objs.hand.push(this.objs.deck.pull()));
+      this.objs.hand.push(this.objs.deck.pull());
     }
-    return results;
+    return this.objs.hand.redraw();
+  };
+
+  Game.pullConsumer = function(amount) {
+    var i, j, ref;
+    if (amount == null) {
+      amount = 1;
+    }
+    for (i = j = 0, ref = amount; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
+      this.objs.hand.push(this.objs.consumer.pull());
+    }
+    return this.objs.hand.redraw();
+  };
+
+  Game.pullPublic = function(amount) {
+    var i, j, ref;
+    if (amount == null) {
+      amount = 1;
+    }
+    for (i = j = 0, ref = amount; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
+      this.objs["public"].push(this.objs.round.pull());
+    }
+    return this.objs["public"].redraw();
   };
 
   return Game;
@@ -95,10 +116,56 @@ PublicSpace = (function(superClass) {
 
   PublicSpace.init = function() {
     PublicSpace.__super__.constructor.init.call(this);
-    return this.cards = {};
+    return this.cards = [];
   };
 
-  PublicSpace.insert = function(cardObj) {};
+  PublicSpace.push = function(cardNum) {
+    return this.cards.push(cardNum);
+  };
+
+  PublicSpace.redraw = function() {
+    var index, j, me, ref, results;
+    me = this.getElement();
+    me.html('');
+    results = [];
+    for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
+      results.push(me.append(this.createElement(index)));
+    }
+    return results;
+  };
+
+  PublicSpace.createElement = function(index) {
+    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costBalloon, costStr, desc, e, header, img, name, point, pointBalloon, pointSpan, pointStr, price, priceBalloon;
+    if (this.cards[index] == null) {
+      return false;
+    }
+    cardClass = Card.getClass(this.cards[index]);
+    name = cardClass.getName();
+    cat = cardClass.getCategory();
+    price = cardClass.getPrice();
+    cost = cardClass.getCost();
+    point = cardClass.getPoint();
+    desc = cardClass.getDescription();
+    e = $('<div>').addClass('public');
+    costStr = cardClass.isPublicOnly() ? '' : '[' + cost + ']';
+    header = $('<span>').addClass('public_header').html(costStr + cardClass.getName());
+    img = cardClass.getImageObj().addClass('public_image');
+    catStr = cat != null ? '[' + cat + ']' : '';
+    categorySpan = $('<span>').addClass('public_footer public_category').html(catStr);
+    pointStr = cardClass.isPublicOnly() ? '' : '[$' + point + ']';
+    pointSpan = $('<span>').addClass('public_footer public_point').html(pointStr);
+    costBalloon = cardClass.isPublicOnly() ? '-' : cost;
+    priceBalloon = cardClass.isPublicOnly() ? '-' : price;
+    pointBalloon = cardClass.isPublicOnly() ? '-' : point;
+    catBalloon = cat != null ? cat : 'なし';
+    balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + costBalloon + "\n売却価格：" + pointBalloon + "\n得点：" + point).replace(/\n/g, '<br>');
+    e.attr('data-tooltip', balloonStr).darkTooltip();
+    e.append(header);
+    e.append(img);
+    e.append(categorySpan);
+    e.append(pointSpan);
+    return e;
+  };
 
   return PublicSpace;
 
@@ -170,9 +237,7 @@ HandSpace = (function(superClass) {
   };
 
   HandSpace.push = function(cardNum) {
-    this.cards.push(cardNum);
-    this.sort();
-    return this.redraw();
+    return this.cards.push(cardNum);
   };
 
   HandSpace.redraw = function() {
@@ -187,7 +252,7 @@ HandSpace = (function(superClass) {
   };
 
   HandSpace.createElement = function(index) {
-    var balloonStr, cardClass, cat, catBalloon, catStr, cost, desc, e, footer, header, img, name, point, price;
+    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, desc, e, header, img, name, point, pointSpan, price;
     if (this.cards[index] == null) {
       return false;
     }
@@ -202,13 +267,15 @@ HandSpace = (function(superClass) {
     header = $('<span>').addClass('hand_header').html('[' + cost + ']' + cardClass.getName());
     img = cardClass.getImageObj().addClass('hand_image');
     catStr = cat != null ? '[' + cat + ']' : '';
-    footer = $('<span>').addClass('hand_footer').html(catStr + '[$' + point + ']');
+    categorySpan = $('<span>').addClass('hand_footer hand_category').html(catStr);
+    pointSpan = $('<span>').addClass('hand_footer hand_point').html('[$' + point + ']');
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
     e.attr('data-tooltip', balloonStr).darkTooltip();
     e.append(header);
     e.append(img);
-    e.append(footer);
+    e.append(categorySpan);
+    e.append(pointSpan);
     return e;
   };
 
@@ -222,7 +289,7 @@ RoundDeck = (function() {
   RoundDeck.deck = [];
 
   RoundDeck.init = function() {
-    return this.deck = [5, 6, 7, 8, 9, 10, 11, 12];
+    return this.deck = [2, 3, 4, 13, 5, 6, 7, 8, 9, 10, 11, 12];
   };
 
   RoundDeck.pull = function() {
@@ -264,6 +331,10 @@ Deck = (function() {
     return this.deck.pop();
   };
 
+  Deck.place = function(cardNum) {
+    return this.deck.unshift(cardNum);
+  };
+
   Deck.trash = function(cardNum) {
     return this.grave.push(cardNum);
   };
@@ -293,11 +364,11 @@ Deck = (function() {
   Deck.getCardDefine = function() {
     var res;
     res = {
-      13: 8,
+      13: 7,
       14: 4,
       15: 2,
       16: 2,
-      17: 8,
+      17: 7,
       18: 4,
       19: 3,
       20: 3,

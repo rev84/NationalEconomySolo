@@ -20,12 +20,28 @@ class window.Game
 
   @gameStart:->
     @init()
-    # 3枚配る
-    @pull2hand() for i in [0...3]
+    # 3枚デッキから引く
+    @pullDeck() for i in [0...3]
+    # デッキの一番上に工場を乗せる
+    @objs.deck.place 17
+    # 4枚公共に置く
+    @pullPublic 4
 
   # カードをデッキから手札に移動
-  @pull2hand:(amount = 1)->
+  @pullDeck:(amount = 1)->
     @objs.hand.push @objs.deck.pull() for i in [0...amount]
+    @objs.hand.redraw()
+
+  # 消費財を引く
+  @pullConsumer:(amount = 1)->
+    @objs.hand.push @objs.consumer.pull() for i in [0...amount]
+    @objs.hand.redraw()
+
+  # 公共デッキから公共に移動
+  @pullPublic:(amount = 1)->
+    @objs.public.push @objs.round.pull() for i in [0...amount]
+    @objs.public.redraw()
+
 
 class SpaceBase
   @DIV_ID = null
@@ -44,8 +60,81 @@ class PublicSpace extends SpaceBase
 
   @init:->
     super()
-    @cards = {}
-  @insert:(cardObj)->
+    @cards = []
+
+  # 建物を配置する
+  @push:(cardNum)->
+    @cards.push cardNum
+
+  # 描画
+  @redraw:->
+    me = @getElement()
+
+    me.html('')
+    for index in [0...@cards.length]
+      me.append @createElement index
+
+  # 要素作成
+  @createElement:(index)->
+    # ハンドになければ脱出
+    return false unless @cards[index]?
+
+    # カードのクラス
+    cardClass = Card.getClass @cards[index]
+    # カード名
+    name = cardClass.getName()
+    # カテゴリ
+    cat = cardClass.getCategory()
+    # コスト
+    price = cardClass.getPrice()
+    # コスト
+    cost = cardClass.getCost()
+    # 得点
+    point = cardClass.getPoint()
+    # 説明文
+    desc = cardClass.getDescription()
+
+    # カードの外側
+    e = $('<div>').addClass('public')
+
+    # ヘッダ
+    # [コスト]カード名
+    costStr = if cardClass.isPublicOnly() then '' else '['+cost+']'
+    header = $('<span>').addClass('public_header').html(costStr+cardClass.getName())
+
+    # 画像
+    img = cardClass.getImageObj().addClass('public_image')
+
+    # フッタ
+    # カテゴリ
+    catStr = if cat? then '['+cat+']' else ''
+    categorySpan = $('<span>').addClass('public_footer public_category').html(catStr)
+    # 得点
+    pointStr = if cardClass.isPublicOnly() then '' else '[$'+point+']'
+    pointSpan = $('<span>').addClass('public_footer public_point').html(pointStr)
+
+    # 説明の吹き出し
+    costBalloon = if cardClass.isPublicOnly() then '-' else cost
+    priceBalloon = if cardClass.isPublicOnly() then '-' else price
+    pointBalloon = if cardClass.isPublicOnly() then '-' else point
+    catBalloon = if cat? then cat else 'なし'
+    balloonStr = """
+    #{desc}
+    --------------------
+    カテゴリ：#{catBalloon}
+    コスト：#{costBalloon}
+    売却価格：#{pointBalloon}
+    得点：#{point}
+    """.replace /\n/g, '<br>'
+    e.attr('data-tooltip', balloonStr).darkTooltip()
+
+    e.append header
+    e.append img
+    e.append categorySpan
+    e.append pointSpan
+    e
+
+
 
 class PrivateSpace extends SpaceBase
   @DIV_ID = "private"
@@ -81,8 +170,6 @@ class HandSpace extends SpaceBase
   # 手札を増やす
   @push:(cardNum)->
     @cards.push cardNum
-    @sort()
-    @redraw()
 
   # 描画
   @redraw:->
@@ -123,9 +210,11 @@ class HandSpace extends SpaceBase
     img = cardClass.getImageObj().addClass('hand_image')
 
     # フッタ
-    # [カテゴリ][得点]
+    # カテゴリ
     catStr = if cat? then '['+cat+']' else ''
-    footer = $('<span>').addClass('hand_footer').html(catStr+'[$'+point+']')
+    categorySpan = $('<span>').addClass('hand_footer hand_category').html(catStr)
+    # 得点
+    pointSpan = $('<span>').addClass('hand_footer hand_point').html('[$'+point+']')
 
     # 説明の吹き出し
     catBalloon = if cat? then cat else 'なし'
@@ -141,7 +230,8 @@ class HandSpace extends SpaceBase
 
     e.append header
     e.append img
-    e.append footer
+    e.append categorySpan
+    e.append pointSpan
     e
 
 class RoundDeck
@@ -149,6 +239,10 @@ class RoundDeck
 
   @init:->
     @deck = [
+      2
+      3
+      4
+      13
       5
       6
       7
@@ -184,6 +278,10 @@ class Deck
     @recycle() if @deck.length is 0
     @deck.pop()
 
+  # カードを乗せる
+  @place:(cardNum)->
+    @deck.unshift(cardNum)
+
   # カードを捨てる
   @trash:(cardNum)->
     @grave.push cardNum
@@ -206,11 +304,11 @@ class Deck
   # カードの枚数定義
   @getCardDefine:->
     res =
-      13 : 8
+      13 : 7  # 農場は1枚抜く
       14 : 4
       15 : 2
       16 : 2
-      17 : 8
+      17 : 7  # 工場は1枚抜く
       18 : 4
       19 : 3
       20 : 3
