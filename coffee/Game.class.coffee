@@ -22,7 +22,6 @@ class window.Game
   @pull2hand:(amount = 1)->
     @objs.hand.push @objs.deck.pull() for i in [0...amount]
 
-
 class SpaceBase
   @DIV_ID = null
   @init:->
@@ -78,13 +77,34 @@ class HandSpace extends SpaceBase
   @push:(cardNum)->
     @cards.push cardNum
     @sort()
+    @redraw()
 
   # 描画
-  @draw:->
+  @redraw:->
+    me = @getElement()
+
+    me.html('')
+    for index in [0...@cards.length]
+      me.append @createElement index
 
   # 要素作成
   @createElement:(index)->
-    e = $('<div>')
+    # ハンドになければ脱出
+    return false unless @cards[index]?
+
+    # カードのクラス
+    cardClass = Card.getClass @cards[index]
+
+    # カードの外側
+    e = $('<div>').addClass('hand')
+    # タイトル
+    title = $('<span>').addClass('hand_title').html(cardClass.getName())
+    # 画像
+    img = cardClass.getImageObj().addClass('hand_image')
+
+    e.append img
+    e.append title
+    e
 
 class RoundDeck
   @deck : []

@@ -161,14 +161,33 @@ HandSpace = (function(superClass) {
 
   HandSpace.push = function(cardNum) {
     this.cards.push(cardNum);
-    return this.sort();
+    this.sort();
+    return this.redraw();
   };
 
-  HandSpace.draw = function() {};
+  HandSpace.redraw = function() {
+    var index, j, me, ref, results;
+    me = this.getElement();
+    me.html('');
+    results = [];
+    for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
+      results.push(me.append(this.createElement(index)));
+    }
+    return results;
+  };
 
   HandSpace.createElement = function(index) {
-    var e;
-    return e = $('<div>');
+    var cardClass, e, img, title;
+    if (this.cards[index] == null) {
+      return false;
+    }
+    cardClass = Card.getClass(this.cards[index]);
+    e = $('<div>').addClass('hand');
+    title = $('<span>').addClass('hand_title').html(cardClass.getName());
+    img = cardClass.getImageObj().addClass('hand_image');
+    e.append(img);
+    e.append(title);
+    return e;
   };
 
   return HandSpace;

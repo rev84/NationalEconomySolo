@@ -13,7 +13,7 @@ Card = (function() {
     } catch (_error) {
       return false;
     }
-    if (res != null) {
+    if (res == null) {
       return false;
     }
     return res;
@@ -32,6 +32,39 @@ CardBase = (function() {
 
   CardBase.DESCRIPTION = null;
 
+  CardBase.COST = 0;
+
+  CardBase.PRICE = 0;
+
+  CardBase.getName = function() {
+    return this.NAME;
+  };
+
+  CardBase.getNumber = function() {
+    var res;
+    res = this.name.match(/^Card(\d+)$/);
+    if (res != null) {
+      return Number(res[1]);
+    }
+    return false;
+  };
+
+  CardBase.getPrice = function() {
+    return this.PRICE;
+  };
+
+  CardBase.getPoint = function() {
+    return this.PRICE * 2;
+  };
+
+  CardBase.getImagePath = function() {
+    return './img/card/' + this.getNumber() + '.jpg';
+  };
+
+  CardBase.getImageObj = function() {
+    return $('<img>').attr('src', this.getImagePath());
+  };
+
   return CardBase;
 
 })();
@@ -44,6 +77,10 @@ Card2 = (function(superClass) {
   }
 
   Card2.NAME = "鉱山";
+
+  Card2.CATEGORY = "公共";
+
+  Card2.DESCRIPTION = "カードを1枚引く";
 
   return Card2;
 
@@ -58,6 +95,10 @@ Card3 = (function(superClass) {
 
   Card3.NAME = "学校";
 
+  Card3.CATEGORY = "公共";
+
+  Card3.DESCRIPTION = "労働者を1人増やす";
+
   return Card3;
 
 })(CardBase);
@@ -70,6 +111,10 @@ Card4 = (function(superClass) {
   }
 
   Card4.NAME = "大工";
+
+  Card4.CATEGORY = "公共";
+
+  Card4.DESCRIPTION = "建物を1つ作る";
 
   return Card4;
 
@@ -84,6 +129,10 @@ Card5 = (function(superClass) {
 
   Card5.NAME = "露店";
 
+  Card5.CATEGORY = "公共";
+
+  Card5.DESCRIPTION = "手札を1枚捨てる\n家計から$6を得る";
+
   return Card5;
 
 })(CardBase);
@@ -96,6 +145,10 @@ Card6 = (function(superClass) {
   }
 
   Card6.NAME = "市場";
+
+  Card6.CATEGORY = "公共";
+
+  Card6.DESCRIPTION = "手札を2枚捨てる\n家計から$12を得る";
 
   return Card6;
 
@@ -110,6 +163,10 @@ Card7 = (function(superClass) {
 
   Card7.NAME = "高等学校";
 
+  Card7.CATEGORY = "公共";
+
+  Card7.DESCRIPTION = "労働者を4人に増やす";
+
   return Card7;
 
 })(CardBase);
@@ -122,6 +179,10 @@ Card8 = (function(superClass) {
   }
 
   Card8.NAME = "スーパーマーケット";
+
+  Card8.CATEGORY = "公共";
+
+  Card8.DESCRIPTION = "手札を3枚捨てて家計から$18を得る";
 
   return Card8;
 
@@ -136,6 +197,10 @@ Card9 = (function(superClass) {
 
   Card9.NAME = "大学";
 
+  Card9.CATEGORY = "公共";
+
+  Card9.DESCRIPTION = "労働者を5人に増やす";
+
   return Card9;
 
 })(CardBase);
@@ -148,6 +213,10 @@ Card10 = (function(superClass) {
   }
 
   Card10.NAME = "百貨店";
+
+  Card10.CATEGORY = "公共";
+
+  Card10.DESCRIPTION = "手札を4枚捨てて家計から$24を得る";
 
   return Card10;
 
@@ -162,6 +231,10 @@ Card11 = (function(superClass) {
 
   Card11.NAME = "専門学校";
 
+  Card11.CATEGORY = "公共";
+
+  Card11.DESCRIPTION = "労働者を1人増やす\nこのラウンドからすぐ働ける";
+
   return Card11;
 
 })(CardBase);
@@ -174,6 +247,10 @@ Card12 = (function(superClass) {
   }
 
   Card12.NAME = "万博";
+
+  Card12.CATEGORY = "公共";
+
+  Card12.DESCRIPTION = "手札を5枚捨てて家計から$30を得る";
 
   return Card12;
 
@@ -188,6 +265,14 @@ Card13 = (function(superClass) {
 
   Card13.NAME = "農場";
 
+  Card13.CATEGORY = "農業";
+
+  Card13.DESCRIPTION = "消費財を2枚引く";
+
+  Card13.COST = 1;
+
+  Card13.PRICE = 3;
+
   return Card13;
 
 })(CardBase);
@@ -200,6 +285,12 @@ Card14 = (function(superClass) {
   }
 
   Card14.NAME = "設計事務所";
+
+  Card14.DESCRIPTION = "カードを5枚めくり公開する\nうち1枚を引いて残りを捨てる";
+
+  Card14.COST = 1;
+
+  Card14.PRICE = 4;
 
   return Card14;
 
@@ -214,6 +305,14 @@ Card15 = (function(superClass) {
 
   Card15.NAME = "焼畑";
 
+  Card15.CATEGORY = "農業";
+
+  Card15.DESCRIPTION = "消費財を5枚引く\n焼畑は消滅する";
+
+  Card15.COST = 1;
+
+  Card15.PRICE = 0;
+
   return Card15;
 
 })(CardBase);
@@ -226,6 +325,12 @@ Card16 = (function(superClass) {
   }
 
   Card16.NAME = "珈琲店";
+
+  Card16.DESCRIPTION = "家計から$5を得る";
+
+  Card16.COST = 1;
+
+  Card16.PRICE = 4;
 
   return Card16;
 
@@ -240,6 +345,14 @@ Card17 = (function(superClass) {
 
   Card17.NAME = "工場";
 
+  Card17.CATEGORY = "工業";
+
+  Card17.DESCRIPTION = "手札を2枚捨てる\nカードを4枚引く";
+
+  Card17.COST = 2;
+
+  Card17.PRICE = 6;
+
   return Card17;
 
 })(CardBase);
@@ -252,6 +365,12 @@ Card18 = (function(superClass) {
   }
 
   Card18.NAME = "建設会社";
+
+  Card18.DESCRIPTION = "建物を1つコスト-1で作る\n";
+
+  Card18.COST = 2;
+
+  Card18.PRICE = 5;
 
   return Card18;
 
@@ -266,6 +385,14 @@ Card19 = (function(superClass) {
 
   Card19.NAME = "果樹園";
 
+  Card19.CATEGORY = "農業";
+
+  Card19.DESCRIPTION = "手札を2枚捨てる\nカードを4枚引く";
+
+  Card19.COST = 2;
+
+  Card19.PRICE = 5;
+
   return Card19;
 
 })(CardBase);
@@ -278,6 +405,14 @@ Card20 = (function(superClass) {
   }
 
   Card20.NAME = "倉庫";
+
+  Card20.CATEGORY = "非職場";
+
+  Card20.DESCRIPTION = "手札上限+4\n（所有しているだけで効果がある）\n売却不可";
+
+  Card20.COST = 2;
+
+  Card20.PRICE = 5;
 
   return Card20;
 
@@ -292,6 +427,14 @@ Card21 = (function(superClass) {
 
   Card21.NAME = "社宅";
 
+  Card21.CATEGORY = "非職場";
+
+  Card21.DESCRIPTION = "労働者上限+1\n（所有しているだけで効果がある）\n売却不可";
+
+  Card21.COST = 2;
+
+  Card21.PRICE = 4;
+
   return Card21;
 
 })(CardBase);
@@ -304,6 +447,14 @@ Card22 = (function(superClass) {
   }
 
   Card22.NAME = "法律事務所";
+
+  Card22.CATEGORY = "非職場";
+
+  Card22.DESCRIPTION = "終了時：負債から5枚まで免除する";
+
+  Card22.COST = 2;
+
+  Card22.PRICE = 4;
 
   return Card22;
 
@@ -318,6 +469,14 @@ Card23 = (function(superClass) {
 
   Card23.NAME = "大農園";
 
+  Card23.CATEGORY = "農業";
+
+  Card23.DESCRIPTION = "消費財を3枚引く";
+
+  Card23.COST = 3;
+
+  Card23.PRICE = 6;
+
   return Card23;
 
 })(CardBase);
@@ -330,6 +489,12 @@ Card24 = (function(superClass) {
   }
 
   Card24.NAME = "レストラン";
+
+  Card24.DESCRIPTION = "手札を1枚捨てる\n家計から$15を得る";
+
+  Card24.COST = 3;
+
+  Card24.PRICE = 8;
 
   return Card24;
 
@@ -344,6 +509,12 @@ Card25 = (function(superClass) {
 
   Card25.NAME = "開拓民";
 
+  Card25.DESCRIPTION = "手札の農業カテゴリの建物を1つコスト0で作る";
+
+  Card25.COST = 3;
+
+  Card25.PRICE = 7;
+
   return Card25;
 
 })(CardBase);
@@ -356,6 +527,14 @@ Card26 = (function(superClass) {
   }
 
   Card26.NAME = "不動産屋";
+
+  Card26.CATEGORY = "非職場";
+
+  Card26.DESCRIPTION = "終了時：所有する建物1つにつき+3点\n（この建物を含む）\n売却不可";
+
+  Card26.COST = 3;
+
+  Card26.PRICE = 5;
 
   return Card26;
 
@@ -370,6 +549,14 @@ Card27 = (function(superClass) {
 
   Card27.NAME = "農協";
 
+  Card27.CATEGORY = "非職場";
+
+  Card27.DESCRIPTION = "終了時：手札の消費財1枚につき+3点\n売却不可";
+
+  Card27.COST = 3;
+
+  Card27.PRICE = 6;
+
   return Card27;
 
 })(CardBase);
@@ -382,6 +569,14 @@ Card28 = (function(superClass) {
   }
 
   Card28.NAME = "製鉄所";
+
+  Card28.CATEGORY = "工業";
+
+  Card28.DESCRIPTION = "カードを3枚引く";
+
+  Card28.COST = 4;
+
+  Card28.PRICE = 10;
 
   return Card28;
 
@@ -396,6 +591,12 @@ Card29 = (function(superClass) {
 
   Card29.NAME = "ゼネコン";
 
+  Card29.DESCRIPTION = "建物を1つ作る\nカードを2枚引く";
+
+  Card29.COST = 4;
+
+  Card29.PRICE = 9;
+
   return Card29;
 
 })(CardBase);
@@ -408,6 +609,14 @@ Card30 = (function(superClass) {
   }
 
   Card30.NAME = "化学工場";
+
+  Card30.CATEGORY = "工業";
+
+  Card30.DESCRIPTION = "カードを2枚引く\n手札がなければ4枚引く";
+
+  Card30.COST = 4;
+
+  Card30.PRICE = 9;
 
   return Card30;
 
@@ -422,6 +631,14 @@ Card31 = (function(superClass) {
 
   Card31.NAME = "労働組合";
 
+  Card31.CATEGORY = "非職場";
+
+  Card31.DESCRIPTION = "終了時：労働者1人につき+6点\n売却不可";
+
+  Card31.COST = 4;
+
+  Card31.PRICE = 0;
+
   return Card31;
 
 })(CardBase);
@@ -434,6 +651,14 @@ Card32 = (function(superClass) {
   }
 
   Card32.NAME = "邸宅";
+
+  Card32.CATEGORY = "非職場";
+
+  Card32.DESCRIPTION = "売却不可";
+
+  Card32.COST = 4;
+
+  Card32.PRICE = 14;
 
   return Card32;
 
@@ -448,6 +673,14 @@ Card33 = (function(superClass) {
 
   Card33.NAME = "自動車工場";
 
+  Card33.CATEGORY = "工業";
+
+  Card33.DESCRIPTION = "手札を3枚捨てる\nカードを7枚引く";
+
+  Card33.COST = 5;
+
+  Card33.PRICE = 12;
+
   return Card33;
 
 })(CardBase);
@@ -459,7 +692,13 @@ Card34 = (function(superClass) {
     return Card34.__super__.constructor.apply(this, arguments);
   }
 
-  Card34.NAME = "邸宅";
+  Card34.NAME = "二胡市建設";
+
+  Card34.DESCRIPTION = "同じコストの建物を2つ作る\n1つ分のコストだけ支払う";
+
+  Card34.COST = 5;
+
+  Card34.PRICE = 10;
 
   return Card34;
 
@@ -474,6 +713,14 @@ Card35 = (function(superClass) {
 
   Card35.NAME = "鉄道";
 
+  Card35.CATEGORY = "非職場";
+
+  Card35.DESCRIPTION = "終了時：所有する鉱業カテゴリの建物1つにつき+3点\n売却不可";
+
+  Card35.COST = 5;
+
+  Card35.PRICE = 9;
+
   return Card35;
 
 })(CardBase);
@@ -487,6 +734,14 @@ Card36 = (function(superClass) {
 
   Card36.NAME = "本社ビル";
 
+  Card36.CATEGORY = "非職場";
+
+  Card36.DESCRIPTION = "終了時：所有する非職場カテゴリの建物1つにつき+3点\n売却不可";
+
+  Card36.COST = 5;
+
+  Card36.PRICE = 10;
+
   return Card36;
 
 })(CardBase);
@@ -499,6 +754,10 @@ Card99 = (function(superClass) {
   }
 
   Card99.NAME = "消費財";
+
+  Card99.CATEGORY = "消費財";
+
+  Card99.DESCRIPTION = "手札やコストとして捨てられる";
 
   return Card99;
 
