@@ -4,7 +4,7 @@ class window.Game
   @isClickable : false
   # カードの選択待ち
   # false : 待ちではない
-  # [kubun, index, isRightClick] : 区分、インデックス番号、右クリック有効
+  # [kubun, index, isRightClick, isLeftClick2] : 区分、インデックス番号、右クリック有効、左クリックの2段階の順序有効
   @waitChoice : false
   # 手札捨て期間
   @isHandTrash : false
@@ -184,14 +184,16 @@ class window.Game
   @pushOK:->
     return false if @waitChoice is false
     # 選択状態解除
-    [kubun, cardIndex, _] = @waitChoice
+    [kubun, cardIndex, _, _] = @waitChoice
     @waitChoice = false
     # ハンドのリストを作成
     left = []
     right = []
-    for index in [0...@objs.hand.getAmount()]
-      left.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_LEFT
-      right.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_RIGHT
+    left2 = []
+    for index in [0...HandSpace.getAmount()]
+      left.push index if HandSpace.getSelect(index) is HandSpace.SELECT_LEFT
+      right.push index if HandSpace.getSelect(index) is HandSpace.SELECT_RIGHT
+      left2.push index if HandSpace.getSelect(index) is HandSpace.SELECT_LEFT2
 
     # 解除処理
     HandSpace.selectReset()
@@ -203,7 +205,7 @@ class window.Game
     cardClass = spaceClass.getCardClass cardIndex
     LogSpace.removeAll()
 
-    res = cardClass.use(left, right)
+    res = cardClass.use(left, right, left2, kubun, cardIndex)
     # 使えた
     if res is true
       @turnEnd(kubun, cardIndex)
@@ -247,7 +249,7 @@ class window.Game
     [leftReqNum, rightReqNum] = cardClass.requireCards()
     # ない
     if leftReqNum is 0 and rightReqNum is 0
-      res = cardClass.use([], [], kubun, index)
+      res = cardClass.use([], [], [], kubun, index)
       # 正常終了しなかった
       if res isnt true
         alert res

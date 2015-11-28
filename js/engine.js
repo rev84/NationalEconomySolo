@@ -120,29 +120,38 @@ CardBase = (function() {
   CardBase.PRICE = 0;
 
   CardBase.isRightClick = function() {
-    var l, r, ref;
-    ref = this.requireCards(), l = ref[0], r = ref[1];
+    var l, l2, r, ref;
+    ref = this.requireCards(), l = ref[0], r = ref[1], l2 = ref[2];
     return r > 0;
   };
 
+  CardBase.isLeftClick2 = function() {
+    var l, l2, r, ref;
+    ref = this.requireCards(), l = ref[0], r = ref[1], l2 = ref[2];
+    return l2 > 0;
+  };
+
   CardBase.requireCards = function() {
-    return [0, 0];
+    return [0, 0, 0];
   };
 
   CardBase.getSelectMessage = function() {
     return false;
   };
 
-  CardBase.use = function(leftIndexs, rightIndexs) {
-    var leftReqNum, ref, rightReqNum;
+  CardBase.use = function(leftIndexs, rightIndexs, leftIndex2) {
+    var leftReqNum, leftReqNum2, ref, rightReqNum;
     if (leftIndexs == null) {
       leftIndexs = [];
     }
     if (rightIndexs == null) {
       rightIndexs = [];
     }
-    ref = this.requireCards, leftReqNum = ref[0], rightReqNum = ref[1];
-    if (!(leftIndexs.length === leftReqNum && rightReqNum.length === rightReqNum)) {
+    if (leftIndex2 == null) {
+      leftIndex2 = [];
+    }
+    ref = this.requireCards, leftReqNum = ref[0], rightReqNum = ref[1], leftReqNum2 = ref[2];
+    if (!(leftIndexs.length === leftReqNum && rightReqNum.length === rightReqNum && leftReqNum2.length === leftReqNum2)) {
       return false;
     }
     return true;
@@ -280,7 +289,7 @@ Card4 = (function(superClass) {
   Card4.DESCRIPTION = "建物を1つ作る";
 
   Card4.requireCards = function() {
-    return [1, 1];
+    return [1, 1, 0];
   };
 
   Card4.getSelectMessage = function() {
@@ -322,15 +331,15 @@ Card5 = (function(superClass) {
   Card5.DESCRIPTION = "手札を1枚捨てる\n家計から$6を得る";
 
   Card5.requireCards = function() {
-    return [1, 0];
+    return [1, 0, 0];
   };
 
   Card5.getSelectMessage = function() {
     return "選択してください\n左クリック：捨札1枚";
   };
 
-  Card5.use = function(leftIndexs, rightIndexs) {
-    if (Card5.__super__.constructor.use.call(this)) {
+  Card5.use = function(leftIndexs) {
+    if (Card5.__super__.constructor.use.apply(this, arguments)) {
       return "捨札1枚が選択されていません";
     }
     if (Stock.getAmount() < 6) {
@@ -360,7 +369,7 @@ Card6 = (function(superClass) {
   Card6.DESCRIPTION = "手札を2枚捨てる\n家計から$12を得る";
 
   Card6.requireCards = function() {
-    return [2, 0];
+    return [2, 0, 0];
   };
 
   Card6.getSelectMessage = function() {
@@ -368,7 +377,7 @@ Card6 = (function(superClass) {
   };
 
   Card6.use = function(leftIndexs) {
-    if (Card6.__super__.constructor.use.call(this)) {
+    if (Card6.__super__.constructor.use.apply(this, arguments)) {
       return "捨札2枚が選択されていません";
     }
     if (Stock.getAmount() < 12) {
@@ -423,15 +432,15 @@ Card8 = (function(superClass) {
   Card8.DESCRIPTION = "手札を3枚捨てて家計から$18を得る";
 
   Card8.requireCards = function() {
-    return [3, 0];
+    return [3, 0, 0];
   };
 
   Card8.getSelectMessage = function() {
     return "選択してください\n左クリック：捨札3枚";
   };
 
-  Card8.use = function(leftIndexs, rightIndexs) {
-    if (Card8.__super__.constructor.use.call(this)) {
+  Card8.use = function(leftIndexs) {
+    if (Card8.__super__.constructor.use.apply(this, arguments)) {
       return "捨札3枚が選択されていません";
     }
     if (Stock.getAmount() < 18) {
@@ -486,15 +495,15 @@ Card10 = (function(superClass) {
   Card10.DESCRIPTION = "手札を4枚捨てて家計から$24を得る";
 
   Card10.requireCards = function() {
-    return [4, 0];
+    return [4, 0, 0];
   };
 
   Card10.getSelectMessage = function() {
     return "選択してください\n左クリック：捨札にするカード4枚";
   };
 
-  Card10.use = function(leftIndexs, rightIndexs) {
-    if (Card10.__super__.constructor.use.call(this)) {
+  Card10.use = function(leftIndexs) {
+    if (Card10.__super__.constructor.use.apply(this, arguments)) {
       return "捨札4枚が選択されていません";
     }
     if (Stock.getAmount() < 24) {
@@ -549,15 +558,15 @@ Card12 = (function(superClass) {
   Card12.DESCRIPTION = "手札を5枚捨てて家計から$30を得る";
 
   Card12.requireCards = function() {
-    return [5, 0];
+    return [5, 0, 0];
   };
 
   Card12.getSelectMessage = function() {
     return "選択してください\n左クリック：捨札5枚";
   };
 
-  Card12.use = function(leftIndexs, rightIndexs) {
-    if (Card12.__super__.constructor.use.call(this)) {
+  Card12.use = function(leftIndexs) {
+    if (Card12.__super__.constructor.use.apply(this, arguments)) {
       return "捨札5枚が選択されていません";
     }
     if (Stock.getAmount() < 30) {
@@ -635,7 +644,7 @@ Card15 = (function(superClass) {
 
   Card15.PRICE = 0;
 
-  Card15.use = function(leftIndexs, rightIndexs, kubun, index) {
+  Card15.use = function(leftIndexs, rightIndexs, left2Index, kubun, index) {
     var space;
     Game.pullConsumer(5);
     Game.flagYakihata = true;
@@ -694,7 +703,7 @@ Card17 = (function(superClass) {
   Card17.PRICE = 6;
 
   Card17.requireCards = function() {
-    return [2, 0];
+    return [2, 0, 0];
   };
 
   Card17.getSelectMessage = function() {
@@ -702,7 +711,7 @@ Card17 = (function(superClass) {
   };
 
   Card17.use = function(leftIndexs) {
-    if (Card17.__super__.constructor.use.call(this)) {
+    if (Card17.__super__.constructor.use.apply(this, arguments)) {
       return "捨札2枚が選択されていません";
     }
     Hand.trash(leftIndexs);
@@ -730,7 +739,7 @@ Card18 = (function(superClass) {
   Card18.PRICE = 5;
 
   Card18.requireCards = function() {
-    return [1, 1];
+    return [1, 1, 0];
   };
 
   Card18.getSelectMessage = function() {
@@ -891,7 +900,7 @@ Card24 = (function(superClass) {
   Card24.PRICE = 8;
 
   Card24.requireCards = function() {
-    return [1, 0];
+    return [1, 0, 0];
   };
 
   Card24.getSelectMessage = function() {
@@ -899,7 +908,7 @@ Card24 = (function(superClass) {
   };
 
   Card24.use = function(leftIndexs) {
-    if (Card24.__super__.constructor.use.call(this)) {
+    if (Card24.__super__.constructor.use.apply(this, arguments)) {
       return "捨札1枚が選択されていません";
     }
     if (Stock.getAmount() < 15) {
@@ -931,7 +940,7 @@ Card25 = (function(superClass) {
   Card25.PRICE = 7;
 
   Card25.requireCards = function() {
-    return [1, 1];
+    return [1, 1, 0];
   };
 
   Card25.getSelectMessage = function() {
@@ -1042,7 +1051,7 @@ Card29 = (function(superClass) {
   Card29.PRICE = 9;
 
   Card29.requireCards = function() {
-    return [1, 1];
+    return [1, 1, 0];
   };
 
   Card29.getSelectMessage = function() {
@@ -1089,7 +1098,7 @@ Card30 = (function(superClass) {
   Card30.PRICE = 9;
 
   Card30.use = function() {
-    if (HandSpace.getAmount === 0) {
+    if (HandSpace.getAmount() === 0) {
       Game.pullDeck(4);
       Game.pullDeck(2);
     }
@@ -1159,6 +1168,23 @@ Card33 = (function(superClass) {
 
   Card33.PRICE = 12;
 
+  Card33.requireCards = function() {
+    return [3, 0, 0];
+  };
+
+  Card33.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨札3枚";
+  };
+
+  Card33.use = function(leftIndexs) {
+    if (Card33.__super__.constructor.use.apply(this, arguments)) {
+      return "捨札3枚が選択されていません";
+    }
+    Hand.trash(leftIndexs);
+    Game.pullDeck(7);
+    return true;
+  };
+
   return Card33;
 
 })(CardBase);
@@ -1183,17 +1209,20 @@ Card34 = (function(superClass) {
   };
 
   Card34.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物カード2枚\n右クリック：捨札（建物コストの枚数）";
+    return "選択してください\n左クリック：建物カード2枚（順序あり）\n右クリック：捨札（建物コストの枚数）";
   };
 
-  Card34.use = function(leftIndexs, rightIndexs) {
-    var buildCardIndex, buildCardNum, cardClass, cost;
+  Card34.use = function(leftIndexs, rightIndexs, leftIndexs2) {
+    var buildCardIndex1, buildCardNum1, cardClass, cost;
     if (leftIndexs.length !== 1) {
-      return "建物カードを1枚選択しなければなりません";
+      return "先に建てる建物を1枚選択しなければなりません";
     }
-    buildCardIndex = leftIndexs[0];
-    buildCardNum = HandSpace.getCardNum(buildCardIndex);
-    cardClass = HandSpace.getCardClass(buildCardIndex);
+    if (leftIndexs2.length !== 1) {
+      return "後に建てる建物を1枚選択しなければなりません";
+    }
+    buildCardIndex1 = leftIndexs[0];
+    buildCardNum1 = HandSpace.getCardNum(buildCardIndex1);
+    cardClass = HandSpace.getCardClass(buildCardIndex1);
     cost = cardClass.getCost();
     if (cost !== rightIndexs.length) {
       return "捨札が建設コストと一致していません";
@@ -1555,20 +1584,24 @@ window.Game = (function() {
   };
 
   Game.pushOK = function() {
-    var _, cardClass, cardIndex, index, j, kubun, left, ref, ref1, res, right, spaceClass;
+    var _, cardClass, cardIndex, index, j, kubun, left, left2, ref, ref1, res, right, spaceClass;
     if (this.waitChoice === false) {
       return false;
     }
-    ref = this.waitChoice, kubun = ref[0], cardIndex = ref[1], _ = ref[2];
+    ref = this.waitChoice, kubun = ref[0], cardIndex = ref[1], _ = ref[2], _ = ref[3];
     this.waitChoice = false;
     left = [];
     right = [];
-    for (index = j = 0, ref1 = this.objs.hand.getAmount(); 0 <= ref1 ? j < ref1 : j > ref1; index = 0 <= ref1 ? ++j : --j) {
-      if (this.objs.hand.getSelect(index) === this.objs.hand.SELECT_LEFT) {
+    left2 = [];
+    for (index = j = 0, ref1 = HandSpace.getAmount(); 0 <= ref1 ? j < ref1 : j > ref1; index = 0 <= ref1 ? ++j : --j) {
+      if (HandSpace.getSelect(index) === HandSpace.SELECT_LEFT) {
         left.push(index);
       }
-      if (this.objs.hand.getSelect(index) === this.objs.hand.SELECT_RIGHT) {
+      if (HandSpace.getSelect(index) === HandSpace.SELECT_RIGHT) {
         right.push(index);
+      }
+      if (HandSpace.getSelect(index) === HandSpace.SELECT_LEFT2) {
+        left2.push(index);
       }
     }
     HandSpace.selectReset();
@@ -1577,7 +1610,7 @@ window.Game = (function() {
     spaceClass = this.kubun2class(kubun);
     cardClass = spaceClass.getCardClass(cardIndex);
     LogSpace.removeAll();
-    res = cardClass.use(left, right);
+    res = cardClass.use(left, right, left2, kubun, cardIndex);
     if (res === true) {
       this.turnEnd(kubun, cardIndex);
     } else {
@@ -1618,7 +1651,7 @@ window.Game = (function() {
     cardClass = spaceClass.getCardClass(index);
     ref = cardClass.requireCards(), leftReqNum = ref[0], rightReqNum = ref[1];
     if (leftReqNum === 0 && rightReqNum === 0) {
-      res = cardClass.use([], [], kubun, index);
+      res = cardClass.use([], [], [], kubun, index);
       if (res !== true) {
         alert(res);
         this.isClickable = true;
@@ -1728,6 +1761,8 @@ HandSpace = (function(superClass) {
 
   HandSpace.SELECT_RIGHT = 2;
 
+  HandSpace.SELECT_LEFT2 = 3;
+
   HandSpace.cards = [];
 
   HandSpace.select = [];
@@ -1742,11 +1777,22 @@ HandSpace = (function(superClass) {
     return this.select[index];
   };
 
-  HandSpace.clickLeft = function(index) {
-    if (this.select[index] === this.SELECT_LEFT) {
-      return this.select[index] = this.SELECT_NOT;
+  HandSpace.clickLeft = function(index, left2) {
+    if (left2 == null) {
+      left2 = false;
+    }
+    if (left2) {
+      if (this.select[index] === this.SELECT_LEFT) {
+        return this.select[index] = this.SELECT_LEFT2;
+      } else {
+        return this.select[index] = this.SELECT_LEFT;
+      }
     } else {
-      return this.select[index] = this.SELECT_LEFT;
+      if (this.select[index] === this.SELECT_LEFT) {
+        return this.select[index] = this.SELECT_NOT;
+      } else {
+        return this.select[index] = this.SELECT_LEFT;
+      }
     }
   };
 
@@ -1816,6 +1862,9 @@ HandSpace = (function(superClass) {
       if (this.select[index] === this.SELECT_LEFT) {
         e.addClass("select_left");
       }
+      if (this.select[index] === this.SELECT_LEFT2) {
+        e.addClass("select_left2");
+      }
       if (this.select[index] === this.SELECT_RIGHT) {
         results.push(e.addClass("select_right"));
       } else {
@@ -1826,7 +1875,7 @@ HandSpace = (function(superClass) {
   };
 
   HandSpace.createElement = function(index) {
-    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, desc, e, header, img, name, point, pointSpan, price;
+    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, desc, e, header, img, name, number, point, pointSpan, price;
     if (this.cards[index] == null) {
       return false;
     }
@@ -1843,6 +1892,7 @@ HandSpace = (function(superClass) {
     catStr = cat != null ? '[' + cat + ']' : '';
     categorySpan = $('<span>').addClass('hand_footer hand_category').html(catStr);
     pointSpan = $('<span>').addClass('hand_footer hand_point').html('[$' + point + ']');
+    number = $('<span>').html('２').addClass('order');
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
     e.attr('data-tooltip', balloonStr).darkTooltip({
@@ -1864,6 +1914,7 @@ HandSpace = (function(superClass) {
     e.append(img);
     e.append(categorySpan);
     e.append(pointSpan);
+    e.append(number);
     return e;
   };
 

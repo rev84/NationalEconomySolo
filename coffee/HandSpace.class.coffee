@@ -8,6 +8,7 @@ class HandSpace extends SpaceBase
   @SELECT_NOT   = 0
   @SELECT_LEFT  = 1
   @SELECT_RIGHT = 2
+  @SELECT_LEFT2 = 3
 
   @cards : []
   @select : []
@@ -21,11 +22,19 @@ class HandSpace extends SpaceBase
   @getSelect:(index)->
     @select[index]
   # 選択状態を変更
-  @clickLeft:(index)->
-    if @select[index] is @SELECT_LEFT
-      @select[index] = @SELECT_NOT
+  @clickLeft:(index, left2 = false)->
+    # 左クリックが2段階の時
+    if left2
+      if @select[index] is @SELECT_LEFT
+        @select[index] = @SELECT_LEFT2
+      else
+        @select[index] = @SELECT_LEFT
+    # 左クリックが1段階の時
     else
-      @select[index] = @SELECT_LEFT
+      if @select[index] is @SELECT_LEFT
+        @select[index] = @SELECT_NOT
+      else
+        @select[index] = @SELECT_LEFT
   @clickRight:(index)->
     if @select[index] is @SELECT_RIGHT
       @select[index] = @SELECT_NOT
@@ -77,6 +86,7 @@ class HandSpace extends SpaceBase
       e = @createElement index
       me.append e if e isnt false
       e.addClass "select_left"  if @select[index] is @SELECT_LEFT
+      e.addClass "select_left2" if @select[index] is @SELECT_LEFT2
       e.addClass "select_right" if @select[index] is @SELECT_RIGHT
 
   # 要素作成
@@ -116,6 +126,9 @@ class HandSpace extends SpaceBase
     # 得点
     pointSpan = $('<span>').addClass('hand_footer hand_point').html('[$'+point+']')
 
+    # 2段階目の選択であることを示す数字
+    number = $('<span>').html('２').addClass('order')
+
     # 説明の吹き出し
     catBalloon = if cat? then cat else 'なし'
     balloonStr = """
@@ -146,6 +159,7 @@ class HandSpace extends SpaceBase
     e.append img
     e.append categorySpan
     e.append pointSpan
+    e.append number
     e
 
 
