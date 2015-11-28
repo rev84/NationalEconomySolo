@@ -21,9 +21,13 @@ class PrivateSpace extends SpaceBase
   @resetStatus:->
     @status[index] = @STATUS_USABLE for index in [0...@cards.length]
 
+  # カード番号の取得
+  @getCardNum:(index)->
+    @cards[index]
+
   # カードクラスの取得
   @getCardClass:(index)->
-    return Card.getClass(@cards[index])
+    return Card.getClass @getCardNum index
 
   # 使用可能か
   @isUsable:(index)->
@@ -47,6 +51,21 @@ class PrivateSpace extends SpaceBase
   @push:(cardNum)->
     @cards.push Number cardNum
     @status.push @STATUS_USABLE
+
+  # 建物を削除する
+  # 返値は削除したカード番号
+  @pull:(cardIndex)->
+    newCards = []
+    deletedCardNum = null
+    for index in [0...@cards.length]
+      # 削除するカード
+      if index is cardIndex
+        deletedCardNum = @cards[index]
+      # その他
+      else
+        newCards.push @cards[index]
+    @cards = newCards
+    deletedCardNum
 
   # 描画
   @redraw:->
@@ -119,10 +138,17 @@ class PrivateSpace extends SpaceBase
       when @STATUS_TIMER
         e.append $('<img>').attr('src', @IMG_TIMER).addClass('worker')
 
-    # ダブルクリック時には使用する
+    # ダブルクリック時
     e.dblclick ->
-      index = Number $(this).attr('data-index')
-      Game.work 'private', index
+      # 通常時は労働者を派遣
+      if Game.isClickable
+        index = Number $(this).attr('data-index')
+        Game.work 'private', index
+      # 建物を売る
+      else if Game.isSell
+        index = Number $(this).attr('data-index')
+        Game.sellPrivate index
+
 
 
     e.append header

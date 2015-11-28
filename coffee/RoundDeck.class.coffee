@@ -19,8 +19,8 @@ class RoundDeck extends SpaceBase
   @init:->
     @deck = [
       2
-      3
       4
+      3
       13
       5
       6

@@ -128,7 +128,7 @@ class Card4 extends CardBase
     [1,1]
 
   @getSelectMessage:->
-    "選択してください\n左クリック：捨て札にするカード（建物のコスト分の枚数）\n右クリック：建物カードを1枚"
+    "選択してください\n左クリック：建物カードを1枚\n右クリック：捨て札にするカード（建物のコスト分の枚数）"
 
   @use:(leftIndexs, rightIndexs)->
     #return "指定カードが足りません" if super()
@@ -136,8 +136,9 @@ class Card4 extends CardBase
     # 右クリックの建物は1枚でなければならない
     return "建物カードを1枚選択しなければなりません" if leftIndexs.length isnt 1
 
-    buildCardNum = leftIndexs[0]
-    cardClass = Card.getClass buildCardNum
+    buildCardIndex = leftIndexs[0]
+    buildCardNum = Game.objs.hand.getCardNum buildCardIndex
+    cardClass    = Game.objs.hand.getCardClass buildCardIndex
     cost = cardClass.getCost()
 
     # 左クリックの捨札は、コストと同一でなければならない
@@ -155,6 +156,25 @@ class Card5 extends CardBase
   @NAME        = "露店"
   @CATEGORY    = "公共"
   @DESCRIPTION = "手札を1枚捨てる\n家計から$6を得る"
+
+  @requireCards:->
+    [1,0]
+
+  @getSelectMessage:->
+    "選択してください\n左クリック：捨札にするカード1枚"
+
+  @use:(leftIndexs, rightIndexs)->
+    return "カードが足りません" if super()
+    return '家計が$6未満なので回収できません' if Stock.getAmount() < 6
+
+    # 資金を増やす
+    Stock.push 6
+    # 家計を減らす
+    Budget.pull 6
+    # 捨札を捨てる
+    Hand.trash leftIndexs
+
+    true
 
 # No.06 市場
 class Card6 extends CardBase

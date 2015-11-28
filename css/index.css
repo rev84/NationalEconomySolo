@@ -96,14 +96,14 @@ body {
   width:100px; height:75px;
 }
 /* 公共のカード */
-.public {
+.public, .private {
   position:relative;
   width:120px; height:115px;
   border:1px solid #0000ff;
   display:inline-block;
   margin:2px;
 }
-.public_header {
+.public_header, .private_header {
   position:absolute;
   top:0px; left:0px;
   width:120px; height:20px;
@@ -112,7 +112,7 @@ body {
   font-size:16px;
   font-weight:bold;
 }
-.public_footer {
+.public_footer, .private_footer {
   position:absolute;
   text-align:right;
   vertical-align:middle;
@@ -120,19 +120,20 @@ body {
   font-weight:bold;
   width:60px; height:20px;
 }
-.public_category {
+.public_category, .private_category {
   bottom:0px; left:0px;
   text-align:left;
 }
-.public_point {
+.public_point, .private_point {
   bottom:0px; right:0px;
   text-align:right;
 }
-.public_image {
+.public_image, .private_image {
   position:absolute;
   top:20px; right:10px;
   width:100px; height:75px;
 }
+
 .used {
   background-color:#111111;
 }

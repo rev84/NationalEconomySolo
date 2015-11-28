@@ -79,7 +79,13 @@ class window.Game
     @isHandTrash = false
 
     if @isMustSell()
-      @objs.log.show '給料が払えるようになるか、なくなるまで建物を売ってください'
+      # いくら足りないのか計算
+      rest = @objs.worker.getTotal() * @objs.round.getSalary() - @objs.stock.getAmount()
+      message = """
+                給料が払えるようになるか、なくなるまで建物を売ってください
+                不足額：$#{rest}
+                """
+      @objs.log.show message.replace /\n/g, '<br>'
       @isSell = true
       return
     @isSell = false
@@ -119,6 +125,15 @@ class window.Game
     # 再描画
     @refresh()
 
+    @clickable()
+
+  # プレイ続行状態にする
+  @clickable:->
+    @waitChoice  = false
+    @isHandTrash = false
+    @isSell      = false
+    @isClickable = true
+
   # ターンの終了処理（建物）
   @turnEnd:(kubun, index)->
     spaceClass = @kubun2class(kubun)
@@ -130,6 +145,8 @@ class window.Game
     # 終わったら
     if @objs.worker.getActive() <= 0
       @roundEnd()
+    else
+      @clickable()
 
   # ハンドのクリック判定
   @handClickLeft:(index)->
@@ -165,9 +182,8 @@ class window.Game
     left = []
     right = []
     for index in [0...@objs.hand.getAmount()]
-      left.push index if @objs.hand.getSelect() is @objs.hand.SELECT_LEFT
-      right.push index if @objs.hand.getSelect() is @objs.hand.SELECT_RIGHT
-    @objs.hand.select = []
+      left.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_LEFT
+      right.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_RIGHT
 
     # 使用する
     spaceClass = @kubun2class(kubun)
@@ -180,11 +196,32 @@ class window.Game
     else
       @objs.log.show res
       @objs.log.fadeout 3
-      return false
 
+    @objs.hand.selectReset()
+    @objs.ok.disable()
+    @objs.cancel.disable()
+    # 成功時
+    if res is true
+      @turnEnd(kubun, cardIndex)
+    # 失敗時
+    else
+      @objs.hand.selectReset()
+      @objs.hand.redraw()
+      @objs.ok.disable()
+      @objs.cancel.disable()
+      @clickable()
+    res is true
 
   @pushCANCEL:->
     return false if @waitChoice is false
+    @waitChoice = false
+    @objs.hand.selectReset()
+    @objs.hand.redraw()
+    @objs.ok.disable()
+    @objs.cancel.disable()
+    @objs.log.hide()
+    @clickable()
+    true
 
   # 働かせる
   @work:(kubun, index)->
@@ -257,6 +294,20 @@ class window.Game
   @addWorkerActiveNum:(amount = 1)->
     @objs.worker.add(true) for i in [0...amount]
     @objs.worker.redraw()
+
+  # 建物を売る
+  @sellPrivate:(index)->
+    # 売却不可
+    return false unless @objs.private.getCardClass(index).isSellable()
+
+    # 公共に移す
+    deletedCardNum = @objs.private.pull index
+    @objs.public.push deletedCardNum
+    # 資金を増やす
+    @objs.stock.push Card.getClass(deletedCardNum).getPrice()
+
+    # ラウンド終了判定
+    @roundEnd()
 
   # 建物を売らなければいけないか
   @isMustSell:->

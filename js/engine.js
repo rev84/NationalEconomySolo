@@ -269,16 +269,17 @@ Card4 = (function(superClass) {
   };
 
   Card4.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨て札にするカード（建物のコスト分の枚数）\n右クリック：建物カードを1枚";
+    return "選択してください\n左クリック：建物カードを1枚\n右クリック：捨て札にするカード（建物のコスト分の枚数）";
   };
 
   Card4.use = function(leftIndexs, rightIndexs) {
-    var buildCardNum, cardClass, cost;
+    var buildCardIndex, buildCardNum, cardClass, cost;
     if (leftIndexs.length !== 1) {
       return "建物カードを1枚選択しなければなりません";
     }
-    buildCardNum = leftIndexs[0];
-    cardClass = Card.getClass(buildCardNum);
+    buildCardIndex = leftIndexs[0];
+    buildCardNum = Game.objs.hand.getCardNum(buildCardIndex);
+    cardClass = Game.objs.hand.getCardClass(buildCardIndex);
     cost = cardClass.getCost();
     if (cost !== rightIndexs.length) {
       return "捨札がコストと一致していません";
@@ -304,6 +305,27 @@ Card5 = (function(superClass) {
   Card5.CATEGORY = "公共";
 
   Card5.DESCRIPTION = "手札を1枚捨てる\n家計から$6を得る";
+
+  Card5.requireCards = function() {
+    return [1, 0];
+  };
+
+  Card5.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨札にするカード1枚";
+  };
+
+  Card5.use = function(leftIndexs, rightIndexs) {
+    if (Card5.__super__.constructor.use.call(this)) {
+      return "カードが足りません";
+    }
+    if (Stock.getAmount() < 6) {
+      return '家計が$6未満なので回収できません';
+    }
+    Stock.push(6);
+    Budget.pull(6);
+    Hand.trash(leftIndexs);
+    return true;
+  };
 
   return Card5;
 
@@ -1122,7 +1144,7 @@ window.Game = (function() {
   };
 
   Game.roundEnd = function() {
-    var max;
+    var max, message, rest;
     this.objs.log.hide();
     if (this.objs.hand.isHandOver()) {
       max = this.objs.hand.getMax();
@@ -1132,7 +1154,9 @@ window.Game = (function() {
     }
     this.isHandTrash = false;
     if (this.isMustSell()) {
-      this.objs.log.show('給料が払えるようになるか、なくなるまで建物を売ってください');
+      rest = this.objs.worker.getTotal() * this.objs.round.getSalary() - this.objs.stock.getAmount();
+      message = "給料が払えるようになるか、なくなるまで建物を売ってください\n不足額：$" + rest;
+      this.objs.log.show(message.replace(/\n/g, '<br>'));
       this.isSell = true;
       return;
     }
@@ -1160,7 +1184,15 @@ window.Game = (function() {
     this.objs["public"].resetStatus();
     this.objs["private"].resetStatus();
     this.objs.worker.wake();
-    return this.refresh();
+    this.refresh();
+    return this.clickable();
+  };
+
+  Game.clickable = function() {
+    this.waitChoice = false;
+    this.isHandTrash = false;
+    this.isSell = false;
+    return this.isClickable = true;
   };
 
   Game.turnEnd = function(kubun, index) {
@@ -1172,6 +1204,8 @@ window.Game = (function() {
     this.refresh();
     if (this.objs.worker.getActive() <= 0) {
       return this.roundEnd();
+    } else {
+      return this.clickable();
     }
   };
 
@@ -1213,30 +1247,49 @@ window.Game = (function() {
     left = [];
     right = [];
     for (index = j = 0, ref1 = this.objs.hand.getAmount(); 0 <= ref1 ? j < ref1 : j > ref1; index = 0 <= ref1 ? ++j : --j) {
-      if (this.objs.hand.getSelect() === this.objs.hand.SELECT_LEFT) {
+      if (this.objs.hand.getSelect(index) === this.objs.hand.SELECT_LEFT) {
         left.push(index);
       }
-      if (this.objs.hand.getSelect() === this.objs.hand.SELECT_RIGHT) {
+      if (this.objs.hand.getSelect(index) === this.objs.hand.SELECT_RIGHT) {
         right.push(index);
       }
     }
-    this.objs.hand.select = [];
     spaceClass = this.kubun2class(kubun);
     cardClass = spaceClass.getCardClass(cardIndex);
     res = cardClass.use(left, right);
     if (res === true) {
-      return this.objs.log.hide();
+      this.objs.log.hide();
     } else {
       this.objs.log.show(res);
       this.objs.log.fadeout(3);
-      return false;
     }
+    this.objs.hand.selectReset();
+    this.objs.ok.disable();
+    this.objs.cancel.disable();
+    if (res === true) {
+      this.turnEnd(kubun, cardIndex);
+    } else {
+      this.objs.hand.selectReset();
+      this.objs.hand.redraw();
+      this.objs.ok.disable();
+      this.objs.cancel.disable();
+      this.clickable();
+    }
+    return res === true;
   };
 
   Game.pushCANCEL = function() {
     if (this.waitChoice === false) {
       return false;
     }
+    this.waitChoice = false;
+    this.objs.hand.selectReset();
+    this.objs.hand.redraw();
+    this.objs.ok.disable();
+    this.objs.cancel.disable();
+    this.objs.log.hide();
+    this.clickable();
+    return true;
   };
 
   Game.work = function(kubun, index) {
@@ -1334,6 +1387,17 @@ window.Game = (function() {
     return this.objs.worker.redraw();
   };
 
+  Game.sellPrivate = function(index) {
+    var deletedCardNum;
+    if (!this.objs["private"].getCardClass(index).isSellable()) {
+      return false;
+    }
+    deletedCardNum = this.objs["private"].pull(index);
+    this.objs["public"].push(deletedCardNum);
+    this.objs.stock.push(Card.getClass(deletedCardNum).getPrice());
+    return this.roundEnd();
+  };
+
   Game.isMustSell = function() {
     var canSell, cantPaySalary;
     cantPaySalary = this.objs.stock.getAmount() - this.objs.worker.getTotal() * this.objs.round.getSalary() < 0;
@@ -1413,15 +1477,28 @@ HandSpace = (function(superClass) {
     }
   };
 
-  HandSpace.sort = function() {
+  HandSpace.selectReset = function() {
     var i, j, ref, results;
-    this.cards.sort();
     this.select = [];
     results = [];
     for (i = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
       results.push(this.select.push(this.SELECT_NOT));
     }
     return results;
+  };
+
+  HandSpace.sort = function() {
+    this.cards.sort();
+    this.select = [];
+    return this.selectReset();
+  };
+
+  HandSpace.getCardNum = function(index) {
+    return this.cards[index];
+  };
+
+  HandSpace.getCardClass = function(index) {
+    return Card.getClass(this.getCardNum(index));
   };
 
   HandSpace.getAmount = function() {
@@ -1616,8 +1693,12 @@ PrivateSpace = (function(superClass) {
     return results;
   };
 
+  PrivateSpace.getCardNum = function(index) {
+    return this.cards[index];
+  };
+
   PrivateSpace.getCardClass = function(index) {
-    return Card.getClass(this.cards[index]);
+    return Card.getClass(this.getCardNum(index));
   };
 
   PrivateSpace.isUsable = function(index) {
@@ -1648,6 +1729,21 @@ PrivateSpace = (function(superClass) {
   PrivateSpace.push = function(cardNum) {
     this.cards.push(Number(cardNum));
     return this.status.push(this.STATUS_USABLE);
+  };
+
+  PrivateSpace.pull = function(cardIndex) {
+    var deletedCardNum, index, j, newCards, ref;
+    newCards = [];
+    deletedCardNum = null;
+    for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
+      if (index === cardIndex) {
+        deletedCardNum = this.cards[index];
+      } else {
+        newCards.push(this.cards[index]);
+      }
+    }
+    this.cards = newCards;
+    return deletedCardNum;
   };
 
   PrivateSpace.redraw = function() {
@@ -1700,8 +1796,13 @@ PrivateSpace = (function(superClass) {
         e.append($('<img>').attr('src', this.IMG_TIMER).addClass('worker'));
     }
     e.dblclick(function() {
-      index = Number($(this).attr('data-index'));
-      return Game.work('private', index);
+      if (Game.isClickable) {
+        index = Number($(this).attr('data-index'));
+        return Game.work('private', index);
+      } else if (Game.isSell) {
+        index = Number($(this).attr('data-index'));
+        return Game.sellPrivate(index);
+      }
     });
     e.append(header);
     e.append(img);
@@ -1924,7 +2025,7 @@ RoundDeck = (function(superClass) {
   RoundDeck.round = 0;
 
   RoundDeck.init = function() {
-    this.deck = [2, 3, 4, 13, 5, 6, 7, 8, 9, 10, 11, 12];
+    this.deck = [2, 4, 3, 13, 5, 6, 7, 8, 9, 10, 11, 12];
     return this.round = 1;
   };
 

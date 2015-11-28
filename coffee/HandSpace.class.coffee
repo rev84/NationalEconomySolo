@@ -31,12 +31,24 @@ class HandSpace extends SpaceBase
       @select[index] = @SELECT_NOT
     else
       @select[index] = @SELECT_RIGHT
+  # 選択状態を全解除
+  @selectReset:->
+    @select = []
+    @select.push @SELECT_NOT for i in [0...@cards.length]    
 
   # ソートする
   @sort:->
     @cards.sort()
     @select = []
-    @select.push @SELECT_NOT for i in [0...@cards.length]
+    @selectReset()
+
+  # カード番号の取得
+  @getCardNum:(index)->
+    @cards[index]
+
+  # カードクラスの取得
+  @getCardClass:(index)->
+    Card.getClass @getCardNum index
 
   # 手札の数を取得
   @getAmount:->
