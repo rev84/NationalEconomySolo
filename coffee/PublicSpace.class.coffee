@@ -28,10 +28,12 @@ class PublicSpace extends SpaceBase
     return false if @status[index] isnt @STATUS_USABLE
     true
 
+  # 労働者を置く
   @setWorked:(index)->
     return false if @isUsable index is false
     @status[index] = @STATUS_WORKED
 
+  # 時間経過労働者を置く
   @setDisabled:(index)->
     return false if @isUsable index is false
     @status[index] = @STATUS_DISABLED

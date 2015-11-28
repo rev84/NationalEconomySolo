@@ -39,6 +39,11 @@ class PrivateSpace extends SpaceBase
     return false unless @getCardClass(index).isWorkable()
     true
 
+  # 労働者を置く
+  @setWorked:(index)->
+    return false if @isUsable index is false
+    @status[index] = @STATUS_WORKED
+
   # 資産の合計点を取得
   @getPoint:->
     point = 0
@@ -132,11 +137,9 @@ class PrivateSpace extends SpaceBase
     )
 
     # 労働者により使用不可
-    switch @status[index]
-      when @STATUS_WORKED
-        e.append $('<img>').attr('src', @IMG_WORKER).addClass('worker')
-      when @STATUS_TIMER
-        e.append $('<img>').attr('src', @IMG_TIMER).addClass('worker')
+    if @status[index] is @STATUS_WORKED
+      e.addClass('used')
+      e.append $('<img>').attr('src', @IMG_WORKER).addClass('worker')
 
     # ダブルクリック時
     e.dblclick ->
@@ -165,23 +168,83 @@ class PrivateSpace extends SpaceBase
       return true if cardClass.isSellable()
     false
 
+  # 所有する建物の数
+  @getAmount:->
+    @cards.length
 
-  # 法律事務所が存在するか（No.22）
-  @isExistHouritu:->
+  # 所有する法律事務所の数
+  @getAmountHouritu:->
+    amount = 0
     for cardNum in @cards
       return true if cardNum is Card.CARD_NUM_HOURITU
-    false
+    amount
 
-  # 存在する倉庫の数
+  # 所有する不動産屋の数
+  @getAmountHudousan:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if cardNum is Card.CARD_NUM_HUDOUSAN
+    amount
+
+  # 所有する農協の数
+  @getAmountNoukyou:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if cardNum is Card.CARD_NUM_NOUKYOU
+    amount
+
+  # 所有する労働組合の数
+  @getAmountRouso:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if cardNum is Card.CARD_NUM_ROUSO
+    amount
+
+  # 所有する鉄道の数
+  @getAmountRail:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if cardNum is Card.CARD_NUM_RAIL
+    amount
+
+  # 所有する本社ビルの数
+  @getAmountBuilding:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if cardNum is Card.CARD_NUM_BUILDING
+    amount
+
+  # 所有する倉庫の数
   @getAmountExistSouko:->
     amount = 0
     for cardNum in @cards
       amount++ if cardNum is Card.CARD_NUM_SOUKO
     amount
 
-  # 存在する社宅の数
+  # 所有する社宅の数
   @getAmountExistSyataku:->
     amount = 0
     for cardNum in @cards
       amount++ if cardNum is Card.CARD_NUM_SYATAKU
+    amount
+
+  # 所有する非職場カテゴリの数
+  @getAmountUnworkable:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if Card.getClass(cardNum).isUnworkable()
+    amount
+
+  # 所有する農業カテゴリの数
+  @getAmountFarming:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if Card.getClass(cardNum).isFarming()
+    amount
+
+  # 所有する工業カテゴリの数
+  @getAmountIndustry:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if Card.getClass(cardNum).isIndustry()
     amount

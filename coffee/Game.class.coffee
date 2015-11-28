@@ -4,7 +4,7 @@ class window.Game
   @isClickable : false
   # カードの選択待ち
   # false : 待ちではない
-  # [kubun, index, isRightClick, isLeftClick2] : 区分、インデックス番号、右クリック有効、左クリックの2段階の順序有効
+  # [kubun, index, isRightClick] : 区分、インデックス番号、右クリック有効
   @waitChoice : false
   # 手札捨て期間
   @isHandTrash : false
@@ -66,16 +66,17 @@ class window.Game
     # 4枚公共に置く
     @pullPublic 4
 
-    @isClickable = true
+    @clickable()
 
 
   # ラウンドの終了判定
   @roundEnd:->
+    @isClickable = false
     LogSpace.removeAll()
 
     # 手札が規定枚数以上なら手札を捨てなくてはならない
-    if @objs.hand.isHandOver()
-      max = @objs.hand.getMax()
+    if HandSpace.isHandOver()
+      max = HandSpace.getMax()
       LogSpace.addWarn '手札を'+max+'枚になるまで捨ててください'
       @isHandTrash = true
       return
@@ -118,7 +119,7 @@ class window.Game
     # 未払いを増やす
     Unpaid.push penalty
     # ラウンドを進める
-    Round.addRound()
+    RoundDeck.addRound()
     # ラウンドカードを置く
     @pullPublic()
     # 公共カード・所有カードを使用可能にする
@@ -140,6 +141,8 @@ class window.Game
 
   # ターンの終了処理（建物）
   @turnEnd:(kubun, index)->
+    @isClickable = false
+
     spaceClass = @kubun2class(kubun)
 
     Worker.work() # 労働者を減らす
@@ -151,7 +154,7 @@ class window.Game
     PublicSpace.disableLastest()  # 最新の職場を潰す
     @refresh()
     # 終わったら
-    if @objs.worker.getActive() <= 0
+    if Worker.getActive() <= 0
       @roundEnd()
     else
       @clickable()
@@ -184,16 +187,14 @@ class window.Game
   @pushOK:->
     return false if @waitChoice is false
     # 選択状態解除
-    [kubun, cardIndex, _, _] = @waitChoice
+    [kubun, cardIndex, _] = @waitChoice
     @waitChoice = false
     # ハンドのリストを作成
     left = []
     right = []
-    left2 = []
-    for index in [0...HandSpace.getAmount()]
-      left.push index if HandSpace.getSelect(index) is HandSpace.SELECT_LEFT
-      right.push index if HandSpace.getSelect(index) is HandSpace.SELECT_RIGHT
-      left2.push index if HandSpace.getSelect(index) is HandSpace.SELECT_LEFT2
+    for index in [0...@objs.hand.getAmount()]
+      left.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_LEFT
+      right.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_RIGHT
 
     # 解除処理
     HandSpace.selectReset()
@@ -205,7 +206,7 @@ class window.Game
     cardClass = spaceClass.getCardClass cardIndex
     LogSpace.removeAll()
 
-    res = cardClass.use(left, right, left2, kubun, cardIndex)
+    res = cardClass.use(left, right)
     # 使えた
     if res is true
       @turnEnd(kubun, cardIndex)
@@ -220,10 +221,10 @@ class window.Game
   @pushCANCEL:->
     return false if @waitChoice is false
     @waitChoice = false
-    @objs.hand.selectReset()
-    @objs.hand.redraw()
-    @objs.ok.disable()
-    @objs.cancel.disable()
+    HandSpace.selectReset()
+    HandSpace.redraw()
+    ButtonOK.disable()
+    ButtonCANCEL.disable()
     LogSpace.removeAll()
     @clickable()
     true
@@ -249,15 +250,14 @@ class window.Game
     [leftReqNum, rightReqNum] = cardClass.requireCards()
     # ない
     if leftReqNum is 0 and rightReqNum is 0
-      res = cardClass.use([], [], [], kubun, index)
+      res = cardClass.use([], [], kubun, index)
       # 正常終了しなかった
       if res isnt true
         alert res
-        @isClickable = true
+        @clickable()
         return false
       # 正常終了
       @turnEnd(kubun, index)
-      @isClickable = true
 
     # ある
     else
@@ -266,8 +266,8 @@ class window.Game
       # 選択待ちメッセージがあれば表示する
       LogSpace.addWarn(cardClass.getSelectMessage().replace /\n/g, '<br>')
       # ボタンを押せるようにする
-      @objs.ok.enable()
-      @objs.cancel.enable()
+      ButtonOK.enable()
+      ButtonCANCEL.enable()
     return true
 
   # カードをデッキから手札に移動
@@ -282,19 +282,19 @@ class window.Game
 
   # 公共デッキから公共に移動
   @pullPublic:(amount = 1)->
-    @objs.public.push @objs.round.pull() for i in [0...amount]
-    @objs.public.redraw()
+    PublicSpace.push @objs.round.pull() for i in [0...amount]
+    PublicSpace.redraw()
 
   # 建物を売る
   @sellPrivate:(index)->
     # 売却不可
-    return false unless @objs.private.getCardClass(index).isSellable()
+    return false unless PrivateSpace.getCardClass(index).isSellable()
 
     # 公共に移す
     deletedCardNum = @objs.private.pull index
-    @objs.public.push deletedCardNum
+    PublicSpace.push deletedCardNum
     # 資金を増やす
-    @objs.stock.push Card.getClass(deletedCardNum).getPrice()
+    Stock.push Card.getClass(deletedCardNum).getPrice()
 
     # ラウンド終了判定
     @roundEnd()
@@ -304,9 +304,9 @@ class window.Game
     # TODO:焼畑は手放さなくてはならない前提
 
     # (1)給料が支払えない
-    cantPaySalary = @objs.stock.getAmount() - @objs.worker.getTotal() * @objs.round.getSalary() < 0
+    cantPaySalary = Stock.getAmount() - Worker.getTotal() * RoundDeck.getSalary() < 0
     # (2)売れる建物がある
-    canSell = @objs.private.isExistSellable()
+    canSell = PrivateSpace.isExistSellable()
 
     cantPaySalary and canSell
 
@@ -315,16 +315,32 @@ class window.Game
   @getPoint:->
     point = 0
 
-    # 所持金を加算
-    point += @objs.stock.getAmount()
-    # 建造物の合計価値を加算
-    point += @objs.private.getPoint()
-    # 未払いを引く
-    unpaidNum = @objs.unpaid.getAmount()
-    if @objs.private.isExistHouritu()
-      unpaidNum -= 5
+    # 所持金*1 加点
+    point += Stock.getAmount()
+
+    # 建造物の合計価値*1 加点
+    point += PrivateSpace.getPoint()
+
+    # (未払い賃金-法律事務所の数*5)*3 > 0 減点
+    unpaidNum = Unpaid.getAmount()
+    unpaidNum -= 5*PrivateSpace.getAmountHouritu()
     unpaidNum = if unpaidNum < 0 then 0 else unpaidNum
-    point -= unpaidNum
+    point -= unpaidNum*3
+
+    # 不動産屋の数*所有する建物の数*3 加点
+    point += PrivateSpace.getAmountHudousan()*PrivateSpace.getAmount()*3
+
+    # 農協の数*手札の消費財の数*3 加点
+    point += PrivateSpace.getAmountNoukyou()*HandSpace.getAmountConsumer()*3
+
+    # 労働組合の数*労働者の数*6 加点
+    point += PrivateSpace.getAmountRouso()*Worker.getTotal()*6
+
+    # 鉄道の数*所有する工業カテゴリの建物の数*3 加点
+    point += PrivateSpace.getAmountRail()*PrivateSpace.getAmountIndustry()*6
+
+    # 本社ビルの数*所有する非職場カテゴリの建物の数*3 加点
+    point += PrivateSpace.getAmountBuilding()*PrivateSpace.getAmountUnworkable()*6
 
     point
 

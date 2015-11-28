@@ -80,6 +80,62 @@ Budget = (function(superClass) {
 
 })(SpaceBase);
 
+ButtonOK = (function(superClass) {
+  extend(ButtonOK, superClass);
+
+  function ButtonOK() {
+    return ButtonOK.__super__.constructor.apply(this, arguments);
+  }
+
+  ButtonOK.DIV_ID = 'ok';
+
+  ButtonOK.init = function() {
+    this.disable();
+    return this.getElement().on('click', function() {
+      return Game.pushOK();
+    });
+  };
+
+  ButtonOK.enable = function() {
+    return this.getElement().prop("disabled", false).removeClass("disabled");
+  };
+
+  ButtonOK.disable = function() {
+    return this.getElement().prop("disabled", true).addClass("disabled");
+  };
+
+  return ButtonOK;
+
+})(SpaceBase);
+
+ButtonCANCEL = (function(superClass) {
+  extend(ButtonCANCEL, superClass);
+
+  function ButtonCANCEL() {
+    return ButtonCANCEL.__super__.constructor.apply(this, arguments);
+  }
+
+  ButtonCANCEL.DIV_ID = 'cancel';
+
+  ButtonCANCEL.init = function() {
+    this.disable();
+    return this.getElement().on('click', function() {
+      return Game.pushCANCEL();
+    });
+  };
+
+  ButtonCANCEL.enable = function() {
+    return this.getElement().prop("disabled", false).removeClass("disabled");
+  };
+
+  ButtonCANCEL.disable = function() {
+    return this.getElement().prop("disabled", true).addClass("disabled");
+  };
+
+  return ButtonCANCEL;
+
+})(SpaceBase);
+
 Card = (function() {
   function Card() {}
 
@@ -88,6 +144,16 @@ Card = (function() {
   Card.CARD_NUM_HOURITU = 22;
 
   Card.CARD_NUM_SYATAKU = 21;
+
+  Card.CARD_NUM_HUDOUSAN = 26;
+
+  Card.CARD_NUM_NOUKYOU = 27;
+
+  Card.CARD_NUM_ROUSO = 31;
+
+  Card.CARD_NUM_RAIL = 35;
+
+  Card.CARD_NUM_BUILDING = 36;
 
   Card.getClass = function(classNum) {
     var res;
@@ -120,38 +186,29 @@ CardBase = (function() {
   CardBase.PRICE = 0;
 
   CardBase.isRightClick = function() {
-    var l, l2, r, ref;
-    ref = this.requireCards(), l = ref[0], r = ref[1], l2 = ref[2];
+    var l, r, ref;
+    ref = this.requireCards(), l = ref[0], r = ref[1];
     return r > 0;
   };
 
-  CardBase.isLeftClick2 = function() {
-    var l, l2, r, ref;
-    ref = this.requireCards(), l = ref[0], r = ref[1], l2 = ref[2];
-    return l2 > 0;
-  };
-
   CardBase.requireCards = function() {
-    return [0, 0, 0];
+    return [0, 0];
   };
 
   CardBase.getSelectMessage = function() {
     return false;
   };
 
-  CardBase.use = function(leftIndexs, rightIndexs, leftIndex2) {
-    var leftReqNum, leftReqNum2, ref, rightReqNum;
+  CardBase.use = function(leftIndexs, rightIndexs) {
+    var leftReqNum, ref, rightReqNum;
     if (leftIndexs == null) {
       leftIndexs = [];
     }
     if (rightIndexs == null) {
       rightIndexs = [];
     }
-    if (leftIndex2 == null) {
-      leftIndex2 = [];
-    }
-    ref = this.requireCards, leftReqNum = ref[0], rightReqNum = ref[1], leftReqNum2 = ref[2];
-    if (!(leftIndexs.length === leftReqNum && rightReqNum.length === rightReqNum && leftReqNum2.length === leftReqNum2)) {
+    ref = this.requireCards, leftReqNum = ref[0], rightReqNum = ref[1];
+    if (!(leftIndexs.length === leftReqNum && rightReqNum.length === rightReqNum)) {
       return false;
     }
     return true;
@@ -182,6 +239,10 @@ CardBase = (function() {
     return this.CATEGORY === '公共';
   };
 
+  CardBase.isBuildable = function() {
+    return this.CATEGORY !== '消費財';
+  };
+
   CardBase.isFarming = function() {
     return this.CATEGORY === '農業';
   };
@@ -190,11 +251,19 @@ CardBase = (function() {
     return this.CATEGORY === '工業';
   };
 
+  CardBase.isUnworkable = function() {
+    return this.CATEGORY === '非職場';
+  };
+
+  CardBase.isConsumer = function() {
+    return this.CATEGORY === '消費財';
+  };
+
   CardBase.isWorkable = function() {
-    if (this.CATEGORY === '非職場') {
+    if (this.isConsumer()) {
       return false;
     }
-    if (this.CATEGORY === '消費財') {
+    if (this.isUnworkable()) {
       return false;
     }
     return true;
@@ -289,27 +358,30 @@ Card4 = (function(superClass) {
   Card4.DESCRIPTION = "建物を1つ作る";
 
   Card4.requireCards = function() {
-    return [1, 1, 0];
+    return [1, 1];
   };
 
   Card4.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物カード1枚\n右クリック：捨札（建物コストの枚数）";
+    return "選択してください\n左クリック：建物1枚\n右クリック：捨札（建物コストの枚数）";
   };
 
   Card4.use = function(leftIndexs, rightIndexs) {
     var buildCardIndex, buildCardNum, cardClass, cost;
     if (leftIndexs.length !== 1) {
-      return "建物カードを1枚選択しなければなりません";
+      return "建物1枚を選択しなければなりません";
     }
     buildCardIndex = leftIndexs[0];
     buildCardNum = HandSpace.getCardNum(buildCardIndex);
     cardClass = HandSpace.getCardClass(buildCardIndex);
     cost = cardClass.getCost();
+    if (!cardClass.isBuildable()) {
+      return "消費財は建設できません";
+    }
     if (cost !== rightIndexs.length) {
       return "捨札が建設コストと一致していません";
     }
     PrivateSpace.push(buildCardNum);
-    HandSpace.trash(leftIndexs.concat(rightIndexs));
+    HandSpace.trash(rightIndexs, leftIndexs);
     return true;
   };
 
@@ -331,7 +403,7 @@ Card5 = (function(superClass) {
   Card5.DESCRIPTION = "手札を1枚捨てる\n家計から$6を得る";
 
   Card5.requireCards = function() {
-    return [1, 0, 0];
+    return [1, 0];
   };
 
   Card5.getSelectMessage = function() {
@@ -342,12 +414,12 @@ Card5 = (function(superClass) {
     if (Card5.__super__.constructor.use.apply(this, arguments)) {
       return "捨札1枚が選択されていません";
     }
-    if (Stock.getAmount() < 6) {
+    if (Budget.getAmount() < 6) {
       return '家計が$6未満なので回収できません';
     }
     Stock.push(6);
     Budget.pull(6);
-    Hand.trash(leftIndexs);
+    HandSpace.trash(leftIndexs);
     return true;
   };
 
@@ -369,7 +441,7 @@ Card6 = (function(superClass) {
   Card6.DESCRIPTION = "手札を2枚捨てる\n家計から$12を得る";
 
   Card6.requireCards = function() {
-    return [2, 0, 0];
+    return [2, 0];
   };
 
   Card6.getSelectMessage = function() {
@@ -380,12 +452,12 @@ Card6 = (function(superClass) {
     if (Card6.__super__.constructor.use.apply(this, arguments)) {
       return "捨札2枚が選択されていません";
     }
-    if (Stock.getAmount() < 12) {
+    if (Budget.getAmount() < 12) {
       return '家計が$12未満なので回収できません';
     }
     Stock.push(12);
     Budget.pull(12);
-    Hand.trash(leftIndexs);
+    HandSpace.trash(leftIndexs);
     return true;
   };
 
@@ -432,7 +504,7 @@ Card8 = (function(superClass) {
   Card8.DESCRIPTION = "手札を3枚捨てて家計から$18を得る";
 
   Card8.requireCards = function() {
-    return [3, 0, 0];
+    return [3, 0];
   };
 
   Card8.getSelectMessage = function() {
@@ -443,12 +515,12 @@ Card8 = (function(superClass) {
     if (Card8.__super__.constructor.use.apply(this, arguments)) {
       return "捨札3枚が選択されていません";
     }
-    if (Stock.getAmount() < 18) {
+    if (Budget.getAmount() < 18) {
       return '家計が$18未満なので回収できません';
     }
     Stock.push(18);
     Budget.pull(18);
-    Hand.trash(leftIndexs);
+    HandSpace.trash(leftIndexs);
     return true;
   };
 
@@ -495,23 +567,23 @@ Card10 = (function(superClass) {
   Card10.DESCRIPTION = "手札を4枚捨てて家計から$24を得る";
 
   Card10.requireCards = function() {
-    return [4, 0, 0];
+    return [4, 0];
   };
 
   Card10.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札にするカード4枚";
+    return "選択してください\n左クリック：捨札4枚";
   };
 
   Card10.use = function(leftIndexs) {
     if (Card10.__super__.constructor.use.apply(this, arguments)) {
       return "捨札4枚が選択されていません";
     }
-    if (Stock.getAmount() < 24) {
+    if (Budget.getAmount() < 24) {
       return '家計が$24未満なので回収できません';
     }
     Stock.push(24);
     Budget.pull(24);
-    Hand.trash(leftIndexs);
+    HandSpace.trash(leftIndexs);
     return true;
   };
 
@@ -558,7 +630,7 @@ Card12 = (function(superClass) {
   Card12.DESCRIPTION = "手札を5枚捨てて家計から$30を得る";
 
   Card12.requireCards = function() {
-    return [5, 0, 0];
+    return [5, 0];
   };
 
   Card12.getSelectMessage = function() {
@@ -569,12 +641,12 @@ Card12 = (function(superClass) {
     if (Card12.__super__.constructor.use.apply(this, arguments)) {
       return "捨札5枚が選択されていません";
     }
-    if (Stock.getAmount() < 30) {
+    if (Budget.getAmount() < 30) {
       return '家計が$30未満なので回収できません';
     }
     Stock.push(30);
     Budget.pull(30);
-    Hand.trash(leftIndexs);
+    HandSpace.trash(leftIndexs);
     return true;
   };
 
@@ -644,7 +716,7 @@ Card15 = (function(superClass) {
 
   Card15.PRICE = 0;
 
-  Card15.use = function(leftIndexs, rightIndexs, left2Index, kubun, index) {
+  Card15.use = function(leftIndexs, rightIndexs, kubun, index) {
     var space;
     Game.pullConsumer(5);
     Game.flagYakihata = true;
@@ -673,7 +745,7 @@ Card16 = (function(superClass) {
   Card16.PRICE = 4;
 
   Card16.use = function() {
-    if (Stock.getAmount() < 5) {
+    if (Budget.getAmount() < 5) {
       return '家計が$5未満なので回収できません';
     }
     Stock.push(5);
@@ -703,7 +775,7 @@ Card17 = (function(superClass) {
   Card17.PRICE = 6;
 
   Card17.requireCards = function() {
-    return [2, 0, 0];
+    return [2, 0];
   };
 
   Card17.getSelectMessage = function() {
@@ -711,10 +783,10 @@ Card17 = (function(superClass) {
   };
 
   Card17.use = function(leftIndexs) {
-    if (Card17.__super__.constructor.use.apply(this, arguments)) {
+    if (Card17.__super__.constructor.use.call(this)) {
       return "捨札2枚が選択されていません";
     }
-    Hand.trash(leftIndexs);
+    HandSpace.trash(leftIndexs);
     Game.pullDeck(4);
     return true;
   };
@@ -732,14 +804,14 @@ Card18 = (function(superClass) {
 
   Card18.NAME = "建設会社";
 
-  Card18.DESCRIPTION = "建物を1つコスト-1で作る\n";
+  Card18.DESCRIPTION = "建物を1つ少ないコストで作る\n";
 
   Card18.COST = 2;
 
   Card18.PRICE = 5;
 
   Card18.requireCards = function() {
-    return [1, 1, 0];
+    return [1, 1];
   };
 
   Card18.getSelectMessage = function() {
@@ -759,7 +831,7 @@ Card18 = (function(superClass) {
       return "捨札が建設コストと一致していません";
     }
     PrivateSpace.push(buildCardNum);
-    HandSpace.trash(leftIndexs.concat(rightIndexs));
+    HandSpace.trash(rightIndexs, leftIndexs);
     return true;
   };
 
@@ -900,7 +972,7 @@ Card24 = (function(superClass) {
   Card24.PRICE = 8;
 
   Card24.requireCards = function() {
-    return [1, 0, 0];
+    return [1, 0];
   };
 
   Card24.getSelectMessage = function() {
@@ -916,7 +988,7 @@ Card24 = (function(superClass) {
     }
     Stock.push(15);
     Budget.pull(15);
-    Hand.trash(leftIndexs);
+    HandSpace.trash(leftIndexs);
     return true;
   };
 
@@ -940,26 +1012,26 @@ Card25 = (function(superClass) {
   Card25.PRICE = 7;
 
   Card25.requireCards = function() {
-    return [1, 1, 0];
+    return [1, 0];
   };
 
   Card25.getSelectMessage = function() {
-    return "選択してください\n左クリック：農業カテゴリの建物カード1枚";
+    return "選択してください\n左クリック：農業カテゴリの建物1枚";
   };
 
   Card25.use = function(leftIndexs) {
     var buildCardIndex, buildCardNum, cardClass;
     if (leftIndexs.length !== 1) {
-      return "建物カードを1枚選択しなければなりません";
+      return "建物1枚選択しなければなりません";
     }
     buildCardIndex = leftIndexs[0];
     buildCardNum = HandSpace.getCardNum(buildCardIndex);
     cardClass = HandSpace.getCardClass(buildCardIndex);
     if (!cardClass.isFarming()) {
-      return "選択したカードが農業カテゴリではありません";
+      return "建物が農業カテゴリではありません";
     }
     PrivateSpace.push(buildCardNum);
-    HandSpace.trash(leftIndexs);
+    HandSpace.trash([], leftIndexs);
     return true;
   };
 
@@ -1051,11 +1123,11 @@ Card29 = (function(superClass) {
   Card29.PRICE = 9;
 
   Card29.requireCards = function() {
-    return [1, 1, 0];
+    return [1, 1];
   };
 
   Card29.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物カード1枚\n右クリック：捨札（建物コストの枚数）";
+    return "選択してください\n左クリック：建物1枚\n右クリック：捨札（建物コストの枚数）";
   };
 
   Card29.use = function(leftIndexs, rightIndexs) {
@@ -1071,7 +1143,7 @@ Card29 = (function(superClass) {
       return "捨札が建設コストと一致していません";
     }
     PrivateSpace.push(buildCardNum);
-    HandSpace.trash(leftIndexs.concat(rightIndexs));
+    HandSpace.trash(rightIndexs, leftIndexs);
     Game.pullDeck(2);
     return true;
   };
@@ -1098,7 +1170,7 @@ Card30 = (function(superClass) {
   Card30.PRICE = 9;
 
   Card30.use = function() {
-    if (HandSpace.getAmount() === 0) {
+    if (HandSpace.getAmount === 0) {
       Game.pullDeck(4);
       Game.pullDeck(2);
     }
@@ -1169,7 +1241,7 @@ Card33 = (function(superClass) {
   Card33.PRICE = 12;
 
   Card33.requireCards = function() {
-    return [3, 0, 0];
+    return [3, 0];
   };
 
   Card33.getSelectMessage = function() {
@@ -1180,7 +1252,7 @@ Card33 = (function(superClass) {
     if (Card33.__super__.constructor.use.apply(this, arguments)) {
       return "捨札3枚が選択されていません";
     }
-    Hand.trash(leftIndexs);
+    HandSpace.trash(leftIndexs);
     Game.pullDeck(7);
     return true;
   };
@@ -1205,30 +1277,35 @@ Card34 = (function(superClass) {
   Card34.PRICE = 10;
 
   Card34.requireCards = function() {
-    return [1, 1, 1];
+    return [2, 1];
   };
 
   Card34.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物カード2枚（順序あり）\n右クリック：捨札（建物コストの枚数）";
+    return "選択してください\n左クリック：建物カード2枚\n右クリック：捨札（建物コストの枚数）";
   };
 
-  Card34.use = function(leftIndexs, rightIndexs, leftIndexs2) {
-    var buildCardIndex1, buildCardNum1, cardClass, cost;
-    if (leftIndexs.length !== 1) {
-      return "先に建てる建物を1枚選択しなければなりません";
+  Card34.use = function(leftIndexs, rightIndexs) {
+    var buildCardIndex0, buildCardIndex1, buildCardNum0, buildCardNum1, cardClass0, cardClass1, cost0, cost1;
+    if (leftIndexs.length !== 2) {
+      return "建物カードを2枚選択しなければなりません";
     }
-    if (leftIndexs2.length !== 1) {
-      return "後に建てる建物を1枚選択しなければなりません";
-    }
-    buildCardIndex1 = leftIndexs[0];
+    buildCardIndex0 = leftIndexs[0];
+    buildCardNum0 = HandSpace.getCardNum(buildCardIndex0);
+    cardClass0 = HandSpace.getCardClass(buildCardIndex0);
+    cost0 = cardClass0.getCost();
+    buildCardIndex1 = leftIndexs[1];
     buildCardNum1 = HandSpace.getCardNum(buildCardIndex1);
-    cardClass = HandSpace.getCardClass(buildCardIndex1);
-    cost = cardClass.getCost();
-    if (cost !== rightIndexs.length) {
+    cardClass1 = HandSpace.getCardClass(buildCardIndex1);
+    cost1 = cardClass1.getCost();
+    if (cost0 !== cost1) {
+      return "建物カードのコストが一致していません";
+    }
+    if (cost0 !== rightIndexs.length) {
       return "捨札が建設コストと一致していません";
     }
-    PrivateSpace.push(buildCardNum);
-    HandSpace.trash(leftIndexs.concat(rightIndexs));
+    PrivateSpace.push(buildCardNum0);
+    PrivateSpace.push(buildCardNum1);
+    HandSpace.trash(rightIndexs, leftIndexs);
     Game.pullDeck(2);
     return true;
   };
@@ -1248,7 +1325,7 @@ Card35 = (function(superClass) {
 
   Card35.CATEGORY = "非職場";
 
-  Card35.DESCRIPTION = "終了時：所有する鉱業カテゴリの建物1つにつき+3点\n売却不可";
+  Card35.DESCRIPTION = "終了時：所有する工業カテゴリの建物1つにつき+3点\n売却不可";
 
   Card35.COST = 5;
 
@@ -1482,14 +1559,15 @@ window.Game = (function() {
     this.pullDeck(3);
     this.objs.deck.place(17);
     this.pullPublic(4);
-    return this.isClickable = true;
+    return this.clickable();
   };
 
   Game.roundEnd = function() {
     var max, message, rest;
+    this.isClickable = false;
     LogSpace.removeAll();
-    if (this.objs.hand.isHandOver()) {
-      max = this.objs.hand.getMax();
+    if (HandSpace.isHandOver()) {
+      max = HandSpace.getMax();
       LogSpace.addWarn('手札を' + max + '枚になるまで捨ててください');
       this.isHandTrash = true;
       return;
@@ -1521,7 +1599,7 @@ window.Game = (function() {
     Stock.pull(minusSalary);
     Budget.push(minusSalary - penalty);
     Unpaid.push(penalty);
-    Round.addRound();
+    RoundDeck.addRound();
     this.pullPublic();
     PublicSpace.resetStatus();
     PrivateSpace.resetStatus();
@@ -1539,6 +1617,7 @@ window.Game = (function() {
 
   Game.turnEnd = function(kubun, index) {
     var spaceClass;
+    this.isClickable = false;
     spaceClass = this.kubun2class(kubun);
     Worker.work();
     if (this.flagYakihata) {
@@ -1548,7 +1627,7 @@ window.Game = (function() {
     }
     PublicSpace.disableLastest();
     this.refresh();
-    if (this.objs.worker.getActive() <= 0) {
+    if (Worker.getActive() <= 0) {
       return this.roundEnd();
     } else {
       return this.clickable();
@@ -1584,24 +1663,20 @@ window.Game = (function() {
   };
 
   Game.pushOK = function() {
-    var _, cardClass, cardIndex, index, j, kubun, left, left2, ref, ref1, res, right, spaceClass;
+    var _, cardClass, cardIndex, index, j, kubun, left, ref, ref1, res, right, spaceClass;
     if (this.waitChoice === false) {
       return false;
     }
-    ref = this.waitChoice, kubun = ref[0], cardIndex = ref[1], _ = ref[2], _ = ref[3];
+    ref = this.waitChoice, kubun = ref[0], cardIndex = ref[1], _ = ref[2];
     this.waitChoice = false;
     left = [];
     right = [];
-    left2 = [];
-    for (index = j = 0, ref1 = HandSpace.getAmount(); 0 <= ref1 ? j < ref1 : j > ref1; index = 0 <= ref1 ? ++j : --j) {
-      if (HandSpace.getSelect(index) === HandSpace.SELECT_LEFT) {
+    for (index = j = 0, ref1 = this.objs.hand.getAmount(); 0 <= ref1 ? j < ref1 : j > ref1; index = 0 <= ref1 ? ++j : --j) {
+      if (this.objs.hand.getSelect(index) === this.objs.hand.SELECT_LEFT) {
         left.push(index);
       }
-      if (HandSpace.getSelect(index) === HandSpace.SELECT_RIGHT) {
+      if (this.objs.hand.getSelect(index) === this.objs.hand.SELECT_RIGHT) {
         right.push(index);
-      }
-      if (HandSpace.getSelect(index) === HandSpace.SELECT_LEFT2) {
-        left2.push(index);
       }
     }
     HandSpace.selectReset();
@@ -1610,7 +1685,7 @@ window.Game = (function() {
     spaceClass = this.kubun2class(kubun);
     cardClass = spaceClass.getCardClass(cardIndex);
     LogSpace.removeAll();
-    res = cardClass.use(left, right, left2, kubun, cardIndex);
+    res = cardClass.use(left, right);
     if (res === true) {
       this.turnEnd(kubun, cardIndex);
     } else {
@@ -1626,10 +1701,10 @@ window.Game = (function() {
       return false;
     }
     this.waitChoice = false;
-    this.objs.hand.selectReset();
-    this.objs.hand.redraw();
-    this.objs.ok.disable();
-    this.objs.cancel.disable();
+    HandSpace.selectReset();
+    HandSpace.redraw();
+    ButtonOK.disable();
+    ButtonCANCEL.disable();
     LogSpace.removeAll();
     this.clickable();
     return true;
@@ -1651,19 +1726,18 @@ window.Game = (function() {
     cardClass = spaceClass.getCardClass(index);
     ref = cardClass.requireCards(), leftReqNum = ref[0], rightReqNum = ref[1];
     if (leftReqNum === 0 && rightReqNum === 0) {
-      res = cardClass.use([], [], [], kubun, index);
+      res = cardClass.use([], [], kubun, index);
       if (res !== true) {
         alert(res);
-        this.isClickable = true;
+        this.clickable();
         return false;
       }
       this.turnEnd(kubun, index);
-      this.isClickable = true;
     } else {
       this.waitChoice = [kubun, index, cardClass.isRightClick()];
       LogSpace.addWarn(cardClass.getSelectMessage().replace(/\n/g, '<br>'));
-      this.objs.ok.enable();
-      this.objs.cancel.enable();
+      ButtonOK.enable();
+      ButtonCANCEL.enable();
     }
     return true;
   };
@@ -1696,40 +1770,43 @@ window.Game = (function() {
       amount = 1;
     }
     for (i = j = 0, ref = amount; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-      this.objs["public"].push(this.objs.round.pull());
+      PublicSpace.push(this.objs.round.pull());
     }
-    return this.objs["public"].redraw();
+    return PublicSpace.redraw();
   };
 
   Game.sellPrivate = function(index) {
     var deletedCardNum;
-    if (!this.objs["private"].getCardClass(index).isSellable()) {
+    if (!PrivateSpace.getCardClass(index).isSellable()) {
       return false;
     }
     deletedCardNum = this.objs["private"].pull(index);
-    this.objs["public"].push(deletedCardNum);
-    this.objs.stock.push(Card.getClass(deletedCardNum).getPrice());
+    PublicSpace.push(deletedCardNum);
+    Stock.push(Card.getClass(deletedCardNum).getPrice());
     return this.roundEnd();
   };
 
   Game.isMustSell = function() {
     var canSell, cantPaySalary;
-    cantPaySalary = this.objs.stock.getAmount() - this.objs.worker.getTotal() * this.objs.round.getSalary() < 0;
-    canSell = this.objs["private"].isExistSellable();
+    cantPaySalary = Stock.getAmount() - Worker.getTotal() * RoundDeck.getSalary() < 0;
+    canSell = PrivateSpace.isExistSellable();
     return cantPaySalary && canSell;
   };
 
   Game.getPoint = function() {
     var point, unpaidNum;
     point = 0;
-    point += this.objs.stock.getAmount();
-    point += this.objs["private"].getPoint();
-    unpaidNum = this.objs.unpaid.getAmount();
-    if (this.objs["private"].isExistHouritu()) {
-      unpaidNum -= 5;
-    }
+    point += Stock.getAmount();
+    point += PrivateSpace.getPoint();
+    unpaidNum = Unpaid.getAmount();
+    unpaidNum -= 5 * PrivateSpace.getAmountHouritu();
     unpaidNum = unpaidNum < 0 ? 0 : unpaidNum;
-    point -= unpaidNum;
+    point -= unpaidNum * 3;
+    point += PrivateSpace.getAmountHudousan() * PrivateSpace.getAmount() * 3;
+    point += PrivateSpace.getAmountNoukyou() * HandSpace.getAmountConsumer() * 3;
+    point += PrivateSpace.getAmountRouso() * Worker.getTotal() * 6;
+    point += PrivateSpace.getAmountRail() * PrivateSpace.getAmountIndustry() * 6;
+    point += PrivateSpace.getAmountBuilding() * PrivateSpace.getAmountUnworkable() * 6;
     return point;
   };
 
@@ -1761,8 +1838,6 @@ HandSpace = (function(superClass) {
 
   HandSpace.SELECT_RIGHT = 2;
 
-  HandSpace.SELECT_LEFT2 = 3;
-
   HandSpace.cards = [];
 
   HandSpace.select = [];
@@ -1777,22 +1852,11 @@ HandSpace = (function(superClass) {
     return this.select[index];
   };
 
-  HandSpace.clickLeft = function(index, left2) {
-    if (left2 == null) {
-      left2 = false;
-    }
-    if (left2) {
-      if (this.select[index] === this.SELECT_LEFT) {
-        return this.select[index] = this.SELECT_LEFT2;
-      } else {
-        return this.select[index] = this.SELECT_LEFT;
-      }
+  HandSpace.clickLeft = function(index) {
+    if (this.select[index] === this.SELECT_LEFT) {
+      return this.select[index] = this.SELECT_NOT;
     } else {
-      if (this.select[index] === this.SELECT_LEFT) {
-        return this.select[index] = this.SELECT_NOT;
-      } else {
-        return this.select[index] = this.SELECT_LEFT;
-      }
+      return this.select[index] = this.SELECT_LEFT;
     }
   };
 
@@ -1832,15 +1896,24 @@ HandSpace = (function(superClass) {
     return this.cards.length;
   };
 
-  HandSpace.trash = function(cardIndexs) {
-    var index, j, newCards, ref;
-    newCards = [];
+  HandSpace.trash = function(trashCardIndexs, dropCardIndexs) {
+    var index, j, newCardNum, ref, trashCardNum;
+    if (dropCardIndexs == null) {
+      dropCardIndexs = [];
+    }
+    newCardNum = [];
+    trashCardNum = [];
     for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
-      if (!cardIndexs.in_array(index)) {
-        newCards.push(this.cards[index]);
+      if (trashCardIndexs.in_array(index)) {
+        trashCardNum.push(this.cards[index]);
+      } else if (dropCardIndexs.in_array(index)) {
+
+      } else {
+        newCardNum.push(this.cards[index]);
       }
     }
-    return this.cards = newCards;
+    this.cards = newCardNum;
+    return Deck.trash(trashCardNum);
   };
 
   HandSpace.push = function(cardNum) {
@@ -1862,9 +1935,6 @@ HandSpace = (function(superClass) {
       if (this.select[index] === this.SELECT_LEFT) {
         e.addClass("select_left");
       }
-      if (this.select[index] === this.SELECT_LEFT2) {
-        e.addClass("select_left2");
-      }
       if (this.select[index] === this.SELECT_RIGHT) {
         results.push(e.addClass("select_right"));
       } else {
@@ -1875,7 +1945,7 @@ HandSpace = (function(superClass) {
   };
 
   HandSpace.createElement = function(index) {
-    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, desc, e, header, img, name, number, point, pointSpan, price;
+    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, desc, e, header, img, name, point, pointSpan, price;
     if (this.cards[index] == null) {
       return false;
     }
@@ -1892,7 +1962,6 @@ HandSpace = (function(superClass) {
     catStr = cat != null ? '[' + cat + ']' : '';
     categorySpan = $('<span>').addClass('hand_footer hand_category').html(catStr);
     pointSpan = $('<span>').addClass('hand_footer hand_point').html('[$' + point + ']');
-    number = $('<span>').html('２').addClass('order');
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
     e.attr('data-tooltip', balloonStr).darkTooltip({
@@ -1914,7 +1983,6 @@ HandSpace = (function(superClass) {
     e.append(img);
     e.append(categorySpan);
     e.append(pointSpan);
-    e.append(number);
     return e;
   };
 
@@ -1925,8 +1993,21 @@ HandSpace = (function(superClass) {
   HandSpace.getMax = function() {
     var handMax, soukoNum;
     handMax = 5;
-    soukoNum = Game.objs["private"].getAmountExistSouko();
+    soukoNum = PrivateSpace.getAmountExistSouko();
     return handMax + soukoNum * 4;
+  };
+
+  HandSpace.getAmountConsumer = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (Card.getClass(cardNum).isConsumer()) {
+        amount++;
+      }
+    }
+    return amount;
   };
 
   return HandSpace;
@@ -2071,6 +2152,13 @@ PrivateSpace = (function(superClass) {
     return true;
   };
 
+  PrivateSpace.setWorked = function(index) {
+    if (this.isUsable(index === false)) {
+      return false;
+    }
+    return this.status[index] = this.STATUS_WORKED;
+  };
+
   PrivateSpace.getPoint = function() {
     var c, cardClass, j, len, point, ref;
     point = 0;
@@ -2145,12 +2233,9 @@ PrivateSpace = (function(superClass) {
     e.attr('data-tooltip', balloonStr).darkTooltip({
       addClass: this.BALLOON_CLASS_NAME
     });
-    switch (this.status[index]) {
-      case this.STATUS_WORKED:
-        e.append($('<img>').attr('src', this.IMG_WORKER).addClass('worker'));
-        break;
-      case this.STATUS_TIMER:
-        e.append($('<img>').attr('src', this.IMG_TIMER).addClass('worker'));
+    if (this.status[index] === this.STATUS_WORKED) {
+      e.addClass('used');
+      e.append($('<img>').attr('src', this.IMG_WORKER).addClass('worker'));
     }
     e.dblclick(function() {
       if (Game.isClickable) {
@@ -2179,8 +2264,13 @@ PrivateSpace = (function(superClass) {
     return false;
   };
 
-  PrivateSpace.isExistHouritu = function() {
-    var cardNum, j, len, ref;
+  PrivateSpace.getAmount = function() {
+    return this.cards.length;
+  };
+
+  PrivateSpace.getAmountHouritu = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
     ref = this.cards;
     for (j = 0, len = ref.length; j < len; j++) {
       cardNum = ref[j];
@@ -2188,7 +2278,72 @@ PrivateSpace = (function(superClass) {
         return true;
       }
     }
-    return false;
+    return amount;
+  };
+
+  PrivateSpace.getAmountHudousan = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (cardNum === Card.CARD_NUM_HUDOUSAN) {
+        amount++;
+      }
+    }
+    return amount;
+  };
+
+  PrivateSpace.getAmountNoukyou = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (cardNum === Card.CARD_NUM_NOUKYOU) {
+        amount++;
+      }
+    }
+    return amount;
+  };
+
+  PrivateSpace.getAmountRouso = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (cardNum === Card.CARD_NUM_ROUSO) {
+        amount++;
+      }
+    }
+    return amount;
+  };
+
+  PrivateSpace.getAmountRail = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (cardNum === Card.CARD_NUM_RAIL) {
+        amount++;
+      }
+    }
+    return amount;
+  };
+
+  PrivateSpace.getAmountBuilding = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (cardNum === Card.CARD_NUM_BUILDING) {
+        amount++;
+      }
+    }
+    return amount;
   };
 
   PrivateSpace.getAmountExistSouko = function() {
@@ -2211,6 +2366,45 @@ PrivateSpace = (function(superClass) {
     for (j = 0, len = ref.length; j < len; j++) {
       cardNum = ref[j];
       if (cardNum === Card.CARD_NUM_SYATAKU) {
+        amount++;
+      }
+    }
+    return amount;
+  };
+
+  PrivateSpace.getAmountUnworkable = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (Card.getClass(cardNum).isUnworkable()) {
+        amount++;
+      }
+    }
+    return amount;
+  };
+
+  PrivateSpace.getAmountFarming = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (Card.getClass(cardNum).isFarming()) {
+        amount++;
+      }
+    }
+    return amount;
+  };
+
+  PrivateSpace.getAmountIndustry = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (Card.getClass(cardNum).isIndustry()) {
         amount++;
       }
     }
@@ -2525,6 +2719,16 @@ Unpaid = (function(superClass) {
 
 })(SpaceBase);
 
+Array.prototype.in_array = function(target) {
+  var index, j, ref;
+  for (index = j = 0, ref = this.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
+    if (this[index] === target) {
+      return true;
+    }
+  }
+  return false;
+};
+
 Worker = (function(superClass) {
   extend(Worker, superClass);
 
@@ -2597,69 +2801,3 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
-
-ButtonOK = (function(superClass) {
-  extend(ButtonOK, superClass);
-
-  function ButtonOK() {
-    return ButtonOK.__super__.constructor.apply(this, arguments);
-  }
-
-  ButtonOK.DIV_ID = 'ok';
-
-  ButtonOK.init = function() {
-    this.disable();
-    return this.getElement().on('click', function() {
-      return Game.pushOK();
-    });
-  };
-
-  ButtonOK.enable = function() {
-    return this.getElement().prop("disabled", false).removeClass("disabled");
-  };
-
-  ButtonOK.disable = function() {
-    return this.getElement().prop("disabled", true).addClass("disabled");
-  };
-
-  return ButtonOK;
-
-})(SpaceBase);
-
-ButtonCANCEL = (function(superClass) {
-  extend(ButtonCANCEL, superClass);
-
-  function ButtonCANCEL() {
-    return ButtonCANCEL.__super__.constructor.apply(this, arguments);
-  }
-
-  ButtonCANCEL.DIV_ID = 'cancel';
-
-  ButtonCANCEL.init = function() {
-    this.disable();
-    return this.getElement().on('click', function() {
-      return Game.pushCANCEL();
-    });
-  };
-
-  ButtonCANCEL.enable = function() {
-    return this.getElement().prop("disabled", false).removeClass("disabled");
-  };
-
-  ButtonCANCEL.disable = function() {
-    return this.getElement().prop("disabled", true).addClass("disabled");
-  };
-
-  return ButtonCANCEL;
-
-})(SpaceBase);
-
-Array.prototype.in_array = function(target) {
-  var index, j, ref;
-  for (index = j = 0, ref = this.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
-    if (this[index] === target) {
-      return true;
-    }
-  }
-  return false;
-};
