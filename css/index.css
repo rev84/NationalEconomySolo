@@ -40,6 +40,7 @@ body {
   position:absolute;
   top:71%; left:0;
   width:70%; height:29%;
+  padding:2px;
 }
 #form_space {
   border:1px solid #000;
@@ -47,15 +48,35 @@ body {
 }
 /* ハンドのカード */
 .hand {
-  width:100px; height:100px;
+  position:relative;
+  width:120px; height:115px;
+  border:1px solid #0000ff;
+  display:inline-block;
+  margin:2px;
 }
-.hand_title {
+.hand_header {
   position:absolute;
   top:0px; left:0px;
-  width:100px; height:20px;
+  width:120px; height:20px;
+  text-align:center;
+  vertical-align:middle;
+  font-size:16px;
+  font-weight:bold;
+}
+.hand_footer {
+  position:absolute;
+  bottom:0px; left:0px;
+  width:120px; height:20px;
+  text-align:right;
+  vertical-align:middle;
+  font-size:16px;
+  font-weight:bold;
 }
 .hand_image {
   position:absolute;
-  top:20px; left:0px;
-  width:100px;
+  top:20px; left:10px;
+  width:100px; height:75px;
+}
+.no_display {
+  display:none;
 }

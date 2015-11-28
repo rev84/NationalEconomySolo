@@ -18,6 +18,11 @@ class window.Game
     @objs.deck     = Deck
     @objs.consumer = Consumer
 
+  @gameStart:->
+    @init()
+    # 3枚配る
+    @pull2hand() for i in [0...3]
+
   # カードをデッキから手札に移動
   @pull2hand:(amount = 1)->
     @objs.hand.push @objs.deck.pull() for i in [0...amount]
@@ -94,16 +99,49 @@ class HandSpace extends SpaceBase
 
     # カードのクラス
     cardClass = Card.getClass @cards[index]
+    # カード名
+    name = cardClass.getName()
+    # カテゴリ
+    cat = cardClass.getCategory()
+    # コスト
+    price = cardClass.getPrice()
+    # コスト
+    cost = cardClass.getCost()
+    # 得点
+    point = cardClass.getPoint()
+    # 説明文
+    desc = cardClass.getDescription()
 
     # カードの外側
     e = $('<div>').addClass('hand')
-    # タイトル
-    title = $('<span>').addClass('hand_title').html(cardClass.getName())
+
+    # ヘッダ
+    # [コスト]カード名
+    header = $('<span>').addClass('hand_header').html('['+cost+']'+cardClass.getName())
+
     # 画像
     img = cardClass.getImageObj().addClass('hand_image')
 
+    # フッタ
+    # [カテゴリ][得点]
+    catStr = if cat? then '['+cat+']' else ''
+    footer = $('<span>').addClass('hand_footer').html(catStr+'[$'+point+']')
+
+    # 説明の吹き出し
+    catBalloon = if cat? then cat else 'なし'
+    balloonStr = """
+    #{desc}
+    --------------------
+    カテゴリ：#{catBalloon}
+    コスト：#{cost}
+    売却価格：#{price}
+    得点：#{point}
+    """.replace /\n/g, '<br>'
+    e.attr('data-tooltip', balloonStr).darkTooltip()
+
+    e.append header
     e.append img
-    e.append title
+    e.append footer
     e
 
 class RoundDeck

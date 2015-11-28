@@ -37,6 +37,16 @@ window.Game = (function() {
     return this.objs.consumer = Consumer;
   };
 
+  Game.gameStart = function() {
+    var i, j, results;
+    this.init();
+    results = [];
+    for (i = j = 0; j < 3; i = ++j) {
+      results.push(this.pull2hand());
+    }
+    return results;
+  };
+
   Game.pull2hand = function(amount) {
     var i, j, ref, results;
     if (amount == null) {
@@ -177,16 +187,28 @@ HandSpace = (function(superClass) {
   };
 
   HandSpace.createElement = function(index) {
-    var cardClass, e, img, title;
+    var balloonStr, cardClass, cat, catBalloon, catStr, cost, desc, e, footer, header, img, name, point, price;
     if (this.cards[index] == null) {
       return false;
     }
     cardClass = Card.getClass(this.cards[index]);
+    name = cardClass.getName();
+    cat = cardClass.getCategory();
+    price = cardClass.getPrice();
+    cost = cardClass.getCost();
+    point = cardClass.getPoint();
+    desc = cardClass.getDescription();
     e = $('<div>').addClass('hand');
-    title = $('<span>').addClass('hand_title').html(cardClass.getName());
+    header = $('<span>').addClass('hand_header').html('[' + cost + ']' + cardClass.getName());
     img = cardClass.getImageObj().addClass('hand_image');
+    catStr = cat != null ? '[' + cat + ']' : '';
+    footer = $('<span>').addClass('hand_footer').html(catStr + '[$' + point + ']');
+    catBalloon = cat != null ? cat : 'なし';
+    balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
+    e.attr('data-tooltip', balloonStr).darkTooltip();
+    e.append(header);
     e.append(img);
-    e.append(title);
+    e.append(footer);
     return e;
   };
 

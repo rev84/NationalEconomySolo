@@ -23,11 +23,33 @@ class CardBase
   @getName:->
     @NAME
 
+  # カード名を取得
+  @getCategory:->
+    @CATEGORY
+
   # カードNoを取得
   @getNumber:->
     res = @name.match /^Card(\d+)$/
     return Number res[1] if res?
     false
+
+  # 説明文（HTML）を取得
+  @getDescription:->
+    @DESCRIPTION
+
+  # 労働者を置けるか
+  @isWorkable:->
+    return false if @CATEGORY is '非職場'
+    return false if @CATEGORY is '消費財'
+    true
+
+  # 売却できるか
+  @isSellable:->
+    @isWorkable()
+
+  # コストを取得
+  @getCost:->
+    @COST
 
   # 売った時の収入を取得
   @getPrice:->

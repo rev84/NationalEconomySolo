@@ -40,6 +40,10 @@ CardBase = (function() {
     return this.NAME;
   };
 
+  CardBase.getCategory = function() {
+    return this.CATEGORY;
+  };
+
   CardBase.getNumber = function() {
     var res;
     res = this.name.match(/^Card(\d+)$/);
@@ -47,6 +51,28 @@ CardBase = (function() {
       return Number(res[1]);
     }
     return false;
+  };
+
+  CardBase.getDescription = function() {
+    return this.DESCRIPTION;
+  };
+
+  CardBase.isWorkable = function() {
+    if (this.CATEGORY === '非職場') {
+      return false;
+    }
+    if (this.CATEGORY === '消費財') {
+      return false;
+    }
+    return true;
+  };
+
+  CardBase.isSellable = function() {
+    return this.isWorkable();
+  };
+
+  CardBase.getCost = function() {
+    return this.COST;
   };
 
   CardBase.getPrice = function() {
