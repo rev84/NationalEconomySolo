@@ -9,8 +9,10 @@ class SpaceBase
   @IMG_WORKER   = './img/worker.png'
 
   @init:->
+    ###
     e = @getElement()
     e.html(@DIV_ID)
+    ###
 
   @getElement:->
     $('#'+@DIV_ID)

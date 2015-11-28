@@ -1,23 +1,38 @@
 class LogSpace extends SpaceBase
-  @DIV_ID = "log"
-  @DIV_ID_PARENT = "log_space"
+  @DIV_ID = "log_space"
+  @DIV_CLASS = 'log'
+  @DIV_WARN_CLASS = 'log_warn'
+  @DIV_FATAL_CLASS = 'log_fatal'
+
   @init:->
     super()
-    @hide()
+    @removeAll()
 
-  # 消す
-  @hide:->
-    @getParentElement().hide()
+  # 固定をすべて消す
+  @removeAll:->
+    $('.'+@DIV_CLASS).remove()
 
-  # メッセージを表示
-  @show:(message)->
-    @getElement().html(message)
-    @getParentElement().show()
+  # 固定の警告メッセージを表示
+  @addFatal:(message)->
+    e = $('<div>').addClass(@DIV_CLASS+' '+@DIV_FATAL_CLASS).html(message)
+    @getElement().append e
 
-  # 徐々に消す
-  @fadeout:(sec)->
-    @getParentElement().fadeOut sec*1000
+  # 固定の忠告メッセージを表示
+  @addWarn:(message)->
+    e = $('<div>').addClass(@DIV_CLASS+' '+@DIV_WARN_CLASS).html(message)
+    @getElement().append e
 
-  # 親の要素を取得
-  @getParentElement:->
-    $('#'+@DIV_ID_PARENT)
+  # 徐々に消える警告メッセージを表示
+  @addFatalInstant:(message, sec = 5)->
+    e = $('<div>').addClass(@DIV_FATAL_CLASS).html(message)
+    @getElement().append e
+    e.fadeOut sec*1000
+    setTimeout e.remove, sec*1000
+
+  # 徐々に消えるメッセージを表示
+  @addWarnInstant:(message, sec = 5)->
+    e = $('<div>').addClass(@DIV_WARN_CLASS).html(message)
+    @getElement().append e
+    e.fadeOut sec*1000
+    setTimeout e.remove, sec*1000
+

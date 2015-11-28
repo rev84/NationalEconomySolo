@@ -128,7 +128,7 @@ class Card4 extends CardBase
     [1,1]
 
   @getSelectMessage:->
-    "選択してください\n左クリック：建物カードを1枚\n右クリック：捨て札にするカード（建物のコスト分の枚数）"
+    "選択してください\n左クリック：建物カードを1枚\n右クリック：捨て札にするカード（建物コストの枚数）"
 
   @use:(leftIndexs, rightIndexs)->
     #return "指定カードが足りません" if super()
@@ -142,7 +142,7 @@ class Card4 extends CardBase
     cost = cardClass.getCost()
 
     # 左クリックの捨札は、コストと同一でなければならない
-    return "捨札がコストと一致していません" if cost isnt rightIndexs.length
+    return "捨札が建設コストと一致していません" if cost isnt rightIndexs.length
 
     # 建物を建てる
     Game.objs.private.push buildCardNum

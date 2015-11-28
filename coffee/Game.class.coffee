@@ -68,12 +68,12 @@ class window.Game
 
   # ラウンドの終了判定
   @roundEnd:->
-    @objs.log.hide()
+    LogSpace.removeAll()
 
     # 手札が規定枚数以上なら手札を捨てなくてはならない
     if @objs.hand.isHandOver()
       max = @objs.hand.getMax()
-      @objs.log.show '手札を'+max+'枚になるまで捨ててください'
+      LogSpace.addWarn '手札を'+max+'枚になるまで捨ててください'
       @isHandTrash = true
       return
     @isHandTrash = false
@@ -85,7 +85,7 @@ class window.Game
                 給料が払えるようになるか、なくなるまで建物を売ってください
                 不足額：$#{rest}
                 """
-      @objs.log.show message.replace /\n/g, '<br>'
+      LogSpace.addWarn(message.replace /\n/g, '<br>')
       @isSell = true
       return
     @isSell = false
@@ -105,7 +105,8 @@ class window.Game
     alertStr += "給料 $"+minusSalary+" を支払います\n"
     alertStr += "支払えなかった $"+penalty+" が未払いになります" if penalty isnt 0
 
-    alert alertStr
+    #alert alertStr
+    LogSpace.addWarnInstant alertStr.replace(/\n/g, '<br>'), 5
 
     # 資金を減らす
     @objs.stock.pull minusSalary
@@ -185,31 +186,26 @@ class window.Game
       left.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_LEFT
       right.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_RIGHT
 
+    # 解除処理
+    HandSpace.selectReset()
+    ButtonOK.disable()
+    ButtonCANCEL.disable()
+
     # 使用する
     spaceClass = @kubun2class(kubun)
     cardClass = spaceClass.getCardClass cardIndex
+    LogSpace.removeAll()
+
     res = cardClass.use(left, right)
     # 使えた
     if res is true
-      @objs.log.hide()
+      @turnEnd(kubun, cardIndex)
     # 使えなかった
     else
-      @objs.log.show res
-      @objs.log.fadeout 3
-
-    @objs.hand.selectReset()
-    @objs.ok.disable()
-    @objs.cancel.disable()
-    # 成功時
-    if res is true
-      @turnEnd(kubun, cardIndex)
-    # 失敗時
-    else
-      @objs.hand.selectReset()
-      @objs.hand.redraw()
-      @objs.ok.disable()
-      @objs.cancel.disable()
+      LogSpace.addFatalInstant res
+      HandSpace.redraw()
       @clickable()
+
     res is true
 
   @pushCANCEL:->
@@ -219,7 +215,7 @@ class window.Game
     @objs.hand.redraw()
     @objs.ok.disable()
     @objs.cancel.disable()
-    @objs.log.hide()
+    LogSpace.removeAll()
     @clickable()
     true
 
@@ -259,7 +255,7 @@ class window.Game
       # 選択待ちにする
       @waitChoice = [kubun, index, cardClass.isRightClick()]
       # 選択待ちメッセージがあれば表示する
-      @objs.log.show cardClass.getSelectMessage().replace /\n/g, '<br>'
+      LogSpace.addWarn(cardClass.getSelectMessage().replace /\n/g, '<br>')
       # ボタンを押せるようにする
       @objs.ok.enable()
       @objs.cancel.enable()

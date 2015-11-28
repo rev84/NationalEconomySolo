@@ -19,9 +19,11 @@ SpaceBase = (function() {
   SpaceBase.IMG_WORKER = './img/worker.png';
 
   SpaceBase.init = function() {
-    var e;
-    e = this.getElement();
-    return e.html(this.DIV_ID);
+
+    /*
+    e = @getElement()
+    e.html(@DIV_ID)
+     */
   };
 
   SpaceBase.getElement = function() {
@@ -269,7 +271,7 @@ Card4 = (function(superClass) {
   };
 
   Card4.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物カードを1枚\n右クリック：捨て札にするカード（建物のコスト分の枚数）";
+    return "選択してください\n左クリック：建物カードを1枚\n右クリック：捨て札にするカード（建物コストの枚数）";
   };
 
   Card4.use = function(leftIndexs, rightIndexs) {
@@ -282,7 +284,7 @@ Card4 = (function(superClass) {
     cardClass = Game.objs.hand.getCardClass(buildCardIndex);
     cost = cardClass.getCost();
     if (cost !== rightIndexs.length) {
-      return "捨札がコストと一致していません";
+      return "捨札が建設コストと一致していません";
     }
     Game.objs["private"].push(buildCardNum);
     Game.objs.hand.trash(leftIndexs.concat(rightIndexs));
@@ -1145,10 +1147,10 @@ window.Game = (function() {
 
   Game.roundEnd = function() {
     var max, message, rest;
-    this.objs.log.hide();
+    LogSpace.removeAll();
     if (this.objs.hand.isHandOver()) {
       max = this.objs.hand.getMax();
-      this.objs.log.show('手札を' + max + '枚になるまで捨ててください');
+      LogSpace.addWarn('手札を' + max + '枚になるまで捨ててください');
       this.isHandTrash = true;
       return;
     }
@@ -1156,7 +1158,7 @@ window.Game = (function() {
     if (this.isMustSell()) {
       rest = this.objs.worker.getTotal() * this.objs.round.getSalary() - this.objs.stock.getAmount();
       message = "給料が払えるようになるか、なくなるまで建物を売ってください\n不足額：$" + rest;
-      this.objs.log.show(message.replace(/\n/g, '<br>'));
+      LogSpace.addWarn(message.replace(/\n/g, '<br>'));
       this.isSell = true;
       return;
     }
@@ -1175,7 +1177,7 @@ window.Game = (function() {
     if (penalty !== 0) {
       alertStr += "支払えなかった $" + penalty + " が未払いになります";
     }
-    alert(alertStr);
+    LogSpace.addWarnInstant(alertStr.replace(/\n/g, '<br>'), 5);
     this.objs.stock.pull(minusSalary);
     this.objs.budget.push(minusSalary - penalty);
     this.objs.unpaid.push(penalty);
@@ -1254,25 +1256,18 @@ window.Game = (function() {
         right.push(index);
       }
     }
+    HandSpace.selectReset();
+    ButtonOK.disable();
+    ButtonCANCEL.disable();
     spaceClass = this.kubun2class(kubun);
     cardClass = spaceClass.getCardClass(cardIndex);
+    LogSpace.removeAll();
     res = cardClass.use(left, right);
-    if (res === true) {
-      this.objs.log.hide();
-    } else {
-      this.objs.log.show(res);
-      this.objs.log.fadeout(3);
-    }
-    this.objs.hand.selectReset();
-    this.objs.ok.disable();
-    this.objs.cancel.disable();
     if (res === true) {
       this.turnEnd(kubun, cardIndex);
     } else {
-      this.objs.hand.selectReset();
-      this.objs.hand.redraw();
-      this.objs.ok.disable();
-      this.objs.cancel.disable();
+      LogSpace.addFatalInstant(res);
+      HandSpace.redraw();
       this.clickable();
     }
     return res === true;
@@ -1287,7 +1282,7 @@ window.Game = (function() {
     this.objs.hand.redraw();
     this.objs.ok.disable();
     this.objs.cancel.disable();
-    this.objs.log.hide();
+    LogSpace.removeAll();
     this.clickable();
     return true;
   };
@@ -1318,7 +1313,7 @@ window.Game = (function() {
       this.isClickable = true;
     } else {
       this.waitChoice = [kubun, index, cardClass.isRightClick()];
-      this.objs.log.show(cardClass.getSelectMessage().replace(/\n/g, '<br>'));
+      LogSpace.addWarn(cardClass.getSelectMessage().replace(/\n/g, '<br>'));
       this.objs.ok.enable();
       this.objs.cancel.enable();
     }
@@ -1608,30 +1603,55 @@ LogSpace = (function(superClass) {
     return LogSpace.__super__.constructor.apply(this, arguments);
   }
 
-  LogSpace.DIV_ID = "log";
+  LogSpace.DIV_ID = "log_space";
 
-  LogSpace.DIV_ID_PARENT = "log_space";
+  LogSpace.DIV_CLASS = 'log';
+
+  LogSpace.DIV_WARN_CLASS = 'log_warn';
+
+  LogSpace.DIV_FATAL_CLASS = 'log_fatal';
 
   LogSpace.init = function() {
     LogSpace.__super__.constructor.init.call(this);
-    return this.hide();
+    return this.removeAll();
   };
 
-  LogSpace.hide = function() {
-    return this.getParentElement().hide();
+  LogSpace.removeAll = function() {
+    return $('.' + this.DIV_CLASS).remove();
   };
 
-  LogSpace.show = function(message) {
-    this.getElement().html(message);
-    return this.getParentElement().show();
+  LogSpace.addFatal = function(message) {
+    var e;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS).html(message);
+    return this.getElement().append(e);
   };
 
-  LogSpace.fadeout = function(sec) {
-    return this.getParentElement().fadeOut(sec * 1000);
+  LogSpace.addWarn = function(message) {
+    var e;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS).html(message);
+    return this.getElement().append(e);
   };
 
-  LogSpace.getParentElement = function() {
-    return $('#' + this.DIV_ID_PARENT);
+  LogSpace.addFatalInstant = function(message, sec) {
+    var e;
+    if (sec == null) {
+      sec = 5;
+    }
+    e = $('<div>').addClass(this.DIV_FATAL_CLASS).html(message);
+    this.getElement().append(e);
+    e.fadeOut(sec * 1000);
+    return setTimeout(e.remove, sec * 1000);
+  };
+
+  LogSpace.addWarnInstant = function(message, sec) {
+    var e;
+    if (sec == null) {
+      sec = 5;
+    }
+    e = $('<div>').addClass(this.DIV_WARN_CLASS).html(message);
+    this.getElement().append(e);
+    e.fadeOut(sec * 1000);
+    return setTimeout(e.remove, sec * 1000);
   };
 
   return LogSpace;

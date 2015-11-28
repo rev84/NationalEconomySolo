@@ -14,18 +14,27 @@ body {
 }
 #log_space {
   position:fixed;
-  margin:0 auto;
-  color:#555;
-  border-radius:10px;
-  font-size:30px;
-  padding:10px 10px 10px 60px;
-  margin:10px;
-  background:#fff8c4 url('../img/warning.png') no-repeat 20px 50%;
-  border:1px solid #f2c779;
-  font-weight:bold;
-  text-transform:uppercase;
   /*height:60px;*/
   z-index:100;
+}
+#log_space div {
+  position:relative;
+  border-radius:10px;
+  font-size:30px;
+  padding:10px 10px 10px 80px;
+  margin:10px;
+  font-weight:bold;
+  text-transform:uppercase;
+}
+.log_fatal {
+  color:#555;
+  background:#ffc0cb url('../img/fatal.png') no-repeat 20px 50%;
+  border:1px solid #ff0000;
+}
+.log_warn {
+  color:#555;
+  background:#fff8c4 url('../img/warning.png') no-repeat 20px 50%;
+  border:1px solid #f2c779;
 }
 #info_space {
   /*border:1px solid #000;*/
