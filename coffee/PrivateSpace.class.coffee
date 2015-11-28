@@ -1,6 +1,9 @@
 class PrivateSpace extends SpaceBase
   @DIV_ID = "private"
 
+  # バルーンにつけるクラス
+  @BALLOON_CLASS_NAME = 'balloon_private'
+
   # 建物の状態の定数
   @STATUS_USABLE = 0
   @STATUS_WORKED = 1
@@ -50,6 +53,8 @@ class PrivateSpace extends SpaceBase
     me = @getElement()
 
     me.html('')
+    # バルーンも削除
+    $('.'+@BALLOON_CLASS_NAME).remove()
     for index in [0...@cards.length]
       e = @createElement index
       me.append e if e isnt false
@@ -103,7 +108,9 @@ class PrivateSpace extends SpaceBase
     売却価格：#{price}
     得点：#{point}
     """.replace /\n/g, '<br>'
-    e.attr('data-tooltip', balloonStr).darkTooltip()
+    e.attr('data-tooltip', balloonStr).darkTooltip(
+      addClass : @BALLOON_CLASS_NAME
+    )
 
     # 労働者により使用不可
     switch @status[index]
@@ -124,8 +131,24 @@ class PrivateSpace extends SpaceBase
     e.append pointSpan
     e
 
+  # 売れる建物があるか
+  @isExistSellable:->
+    # TODO:焼畑は売れる建物に含まれる前提
+    for index in [0...@cards.length]
+      cardClass = @getCardClass index
+      return true if cardClass.isSellable()
+    false
+
+
   # 法律事務所が存在するか（No.22）
   @isExistHouritu:->
     for cardNum in @cards
-      return true if cardNum is 22
+      return true if cardNum is Card.CARD_NUM_HOURITU
     false
+
+  # 存在する倉庫の数
+  @getAmountExistSouko:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if cardNum is Card.CARD_NUM_SOUKO
+    amount

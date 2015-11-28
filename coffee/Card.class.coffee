@@ -1,4 +1,9 @@
 class Card
+  # 倉庫のカードNo
+  @CARD_NUM_SOUKO   = 20
+  # 法律事務所のカードNo
+  @CARD_NUM_HOURITU = 22
+
   @getClass = (classNum)->
     try
       res = eval("Card"+classNum)
@@ -21,17 +26,23 @@ class CardBase
 
   # 選択時に右クリック可能か
   @isRightClick:->
-    false
+    [l, r] = @requireCards()
+    r > 0
 
   # 手札からカードを何枚選ぶ必要性があるか
   @requireCards:->
-    [0, 0]
+    [0,0]
+
+  # 選択待ちの時に表示するメッセージ
+  @getSelectMessage:->
+    false
 
   # 労働者を派遣した時の挙動
   @use:(leftIndexs = [], rightIndexs = [])->
     # 数のバリデーション
     [leftReqNum, rightReqNum] = @requireCards
     return false unless leftIndexs.length is leftReqNum and rightReqNum.length is rightReqNum
+    true
 
   # カード名を取得
   @getName:->
@@ -102,7 +113,7 @@ class Card3 extends CardBase
   @NAME        = "学校"
   @CATEGORY    = "公共"
   @DESCRIPTION = "労働者を1人増やす"
-  
+
   @use:->
     Game.addWorkerNum()
     true
@@ -112,6 +123,32 @@ class Card4 extends CardBase
   @NAME        = "大工"
   @CATEGORY    = "公共"
   @DESCRIPTION = "建物を1つ作る"
+
+  @requireCards:->
+    [1,1]
+
+  @getSelectMessage:->
+    "選択してください\n左クリック：捨て札にするカード（建物のコスト分の枚数）\n右クリック：建物カードを1枚"
+
+  @use:(leftIndexs, rightIndexs)->
+    #return "指定カードが足りません" if super()
+
+    # 右クリックの建物は1枚でなければならない
+    return "建物カードを1枚選択しなければなりません" if leftIndexs.length isnt 1
+
+    buildCardNum = leftIndexs[0]
+    cardClass = Card.getClass buildCardNum
+    cost = cardClass.getCost()
+
+    # 左クリックの捨札は、コストと同一でなければならない
+    return "捨札がコストと一致していません" if cost isnt rightIndexs.length
+
+    # 建物を建てる
+    Game.objs.private.push buildCardNum
+    # 建物と捨札を捨てる
+    Game.objs.hand.trash leftIndexs.concat rightIndexs
+
+    true
 
 # No.05 露店
 class Card5 extends CardBase

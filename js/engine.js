@@ -81,6 +81,10 @@ Budget = (function(superClass) {
 Card = (function() {
   function Card() {}
 
+  Card.CARD_NUM_SOUKO = 20;
+
+  Card.CARD_NUM_HOURITU = 22;
+
   Card.getClass = function(classNum) {
     var res;
     try {
@@ -112,11 +116,17 @@ CardBase = (function() {
   CardBase.PRICE = 0;
 
   CardBase.isRightClick = function() {
-    return false;
+    var l, r, ref;
+    ref = this.requireCards(), l = ref[0], r = ref[1];
+    return r > 0;
   };
 
   CardBase.requireCards = function() {
     return [0, 0];
+  };
+
+  CardBase.getSelectMessage = function() {
+    return false;
   };
 
   CardBase.use = function(leftIndexs, rightIndexs) {
@@ -131,6 +141,7 @@ CardBase = (function() {
     if (!(leftIndexs.length === leftReqNum && rightReqNum.length === rightReqNum)) {
       return false;
     }
+    return true;
   };
 
   CardBase.getName = function() {
@@ -252,6 +263,30 @@ Card4 = (function(superClass) {
   Card4.CATEGORY = "公共";
 
   Card4.DESCRIPTION = "建物を1つ作る";
+
+  Card4.requireCards = function() {
+    return [1, 1];
+  };
+
+  Card4.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨て札にするカード（建物のコスト分の枚数）\n右クリック：建物カードを1枚";
+  };
+
+  Card4.use = function(leftIndexs, rightIndexs) {
+    var buildCardNum, cardClass, cost;
+    if (leftIndexs.length !== 1) {
+      return "建物カードを1枚選択しなければなりません";
+    }
+    buildCardNum = leftIndexs[0];
+    cardClass = Card.getClass(buildCardNum);
+    cost = cardClass.getCost();
+    if (cost !== rightIndexs.length) {
+      return "捨札がコストと一致していません";
+    }
+    Game.objs["private"].push(buildCardNum);
+    Game.objs.hand.trash(leftIndexs.concat(rightIndexs));
+    return true;
+  };
 
   return Card4;
 
@@ -1007,6 +1042,9 @@ Deck = (function() {
 })();
 
 $(function() {
+  $('body').bind('contextmenu', function() {
+    return false;
+  });
   return Game.init();
 });
 
@@ -1021,17 +1059,24 @@ window.Game = (function() {
 
   Game.waitChoice = false;
 
+  Game.isHandTrash = false;
+
   Game.isSell = false;
 
   Game.init = function() {
     var name, obj, ref;
+    this.isClickable = false;
     this.setObj();
     ref = this.objs;
     for (name in ref) {
       obj = ref[name];
       obj.init();
     }
-    return this.refresh();
+    this.refresh();
+    this.waitChoice = false;
+    this.isHandTrash = false;
+    this.isSell = false;
+    return this.isClickable = true;
   };
 
   Game.refresh = function() {
@@ -1077,6 +1122,25 @@ window.Game = (function() {
   };
 
   Game.roundEnd = function() {
+    var max;
+    this.objs.log.hide();
+    if (this.objs.hand.isHandOver()) {
+      max = this.objs.hand.getMax();
+      this.objs.log.show('手札を' + max + '枚になるまで捨ててください');
+      this.isHandTrash = true;
+      return;
+    }
+    this.isHandTrash = false;
+    if (this.isMustSell()) {
+      this.objs.log.show('給料が払えるようになるか、なくなるまで建物を売ってください');
+      this.isSell = true;
+      return;
+    }
+    this.isSell = false;
+    return this.settle();
+  };
+
+  Game.settle = function() {
     var alertStr, minusSalary, penalty;
     minusSalary = this.objs.worker.getTotal() * this.objs.round.getSalary();
     penalty = minusSalary - this.objs.stock.getAmount();
@@ -1089,6 +1153,7 @@ window.Game = (function() {
     }
     alert(alertStr);
     this.objs.stock.pull(minusSalary);
+    this.objs.budget.push(minusSalary - penalty);
     this.objs.unpaid.push(penalty);
     this.objs.round.addRound();
     this.pullPublic();
@@ -1114,7 +1179,8 @@ window.Game = (function() {
     if (this.waitChoice === false) {
       return false;
     }
-    return this.objs.hand.clickLeft();
+    this.objs.hand.clickLeft(index);
+    return this.objs.hand.redraw();
   };
 
   Game.handClickRight = function(index) {
@@ -1124,7 +1190,17 @@ window.Game = (function() {
     if (this.waitChoice[2] === false) {
       return false;
     }
-    return this.objs.hand.clickRight();
+    this.objs.hand.clickRight(index);
+    return this.objs.hand.redraw();
+  };
+
+  Game.handDoubleClick = function(index) {
+    if (!this.isHandTrash) {
+      return false;
+    }
+    this.objs.hand.trash([index]);
+    this.objs.hand.redraw();
+    return this.roundEnd();
   };
 
   Game.pushOK = function() {
@@ -1149,9 +1225,10 @@ window.Game = (function() {
     cardClass = spaceClass.getCardClass(cardIndex);
     res = cardClass.use(left, right);
     if (res === true) {
-
+      return this.objs.log.hide();
     } else {
-      alert(res);
+      this.objs.log.show(res);
+      this.objs.log.fadeout(3);
       return false;
     }
   };
@@ -1188,6 +1265,9 @@ window.Game = (function() {
       this.isClickable = true;
     } else {
       this.waitChoice = [kubun, index, cardClass.isRightClick()];
+      this.objs.log.show(cardClass.getSelectMessage().replace(/\n/g, '<br>'));
+      this.objs.ok.enable();
+      this.objs.cancel.enable();
     }
     return true;
   };
@@ -1254,6 +1334,13 @@ window.Game = (function() {
     return this.objs.worker.redraw();
   };
 
+  Game.isMustSell = function() {
+    var canSell, cantPaySalary;
+    cantPaySalary = this.objs.stock.getAmount() - this.objs.worker.getTotal() * this.objs.round.getSalary() < 0;
+    canSell = this.objs["private"].isExistSellable();
+    return cantPaySalary && canSell;
+  };
+
   Game.getPoint = function() {
     var point, unpaidNum;
     point = 0;
@@ -1287,6 +1374,8 @@ HandSpace = (function(superClass) {
   }
 
   HandSpace.DIV_ID = "hand";
+
+  HandSpace.BALLOON_CLASS_NAME = 'balloon_hand';
 
   HandSpace.SELECT_NOT = 0;
 
@@ -1339,6 +1428,17 @@ HandSpace = (function(superClass) {
     return this.cards.length;
   };
 
+  HandSpace.trash = function(cardIndexs) {
+    var index, j, newCards, ref;
+    newCards = [];
+    for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
+      if (!cardIndexs.in_array(index)) {
+        newCards.push(this.cards[index]);
+      }
+    }
+    return this.cards = newCards;
+  };
+
   HandSpace.push = function(cardNum) {
     this.cards.push(Number(cardNum));
     return this.select.push(this.SELECT_NOT);
@@ -1348,6 +1448,7 @@ HandSpace = (function(superClass) {
     var e, index, j, me, ref, results;
     me = this.getElement();
     me.html('');
+    $('.' + this.BALLOON_CLASS_NAME).remove();
     results = [];
     for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
       e = this.createElement(index);
@@ -1386,20 +1487,37 @@ HandSpace = (function(superClass) {
     pointSpan = $('<span>').addClass('hand_footer hand_point').html('[$' + point + ']');
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
-    e.attr('data-tooltip', balloonStr).darkTooltip();
+    e.attr('data-tooltip', balloonStr).darkTooltip({
+      addClass: this.BALLOON_CLASS_NAME
+    });
     e.on('click', function() {
       index = $(this).attr('data-index');
-      return Game.handClickLeft(index);
+      return Game.handClickLeft(Number(index));
     });
     e.on('contextmenu', function() {
       index = $(this).attr('data-index');
-      return Game.handClickRight(index);
+      return Game.handClickRight(Number(index));
+    });
+    e.dblclick(function() {
+      index = $(this).attr('data-index');
+      return Game.handDoubleClick(Number(index));
     });
     e.append(header);
     e.append(img);
     e.append(categorySpan);
     e.append(pointSpan);
     return e;
+  };
+
+  HandSpace.isHandOver = function() {
+    return this.getAmount() > this.getMax();
+  };
+
+  HandSpace.getMax = function() {
+    var handMax, soukoNum;
+    handMax = 5;
+    soukoNum = Game.objs["private"].getAmountExistSouko();
+    return handMax + soukoNum * 4;
   };
 
   return HandSpace;
@@ -1415,20 +1533,29 @@ LogSpace = (function(superClass) {
 
   LogSpace.DIV_ID = "log";
 
+  LogSpace.DIV_ID_PARENT = "log_space";
+
   LogSpace.init = function() {
     LogSpace.__super__.constructor.init.call(this);
-    return this.clear();
+    return this.hide();
   };
 
-  LogSpace.clear = function() {
-    return this.getElement().html('');
+  LogSpace.hide = function() {
+    return this.getParentElement().hide();
   };
 
-  LogSpace.output = function(message) {};
+  LogSpace.show = function(message) {
+    this.getElement().html(message);
+    return this.getParentElement().show();
+  };
 
-  LogSpace.error = function(message) {};
+  LogSpace.fadeout = function(sec) {
+    return this.getParentElement().fadeOut(sec * 1000);
+  };
 
-  LogSpace.fatal = function(message) {};
+  LogSpace.getParentElement = function() {
+    return $('#' + this.DIV_ID_PARENT);
+  };
 
   return LogSpace;
 
@@ -1463,6 +1590,8 @@ PrivateSpace = (function(superClass) {
   }
 
   PrivateSpace.DIV_ID = "private";
+
+  PrivateSpace.BALLOON_CLASS_NAME = 'balloon_private';
 
   PrivateSpace.STATUS_USABLE = 0;
 
@@ -1525,6 +1654,7 @@ PrivateSpace = (function(superClass) {
     var e, index, j, me, ref, results;
     me = this.getElement();
     me.html('');
+    $('.' + this.BALLOON_CLASS_NAME).remove();
     results = [];
     for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
       e = this.createElement(index);
@@ -1559,7 +1689,9 @@ PrivateSpace = (function(superClass) {
     pointSpan = $('<span>').addClass('private_footer private_point').html(pointStr);
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
-    e.attr('data-tooltip', balloonStr).darkTooltip();
+    e.attr('data-tooltip', balloonStr).darkTooltip({
+      addClass: this.BALLOON_CLASS_NAME
+    });
     switch (this.status[index]) {
       case this.STATUS_WORKED:
         e.append($('<img>').attr('src', this.IMG_WORKER).addClass('worker'));
@@ -1578,16 +1710,40 @@ PrivateSpace = (function(superClass) {
     return e;
   };
 
+  PrivateSpace.isExistSellable = function() {
+    var cardClass, index, j, ref;
+    for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
+      cardClass = this.getCardClass(index);
+      if (cardClass.isSellable()) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   PrivateSpace.isExistHouritu = function() {
     var cardNum, j, len, ref;
     ref = this.cards;
     for (j = 0, len = ref.length; j < len; j++) {
       cardNum = ref[j];
-      if (cardNum === 22) {
+      if (cardNum === Card.CARD_NUM_HOURITU) {
         return true;
       }
     }
     return false;
+  };
+
+  PrivateSpace.getAmountExistSouko = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (cardNum === Card.CARD_NUM_SOUKO) {
+        amount++;
+      }
+    }
+    return amount;
   };
 
   return PrivateSpace;
@@ -1602,6 +1758,8 @@ PublicSpace = (function(superClass) {
   }
 
   PublicSpace.DIV_ID = "public";
+
+  PublicSpace.BALLOON_CLASS_NAME = 'balloon_public';
 
   PublicSpace.cards = [];
 
@@ -1673,6 +1831,7 @@ PublicSpace = (function(superClass) {
     var e, index, j, me, ref, results;
     me = this.getElement();
     me.html('');
+    $('.' + this.BALLOON_CLASS_NAME).remove();
     results = [];
     for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
       e = this.createElement(index);
@@ -1711,7 +1870,8 @@ PublicSpace = (function(superClass) {
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + costBalloon + "\n売却価格：" + priceBalloon + "\n得点：" + pointBalloon).replace(/\n/g, '<br>');
     e.attr('data-tooltip', balloonStr).darkTooltip({
-      gravity: 'north'
+      gravity: 'north',
+      addClass: this.BALLOON_CLASS_NAME
     });
     switch (this.status[index]) {
       case this.STATUS_WORKED:
@@ -1994,3 +2154,13 @@ ButtonCANCEL = (function(superClass) {
   return ButtonCANCEL;
 
 })(SpaceBase);
+
+Array.prototype.in_array = function(target) {
+  var index, j, ref;
+  for (index = j = 0, ref = this.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
+    if (this[index] === target) {
+      return true;
+    }
+  }
+  return false;
+};

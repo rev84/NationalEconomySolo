@@ -1,6 +1,9 @@
 class PublicSpace extends SpaceBase
   @DIV_ID = "public"
 
+  # バルーンにつけるクラス
+  @BALLOON_CLASS_NAME = 'balloon_public'
+
   @cards:[]
   # 建物の状態
   @status:[]
@@ -50,6 +53,8 @@ class PublicSpace extends SpaceBase
     me = @getElement()
 
     me.html('')
+    # バルーンも削除
+    $('.'+@BALLOON_CLASS_NAME).remove()
     for index in [0...@cards.length]
       e = @createElement index
       me.append e if e isnt false
@@ -108,6 +113,7 @@ class PublicSpace extends SpaceBase
     """.replace /\n/g, '<br>'
     e.attr('data-tooltip', balloonStr).darkTooltip(
       gravity : 'north'
+      addClass : @BALLOON_CLASS_NAME
     )
 
     # 労働者により使用不可

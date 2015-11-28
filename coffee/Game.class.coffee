@@ -6,13 +6,22 @@ class window.Game
   # false : 待ちではない
   # [kubun, index, isRightClick] : 区分、インデックス番号、右クリック有効
   @waitChoice : false
+  # 手札捨て期間
+  @isHandTrash : false
   # 建物売り期間
   @isSell : false
 
   @init : ->
+    @isClickable = false
+
     @setObj()
     obj.init() for name, obj of @objs
     @refresh()
+
+    @waitChoice  = false
+    @isHandTrash = false
+    @isSell      = false
+    @isClickable = true
 
   @refresh:->
     @objs.public.redraw()
@@ -56,8 +65,29 @@ class window.Game
 
     @isClickable = true
 
-  # ラウンドの終了処理
+
+  # ラウンドの終了判定
   @roundEnd:->
+    @objs.log.hide()
+
+    # 手札が規定枚数以上なら手札を捨てなくてはならない
+    if @objs.hand.isHandOver()
+      max = @objs.hand.getMax()
+      @objs.log.show '手札を'+max+'枚になるまで捨ててください'
+      @isHandTrash = true
+      return
+    @isHandTrash = false
+
+    if @isMustSell()
+      @objs.log.show '給料が払えるようになるか、なくなるまで建物を売ってください'
+      @isSell = true
+      return
+    @isSell = false
+
+    @settle()
+
+  # ラウンド終了精算
+  @settle:->
     # 給料
     minusSalary = @objs.worker.getTotal() * @objs.round.getSalary()
     # 不足
@@ -73,6 +103,8 @@ class window.Game
 
     # 資金を減らす
     @objs.stock.pull minusSalary
+    # 家計を増やす
+    @objs.budget.push minusSalary - penalty
     # 未払いを増やす
     @objs.unpaid.push penalty
     # ラウンドを進める
@@ -99,19 +131,29 @@ class window.Game
     if @objs.worker.getActive() <= 0
       @roundEnd()
 
-  # ハンド選択
+  # ハンドのクリック判定
   @handClickLeft:(index)->
     # 選択待ちでなければならない
     return false if @waitChoice is false
     # 
-    @objs.hand.clickLeft()
+    @objs.hand.clickLeft index
+    @objs.hand.redraw()
+
   @handClickRight:(index)->
     # 選択待ちでなければならない
     return false if @waitChoice is false
     # 右クリック可能でなければならない
     return false if @waitChoice[2] is false
     # 
-    @objs.hand.clickRight()
+    @objs.hand.clickRight index
+    @objs.hand.redraw()
+
+  @handDoubleClick:(index)->
+    # 手札を捨てる時以外使わない
+    return false unless @isHandTrash
+    @objs.hand.trash [index]
+    @objs.hand.redraw()
+    @roundEnd()
 
   # ボタンを押した時
   @pushOK:->
@@ -133,10 +175,11 @@ class window.Game
     res = cardClass.use(left, right)
     # 使えた
     if res is true
-
+      @objs.log.hide()
     # 使えなかった
     else
-      alert res
+      @objs.log.show res
+      @objs.log.fadeout 3
       return false
 
 
@@ -174,10 +217,15 @@ class window.Game
       @turnEnd(kubun, index)
       @isClickable = true
 
-
     # ある
     else
+      # 選択待ちにする
       @waitChoice = [kubun, index, cardClass.isRightClick()]
+      # 選択待ちメッセージがあれば表示する
+      @objs.log.show cardClass.getSelectMessage().replace /\n/g, '<br>'
+      # ボタンを押せるようにする
+      @objs.ok.enable()
+      @objs.cancel.enable()
     return true
 
   # カードをデッキから手札に移動
@@ -209,6 +257,18 @@ class window.Game
   @addWorkerActiveNum:(amount = 1)->
     @objs.worker.add(true) for i in [0...amount]
     @objs.worker.redraw()
+
+  # 建物を売らなければいけないか
+  @isMustSell:->
+    # TODO:焼畑は手放さなくてはならない前提
+
+    # (1)給料が支払えない
+    cantPaySalary = @objs.stock.getAmount() - @objs.worker.getTotal() * @objs.round.getSalary() < 0
+    # (2)売れる建物がある
+    canSell = @objs.private.isExistSellable()
+
+    cantPaySalary and canSell
+
 
   # 得点の再計算・表示
   @getPoint:->

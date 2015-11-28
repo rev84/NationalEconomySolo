@@ -1,6 +1,9 @@
 class HandSpace extends SpaceBase
   @DIV_ID = "hand"
 
+  # バルーンにつけるクラス
+  @BALLOON_CLASS_NAME = 'balloon_hand'
+
   # 選択状態
   @SELECT_NOT   = 0
   @SELECT_LEFT  = 1
@@ -39,6 +42,13 @@ class HandSpace extends SpaceBase
   @getAmount:->
     @cards.length
 
+  # 手札を捨てる
+  @trash:(cardIndexs)->
+    newCards = []
+    for index in [0...@cards.length]
+      newCards.push @cards[index] unless cardIndexs.in_array index
+    @cards = newCards
+
   # 手札を増やす
   @push:(cardNum)->
     @cards.push Number cardNum
@@ -49,6 +59,8 @@ class HandSpace extends SpaceBase
     me = @getElement()
 
     me.html('')
+    # バルーンも削除
+    $('.'+@BALLOON_CLASS_NAME).remove()
     for index in [0...@cards.length]
       e = @createElement index
       me.append e if e isnt false
@@ -102,18 +114,37 @@ class HandSpace extends SpaceBase
     売却価格：#{price}
     得点：#{point}
     """.replace /\n/g, '<br>'
-    e.attr('data-tooltip', balloonStr).darkTooltip()
+    e.attr('data-tooltip', balloonStr).darkTooltip(
+      addClass : @BALLOON_CLASS_NAME
+    )
 
     # 選択状態にする
     e.on 'click', ->
       index = $(this).attr('data-index')
-      Game.handClickLeft index
+      Game.handClickLeft Number index
     e.on 'contextmenu', ->
       index = $(this).attr('data-index')
-      Game.handClickRight index
+      Game.handClickRight Number index
+    # ダブルクリックにする
+    e.dblclick ->
+      index = $(this).attr('data-index')
+      Game.handDoubleClick Number index
 
     e.append header
     e.append img
     e.append categorySpan
     e.append pointSpan
     e
+
+
+  @isHandOver:->
+    @getAmount() > @getMax()
+
+  # 所持できる最大枚数
+  @getMax:->
+    # 手札の最大枚数
+    handMax = 5
+    # 倉庫の数
+    soukoNum = Game.objs.private.getAmountExistSouko()
+
+    handMax + soukoNum*4
