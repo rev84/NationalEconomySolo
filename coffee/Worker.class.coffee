@@ -19,6 +19,11 @@ class Worker extends SpaceBase
     @active
 
   # 労働者を追加
+  @setMax:(amount)->
+    @max = amount
+    @redraw()
+
+  # 労働者を追加
   @add:(isActiveNow = false)->
     @max++
     @active++ if isActiveNow
@@ -38,3 +43,11 @@ class Worker extends SpaceBase
   # 描画
   @redraw:->
     @getElement().html ''+@active+' / '+@max
+
+  # 労働者数の上限
+  @getLimit:->
+    5 + PrivateSpace.getAmountExistSyataku()
+
+  # 労働者の数が上限に達しているか
+  @isLimit:->
+    @getTotal() >= @getLimit()

@@ -41,6 +41,21 @@ class PublicSpace extends SpaceBase
     @cards.push Number cardNum
     @status.push @STATUS_USABLE
 
+  # 建物を削除する
+  # 返値は削除したカード番号
+  @pull:(cardIndex)->
+    newCards = []
+    deletedCardNum = null
+    for index in [0...@cards.length]
+      # 削除するカード
+      if index is cardIndex
+        deletedCardNum = @cards[index]
+      # その他
+      else
+        newCards.push @cards[index]
+    @cards = newCards
+    deletedCardNum
+
   # 最新の建物を使用不能にする
   @disableLastest:->
     for index in [@status.length-1..0]

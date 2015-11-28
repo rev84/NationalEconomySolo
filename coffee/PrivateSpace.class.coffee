@@ -178,3 +178,10 @@ class PrivateSpace extends SpaceBase
     for cardNum in @cards
       amount++ if cardNum is Card.CARD_NUM_SOUKO
     amount
+
+  # 存在する社宅の数
+  @getAmountExistSyataku:->
+    amount = 0
+    for cardNum in @cards
+      amount++ if cardNum is Card.CARD_NUM_SYATAKU
+    amount

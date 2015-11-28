@@ -10,6 +10,8 @@ class window.Game
   @isHandTrash : false
   # 建物売り期間
   @isSell : false
+  # 焼畑フラグ
+  @flagYakihata : false
 
   @init : ->
     @isClickable = false
@@ -18,10 +20,11 @@ class window.Game
     obj.init() for name, obj of @objs
     @refresh()
 
-    @waitChoice  = false
-    @isHandTrash = false
-    @isSell      = false
-    @isClickable = true
+    @waitChoice   = false
+    @isHandTrash  = false
+    @isSell       = false
+    @flagYakihata = false
+    @isClickable  = true
 
   @refresh:->
     @objs.public.redraw()
@@ -109,20 +112,20 @@ class window.Game
     LogSpace.addWarnInstant alertStr.replace(/\n/g, '<br>'), 5
 
     # 資金を減らす
-    @objs.stock.pull minusSalary
+    Stock.pull minusSalary
     # 家計を増やす
-    @objs.budget.push minusSalary - penalty
+    Budget.push minusSalary - penalty
     # 未払いを増やす
-    @objs.unpaid.push penalty
+    Unpaid.push penalty
     # ラウンドを進める
-    @objs.round.addRound()
+    Round.addRound()
     # ラウンドカードを置く
     @pullPublic()
     # 公共カード・所有カードを使用可能にする
-    @objs.public.resetStatus()
-    @objs.private.resetStatus()
+    PublicSpace.resetStatus()
+    PrivateSpace.resetStatus()
     # 労働者を開腹
-    @objs.worker.wake()
+    Worker.wake()
     # 再描画
     @refresh()
 
@@ -139,8 +142,12 @@ class window.Game
   @turnEnd:(kubun, index)->
     spaceClass = @kubun2class(kubun)
 
-    @objs.worker.work() # 労働者を減らす
-    spaceClass.setWorked index # 労働者を置く
+    Worker.work() # 労働者を減らす
+    # 焼畑フラグが立っていなければ労働者を置く
+    if @flagYakihata
+      @flagYakihata = false
+    else
+      spaceClass.setWorked index 
     PublicSpace.disableLastest()  # 最新の職場を潰す
     @refresh()
     # 終わったら
@@ -154,8 +161,8 @@ class window.Game
     # 選択待ちでなければならない
     return false if @waitChoice is false
     # 
-    @objs.hand.clickLeft index
-    @objs.hand.redraw()
+    HandSpace.clickLeft index
+    HandSpace.redraw()
 
   @handClickRight:(index)->
     # 選択待ちでなければならない
@@ -163,14 +170,14 @@ class window.Game
     # 右クリック可能でなければならない
     return false if @waitChoice[2] is false
     # 
-    @objs.hand.clickRight index
-    @objs.hand.redraw()
+    HandSpace.clickRight index
+    HandSpace.redraw()
 
   @handDoubleClick:(index)->
     # 手札を捨てる時以外使わない
     return false unless @isHandTrash
-    @objs.hand.trash [index]
-    @objs.hand.redraw()
+    HandSpace.trash [index]
+    HandSpace.redraw()
     @roundEnd()
 
   # ボタンを押した時
@@ -240,7 +247,7 @@ class window.Game
     [leftReqNum, rightReqNum] = cardClass.requireCards()
     # ない
     if leftReqNum is 0 and rightReqNum is 0
-      res = cardClass.use()
+      res = cardClass.use([], [], kubun, index)
       # 正常終了しなかった
       if res isnt true
         alert res
@@ -263,33 +270,18 @@ class window.Game
 
   # カードをデッキから手札に移動
   @pullDeck:(amount = 1)->
-    @objs.hand.push @objs.deck.pull() for i in [0...amount]
-    @objs.hand.redraw()
+    HandSpace.push Deck.pull() for i in [0...amount]
+    HandSpace.redraw()
 
   # 消費財を引く
   @pullConsumer:(amount = 1)->
-    @objs.hand.push @objs.consumer.pull() for i in [0...amount]
-    @objs.hand.redraw()
+    HandSpace.push Consumer.pull() for i in [0...amount]
+    HandSpace.redraw()
 
   # 公共デッキから公共に移動
   @pullPublic:(amount = 1)->
     @objs.public.push @objs.round.pull() for i in [0...amount]
     @objs.public.redraw()
-
-  # 労働者を増やす
-  @addWorkerNum:(amount = 1)->
-    @objs.worker.add() for i in [0...amount]
-    @objs.worker.redraw()
-
-  # 労働者を指定数まで増やす
-  @addWorkerUntil:(amount)->
-    @objs.worker.add() while @objs.worker.getTotal() < amount
-    @objs.worker.redraw()
-
-  # アクティブな労働者を増やす
-  @addWorkerActiveNum:(amount = 1)->
-    @objs.worker.add(true) for i in [0...amount]
-    @objs.worker.redraw()
 
   # 建物を売る
   @sellPrivate:(index)->

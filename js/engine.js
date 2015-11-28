@@ -87,6 +87,8 @@ Card = (function() {
 
   Card.CARD_NUM_HOURITU = 22;
 
+  Card.CARD_NUM_SYATAKU = 21;
+
   Card.getClass = function(classNum) {
     var res;
     try {
@@ -171,6 +173,14 @@ CardBase = (function() {
     return this.CATEGORY === '公共';
   };
 
+  CardBase.isFarming = function() {
+    return this.CATEGORY === '農業';
+  };
+
+  CardBase.isIndustry = function() {
+    return this.CATEGORY === '工業';
+  };
+
   CardBase.isWorkable = function() {
     if (this.CATEGORY === '非職場') {
       return false;
@@ -245,7 +255,10 @@ Card3 = (function(superClass) {
   Card3.DESCRIPTION = "労働者を1人増やす";
 
   Card3.use = function() {
-    Game.addWorkerNum();
+    if (Worker.isLimit()) {
+      return "労働者が上限に達しています";
+    }
+    Worker.add();
     return true;
   };
 
@@ -271,7 +284,7 @@ Card4 = (function(superClass) {
   };
 
   Card4.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物カードを1枚\n右クリック：捨て札にするカード（建物コストの枚数）";
+    return "選択してください\n左クリック：建物カード1枚\n右クリック：捨札（建物コストの枚数）";
   };
 
   Card4.use = function(leftIndexs, rightIndexs) {
@@ -280,14 +293,14 @@ Card4 = (function(superClass) {
       return "建物カードを1枚選択しなければなりません";
     }
     buildCardIndex = leftIndexs[0];
-    buildCardNum = Game.objs.hand.getCardNum(buildCardIndex);
-    cardClass = Game.objs.hand.getCardClass(buildCardIndex);
+    buildCardNum = HandSpace.getCardNum(buildCardIndex);
+    cardClass = HandSpace.getCardClass(buildCardIndex);
     cost = cardClass.getCost();
     if (cost !== rightIndexs.length) {
       return "捨札が建設コストと一致していません";
     }
-    Game.objs["private"].push(buildCardNum);
-    Game.objs.hand.trash(leftIndexs.concat(rightIndexs));
+    PrivateSpace.push(buildCardNum);
+    HandSpace.trash(leftIndexs.concat(rightIndexs));
     return true;
   };
 
@@ -313,12 +326,12 @@ Card5 = (function(superClass) {
   };
 
   Card5.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札にするカード1枚";
+    return "選択してください\n左クリック：捨札1枚";
   };
 
   Card5.use = function(leftIndexs, rightIndexs) {
     if (Card5.__super__.constructor.use.call(this)) {
-      return "カードが足りません";
+      return "捨札1枚が選択されていません";
     }
     if (Stock.getAmount() < 6) {
       return '家計が$6未満なので回収できません';
@@ -346,6 +359,27 @@ Card6 = (function(superClass) {
 
   Card6.DESCRIPTION = "手札を2枚捨てる\n家計から$12を得る";
 
+  Card6.requireCards = function() {
+    return [2, 0];
+  };
+
+  Card6.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨札2枚";
+  };
+
+  Card6.use = function(leftIndexs) {
+    if (Card6.__super__.constructor.use.call(this)) {
+      return "捨札2枚が選択されていません";
+    }
+    if (Stock.getAmount() < 12) {
+      return '家計が$12未満なので回収できません';
+    }
+    Stock.push(12);
+    Budget.pull(12);
+    Hand.trash(leftIndexs);
+    return true;
+  };
+
   return Card6;
 
 })(CardBase);
@@ -362,6 +396,14 @@ Card7 = (function(superClass) {
   Card7.CATEGORY = "公共";
 
   Card7.DESCRIPTION = "労働者を4人に増やす";
+
+  Card7.use = function() {
+    if (Worker.getTotal() >= 4) {
+      return "既に労働者が4人以上います";
+    }
+    Worker.setMax(4);
+    return true;
+  };
 
   return Card7;
 
@@ -380,6 +422,27 @@ Card8 = (function(superClass) {
 
   Card8.DESCRIPTION = "手札を3枚捨てて家計から$18を得る";
 
+  Card8.requireCards = function() {
+    return [3, 0];
+  };
+
+  Card8.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨札3枚";
+  };
+
+  Card8.use = function(leftIndexs, rightIndexs) {
+    if (Card8.__super__.constructor.use.call(this)) {
+      return "捨札3枚が選択されていません";
+    }
+    if (Stock.getAmount() < 18) {
+      return '家計が$18未満なので回収できません';
+    }
+    Stock.push(18);
+    Budget.pull(18);
+    Hand.trash(leftIndexs);
+    return true;
+  };
+
   return Card8;
 
 })(CardBase);
@@ -396,6 +459,14 @@ Card9 = (function(superClass) {
   Card9.CATEGORY = "公共";
 
   Card9.DESCRIPTION = "労働者を5人に増やす";
+
+  Card9.use = function(leftIndexs, rightIndexs) {
+    if (Worker.getTotal() >= 5) {
+      return "既に労働者が5人以上います";
+    }
+    Worker.setMax(5);
+    return true;
+  };
 
   return Card9;
 
@@ -414,6 +485,27 @@ Card10 = (function(superClass) {
 
   Card10.DESCRIPTION = "手札を4枚捨てて家計から$24を得る";
 
+  Card10.requireCards = function() {
+    return [4, 0];
+  };
+
+  Card10.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨札にするカード4枚";
+  };
+
+  Card10.use = function(leftIndexs, rightIndexs) {
+    if (Card10.__super__.constructor.use.call(this)) {
+      return "捨札4枚が選択されていません";
+    }
+    if (Stock.getAmount() < 24) {
+      return '家計が$24未満なので回収できません';
+    }
+    Stock.push(24);
+    Budget.pull(24);
+    Hand.trash(leftIndexs);
+    return true;
+  };
+
   return Card10;
 
 })(CardBase);
@@ -431,6 +523,14 @@ Card11 = (function(superClass) {
 
   Card11.DESCRIPTION = "労働者を1人増やす\nこのラウンドからすぐ働ける";
 
+  Card11.use = function() {
+    if (Worker.isLimit()) {
+      return "労働者が上限に達しています";
+    }
+    Worker.add(true);
+    return true;
+  };
+
   return Card11;
 
 })(CardBase);
@@ -447,6 +547,27 @@ Card12 = (function(superClass) {
   Card12.CATEGORY = "公共";
 
   Card12.DESCRIPTION = "手札を5枚捨てて家計から$30を得る";
+
+  Card12.requireCards = function() {
+    return [5, 0];
+  };
+
+  Card12.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨札5枚";
+  };
+
+  Card12.use = function(leftIndexs, rightIndexs) {
+    if (Card12.__super__.constructor.use.call(this)) {
+      return "捨札5枚が選択されていません";
+    }
+    if (Stock.getAmount() < 30) {
+      return '家計が$30未満なので回収できません';
+    }
+    Stock.push(30);
+    Budget.pull(30);
+    Hand.trash(leftIndexs);
+    return true;
+  };
 
   return Card12;
 
@@ -468,6 +589,11 @@ Card13 = (function(superClass) {
   Card13.COST = 1;
 
   Card13.PRICE = 3;
+
+  Card13.use = function() {
+    Game.pullConsumer(2);
+    return true;
+  };
 
   return Card13;
 
@@ -509,6 +635,15 @@ Card15 = (function(superClass) {
 
   Card15.PRICE = 0;
 
+  Card15.use = function(leftIndexs, rightIndexs, kubun, index) {
+    var space;
+    Game.pullConsumer(5);
+    Game.flagYakihata = true;
+    space = Game.kubun2class(kubun);
+    space.pull(index);
+    return true;
+  };
+
   return Card15;
 
 })(CardBase);
@@ -527,6 +662,15 @@ Card16 = (function(superClass) {
   Card16.COST = 1;
 
   Card16.PRICE = 4;
+
+  Card16.use = function() {
+    if (Stock.getAmount() < 5) {
+      return '家計が$5未満なので回収できません';
+    }
+    Stock.push(5);
+    Budget.pull(5);
+    return true;
+  };
 
   return Card16;
 
@@ -549,6 +693,23 @@ Card17 = (function(superClass) {
 
   Card17.PRICE = 6;
 
+  Card17.requireCards = function() {
+    return [2, 0];
+  };
+
+  Card17.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨札2枚";
+  };
+
+  Card17.use = function(leftIndexs) {
+    if (Card17.__super__.constructor.use.call(this)) {
+      return "捨札2枚が選択されていません";
+    }
+    Hand.trash(leftIndexs);
+    Game.pullDeck(4);
+    return true;
+  };
+
   return Card17;
 
 })(CardBase);
@@ -568,6 +729,31 @@ Card18 = (function(superClass) {
 
   Card18.PRICE = 5;
 
+  Card18.requireCards = function() {
+    return [1, 1];
+  };
+
+  Card18.getSelectMessage = function() {
+    return "選択してください\n左クリック：建物1枚\n右クリック：捨札（建設コスト-1の枚数）";
+  };
+
+  Card18.use = function(leftIndexs, rightIndexs) {
+    var buildCardIndex, buildCardNum, cardClass, cost;
+    if (leftIndexs.length !== 1) {
+      return "建物を1枚選択しなければなりません";
+    }
+    buildCardIndex = leftIndexs[0];
+    buildCardNum = HandSpace.getCardNum(buildCardIndex);
+    cardClass = HandSpace.getCardClass(buildCardIndex);
+    cost = cardClass.getCost();
+    if (cost - 1 !== rightIndexs.length) {
+      return "捨札が建設コストと一致していません";
+    }
+    PrivateSpace.push(buildCardNum);
+    HandSpace.trash(leftIndexs.concat(rightIndexs));
+    return true;
+  };
+
   return Card18;
 
 })(CardBase);
@@ -583,11 +769,18 @@ Card19 = (function(superClass) {
 
   Card19.CATEGORY = "農業";
 
-  Card19.DESCRIPTION = "手札を2枚捨てる\nカードを4枚引く";
+  Card19.DESCRIPTION = "手札が4枚になるまで消費財を引く";
 
   Card19.COST = 2;
 
   Card19.PRICE = 5;
+
+  Card19.use = function() {
+    if (HandSpace.getAmount() < 4) {
+      Game.pullConsumer(4 - HandSpace.getAmount());
+    }
+    return true;
+  };
 
   return Card19;
 
@@ -673,6 +866,11 @@ Card23 = (function(superClass) {
 
   Card23.PRICE = 6;
 
+  Card23.use = function() {
+    Game.pullConsumer(3);
+    return true;
+  };
+
   return Card23;
 
 })(CardBase);
@@ -692,6 +890,27 @@ Card24 = (function(superClass) {
 
   Card24.PRICE = 8;
 
+  Card24.requireCards = function() {
+    return [1, 0];
+  };
+
+  Card24.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨札1枚";
+  };
+
+  Card24.use = function(leftIndexs) {
+    if (Card24.__super__.constructor.use.call(this)) {
+      return "捨札1枚が選択されていません";
+    }
+    if (Stock.getAmount() < 15) {
+      return '家計が$15未満なので回収できません';
+    }
+    Stock.push(15);
+    Budget.pull(15);
+    Hand.trash(leftIndexs);
+    return true;
+  };
+
   return Card24;
 
 })(CardBase);
@@ -710,6 +929,30 @@ Card25 = (function(superClass) {
   Card25.COST = 3;
 
   Card25.PRICE = 7;
+
+  Card25.requireCards = function() {
+    return [1, 1];
+  };
+
+  Card25.getSelectMessage = function() {
+    return "選択してください\n左クリック：農業カテゴリの建物カード1枚";
+  };
+
+  Card25.use = function(leftIndexs) {
+    var buildCardIndex, buildCardNum, cardClass;
+    if (leftIndexs.length !== 1) {
+      return "建物カードを1枚選択しなければなりません";
+    }
+    buildCardIndex = leftIndexs[0];
+    buildCardNum = HandSpace.getCardNum(buildCardIndex);
+    cardClass = HandSpace.getCardClass(buildCardIndex);
+    if (!cardClass.isFarming()) {
+      return "選択したカードが農業カテゴリではありません";
+    }
+    PrivateSpace.push(buildCardNum);
+    HandSpace.trash(leftIndexs);
+    return true;
+  };
 
   return Card25;
 
@@ -774,6 +1017,11 @@ Card28 = (function(superClass) {
 
   Card28.PRICE = 10;
 
+  Card28.use = function() {
+    Game.pullDeck(3);
+    return true;
+  };
+
   return Card28;
 
 })(CardBase);
@@ -792,6 +1040,32 @@ Card29 = (function(superClass) {
   Card29.COST = 4;
 
   Card29.PRICE = 9;
+
+  Card29.requireCards = function() {
+    return [1, 1];
+  };
+
+  Card29.getSelectMessage = function() {
+    return "選択してください\n左クリック：建物カード1枚\n右クリック：捨札（建物コストの枚数）";
+  };
+
+  Card29.use = function(leftIndexs, rightIndexs) {
+    var buildCardIndex, buildCardNum, cardClass, cost;
+    if (leftIndexs.length !== 1) {
+      return "建物カードを1枚選択しなければなりません";
+    }
+    buildCardIndex = leftIndexs[0];
+    buildCardNum = HandSpace.getCardNum(buildCardIndex);
+    cardClass = HandSpace.getCardClass(buildCardIndex);
+    cost = cardClass.getCost();
+    if (cost !== rightIndexs.length) {
+      return "捨札が建設コストと一致していません";
+    }
+    PrivateSpace.push(buildCardNum);
+    HandSpace.trash(leftIndexs.concat(rightIndexs));
+    Game.pullDeck(2);
+    return true;
+  };
 
   return Card29;
 
@@ -813,6 +1087,14 @@ Card30 = (function(superClass) {
   Card30.COST = 4;
 
   Card30.PRICE = 9;
+
+  Card30.use = function() {
+    if (HandSpace.getAmount === 0) {
+      Game.pullDeck(4);
+      Game.pullDeck(2);
+    }
+    return true;
+  };
 
   return Card30;
 
@@ -895,6 +1177,32 @@ Card34 = (function(superClass) {
   Card34.COST = 5;
 
   Card34.PRICE = 10;
+
+  Card34.requireCards = function() {
+    return [1, 1, 1];
+  };
+
+  Card34.getSelectMessage = function() {
+    return "選択してください\n左クリック：建物カード2枚\n右クリック：捨札（建物コストの枚数）";
+  };
+
+  Card34.use = function(leftIndexs, rightIndexs) {
+    var buildCardIndex, buildCardNum, cardClass, cost;
+    if (leftIndexs.length !== 1) {
+      return "建物カードを1枚選択しなければなりません";
+    }
+    buildCardIndex = leftIndexs[0];
+    buildCardNum = HandSpace.getCardNum(buildCardIndex);
+    cardClass = HandSpace.getCardClass(buildCardIndex);
+    cost = cardClass.getCost();
+    if (cost !== rightIndexs.length) {
+      return "捨札が建設コストと一致していません";
+    }
+    PrivateSpace.push(buildCardNum);
+    HandSpace.trash(leftIndexs.concat(rightIndexs));
+    Game.pullDeck(2);
+    return true;
+  };
 
   return Card34;
 
@@ -1087,6 +1395,8 @@ window.Game = (function() {
 
   Game.isSell = false;
 
+  Game.flagYakihata = false;
+
   Game.init = function() {
     var name, obj, ref;
     this.isClickable = false;
@@ -1100,6 +1410,7 @@ window.Game = (function() {
     this.waitChoice = false;
     this.isHandTrash = false;
     this.isSell = false;
+    this.flagYakihata = false;
     return this.isClickable = true;
   };
 
@@ -1178,14 +1489,14 @@ window.Game = (function() {
       alertStr += "支払えなかった $" + penalty + " が未払いになります";
     }
     LogSpace.addWarnInstant(alertStr.replace(/\n/g, '<br>'), 5);
-    this.objs.stock.pull(minusSalary);
-    this.objs.budget.push(minusSalary - penalty);
-    this.objs.unpaid.push(penalty);
-    this.objs.round.addRound();
+    Stock.pull(minusSalary);
+    Budget.push(minusSalary - penalty);
+    Unpaid.push(penalty);
+    Round.addRound();
     this.pullPublic();
-    this.objs["public"].resetStatus();
-    this.objs["private"].resetStatus();
-    this.objs.worker.wake();
+    PublicSpace.resetStatus();
+    PrivateSpace.resetStatus();
+    Worker.wake();
     this.refresh();
     return this.clickable();
   };
@@ -1200,8 +1511,12 @@ window.Game = (function() {
   Game.turnEnd = function(kubun, index) {
     var spaceClass;
     spaceClass = this.kubun2class(kubun);
-    this.objs.worker.work();
-    spaceClass.setWorked(index);
+    Worker.work();
+    if (this.flagYakihata) {
+      this.flagYakihata = false;
+    } else {
+      spaceClass.setWorked(index);
+    }
     PublicSpace.disableLastest();
     this.refresh();
     if (this.objs.worker.getActive() <= 0) {
@@ -1215,8 +1530,8 @@ window.Game = (function() {
     if (this.waitChoice === false) {
       return false;
     }
-    this.objs.hand.clickLeft(index);
-    return this.objs.hand.redraw();
+    HandSpace.clickLeft(index);
+    return HandSpace.redraw();
   };
 
   Game.handClickRight = function(index) {
@@ -1226,16 +1541,16 @@ window.Game = (function() {
     if (this.waitChoice[2] === false) {
       return false;
     }
-    this.objs.hand.clickRight(index);
-    return this.objs.hand.redraw();
+    HandSpace.clickRight(index);
+    return HandSpace.redraw();
   };
 
   Game.handDoubleClick = function(index) {
     if (!this.isHandTrash) {
       return false;
     }
-    this.objs.hand.trash([index]);
-    this.objs.hand.redraw();
+    HandSpace.trash([index]);
+    HandSpace.redraw();
     return this.roundEnd();
   };
 
@@ -1303,7 +1618,7 @@ window.Game = (function() {
     cardClass = spaceClass.getCardClass(index);
     ref = cardClass.requireCards(), leftReqNum = ref[0], rightReqNum = ref[1];
     if (leftReqNum === 0 && rightReqNum === 0) {
-      res = cardClass.use();
+      res = cardClass.use([], [], kubun, index);
       if (res !== true) {
         alert(res);
         this.isClickable = true;
@@ -1326,9 +1641,9 @@ window.Game = (function() {
       amount = 1;
     }
     for (i = j = 0, ref = amount; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-      this.objs.hand.push(this.objs.deck.pull());
+      HandSpace.push(Deck.pull());
     }
-    return this.objs.hand.redraw();
+    return HandSpace.redraw();
   };
 
   Game.pullConsumer = function(amount) {
@@ -1337,9 +1652,9 @@ window.Game = (function() {
       amount = 1;
     }
     for (i = j = 0, ref = amount; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-      this.objs.hand.push(this.objs.consumer.pull());
+      HandSpace.push(Consumer.pull());
     }
-    return this.objs.hand.redraw();
+    return HandSpace.redraw();
   };
 
   Game.pullPublic = function(amount) {
@@ -1351,35 +1666,6 @@ window.Game = (function() {
       this.objs["public"].push(this.objs.round.pull());
     }
     return this.objs["public"].redraw();
-  };
-
-  Game.addWorkerNum = function(amount) {
-    var i, j, ref;
-    if (amount == null) {
-      amount = 1;
-    }
-    for (i = j = 0, ref = amount; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-      this.objs.worker.add();
-    }
-    return this.objs.worker.redraw();
-  };
-
-  Game.addWorkerUntil = function(amount) {
-    while (this.objs.worker.getTotal() < amount) {
-      this.objs.worker.add();
-    }
-    return this.objs.worker.redraw();
-  };
-
-  Game.addWorkerActiveNum = function(amount) {
-    var i, j, ref;
-    if (amount == null) {
-      amount = 1;
-    }
-    for (i = j = 0, ref = amount; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-      this.objs.worker.add(true);
-    }
-    return this.objs.worker.redraw();
   };
 
   Game.sellPrivate = function(index) {
@@ -1867,6 +2153,19 @@ PrivateSpace = (function(superClass) {
     return amount;
   };
 
+  PrivateSpace.getAmountExistSyataku = function() {
+    var amount, cardNum, j, len, ref;
+    amount = 0;
+    ref = this.cards;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      if (cardNum === Card.CARD_NUM_SYATAKU) {
+        amount++;
+      }
+    }
+    return amount;
+  };
+
   return PrivateSpace;
 
 })(SpaceBase);
@@ -1932,6 +2231,21 @@ PublicSpace = (function(superClass) {
   PublicSpace.push = function(cardNum) {
     this.cards.push(Number(cardNum));
     return this.status.push(this.STATUS_USABLE);
+  };
+
+  PublicSpace.pull = function(cardIndex) {
+    var deletedCardNum, index, j, newCards, ref;
+    newCards = [];
+    deletedCardNum = null;
+    for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
+      if (index === cardIndex) {
+        deletedCardNum = this.cards[index];
+      } else {
+        newCards.push(this.cards[index]);
+      }
+    }
+    this.cards = newCards;
+    return deletedCardNum;
   };
 
   PublicSpace.disableLastest = function() {
@@ -2188,6 +2502,11 @@ Worker = (function(superClass) {
     return this.active;
   };
 
+  Worker.setMax = function(amount) {
+    this.max = amount;
+    return this.redraw();
+  };
+
   Worker.add = function(isActiveNow) {
     if (isActiveNow == null) {
       isActiveNow = false;
@@ -2214,6 +2533,14 @@ Worker = (function(superClass) {
 
   Worker.redraw = function() {
     return this.getElement().html('' + this.active + ' / ' + this.max);
+  };
+
+  Worker.getLimit = function() {
+    return 5 + PrivateSpace.getAmountExistSyataku();
+  };
+
+  Worker.isLimit = function() {
+    return this.getTotal() >= this.getLimit();
   };
 
   return Worker;
