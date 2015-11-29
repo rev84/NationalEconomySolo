@@ -476,7 +476,8 @@ class window.Game
     # 資金を増やす
     Stock.push Card.getClass(deletedCardNum).getPrice()
 
-    HandSpace.redraw()
+    PrivateSpace.redraw()
+    PublicSpace.redraw()
     # ラウンド終了判定
     @roundEnd()
 

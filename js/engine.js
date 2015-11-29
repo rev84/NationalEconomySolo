@@ -1877,7 +1877,8 @@ window.Game = (function() {
     deletedCardNum = PrivateSpace.pull(index);
     PublicSpace.push(deletedCardNum);
     Stock.push(Card.getClass(deletedCardNum).getPrice());
-    HandSpace.redraw();
+    PrivateSpace.redraw();
+    PublicSpace.redraw();
     return this.roundEnd();
   };
 
