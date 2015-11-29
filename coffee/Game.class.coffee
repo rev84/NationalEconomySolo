@@ -301,7 +301,7 @@ class window.Game
     # 選択状態ではない
     return false if @waitChoice is false
     # 設計事務所はキャンセルできない
-    return false if @flagSekkei is false
+    return false if @flagSekkei isnt false
     @waitChoice = false
     HandSpace.selectReset()
     HandSpace.redraw()

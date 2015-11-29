@@ -1788,7 +1788,7 @@ window.Game = (function() {
     if (this.waitChoice === false) {
       return false;
     }
-    if (this.flagSekkei === false) {
+    if (this.flagSekkei !== false) {
       return false;
     }
     this.waitChoice = false;
