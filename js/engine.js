@@ -1516,13 +1516,6 @@ Deck = (function() {
 
 })();
 
-$(function() {
-  $('body').bind('contextmenu', function() {
-    return false;
-  });
-  return Game.gameStart();
-});
-
 window.Game = (function() {
   function Game() {}
 
@@ -2252,6 +2245,7 @@ PrivateSpace = (function(superClass) {
 
   PrivateSpace.resetStatus = function() {
     var index, j, ref, results;
+    this.status = [];
     results = [];
     for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
       results.push(this.status[index] = this.STATUS_USABLE);
@@ -2281,7 +2275,7 @@ PrivateSpace = (function(superClass) {
   };
 
   PrivateSpace.setWorked = function(index) {
-    if (this.isUsable(index === false)) {
+    if (this.isUsable(index) === false) {
       return false;
     }
     return this.status[index] = this.STATUS_WORKED;
@@ -2929,3 +2923,10 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
+
+$(function() {
+  $('body').bind('contextmenu', function() {
+    return false;
+  });
+  return Game.gameStart();
+});

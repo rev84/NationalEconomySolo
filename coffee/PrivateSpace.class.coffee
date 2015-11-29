@@ -19,6 +19,7 @@ class PrivateSpace extends SpaceBase
 
   # すべて使用可能にする
   @resetStatus:->
+    @status = []
     @status[index] = @STATUS_USABLE for index in [0...@cards.length]
 
   # カード番号の取得
@@ -41,7 +42,7 @@ class PrivateSpace extends SpaceBase
 
   # 労働者を置く
   @setWorked:(index)->
-    return false if @isUsable index is false
+    return false if @isUsable(index) is false
     @status[index] = @STATUS_WORKED
 
   # 資産の合計点を取得
