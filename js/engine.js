@@ -1525,13 +1525,6 @@ Deck = (function() {
 
 })();
 
-$(function() {
-  $('body').bind('contextmenu', function() {
-    return false;
-  });
-  return Game.gameStart();
-});
-
 window.Game = (function() {
   function Game() {}
 
@@ -2951,3 +2944,10 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
+
+$(function() {
+  $('body').bind('contextmenu', function() {
+    return false;
+  });
+  return Game.gameStart();
+});
