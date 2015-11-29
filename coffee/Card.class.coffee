@@ -19,6 +19,8 @@ class Card
   @CARD_NUM_RAIL = 35
   # 本社ビルのカードNo
   @CARD_NUM_BUILDING = 36
+  # 消費財のカードNo
+  @CARD_NUM_CONSUMER = 99
 
   @getClass = (classNum)->
     try
@@ -426,6 +428,9 @@ class Card15 extends CardBase
     Game.flagYakihata = true
     space = Game.kubun2class kubun
     space.pull index
+
+    # 焼畑を捨札にする
+    Deck.trash @CARD_NUM_YAKIHATA
 
     true
 

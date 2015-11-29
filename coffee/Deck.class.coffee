@@ -24,6 +24,8 @@ class Deck
 
   # カードを捨てる
   @trash:(cardNum)->
+    # 消費財は入れない
+    return false if cardNum is Card.CARD_NUM_CONSUMER
     @grave.push Number cardNum
 
   # 墓地から山札に戻してシャッフル

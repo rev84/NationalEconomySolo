@@ -161,6 +161,8 @@ Card = (function() {
 
   Card.CARD_NUM_BUILDING = 36;
 
+  Card.CARD_NUM_CONSUMER = 99;
+
   Card.getClass = function(classNum) {
     var res;
     try {
@@ -766,6 +768,7 @@ Card15 = (function(superClass) {
     Game.flagYakihata = true;
     space = Game.kubun2class(kubun);
     space.pull(index);
+    Deck.trash(this.CARD_NUM_YAKIHATA);
     return true;
   };
 
@@ -1464,6 +1467,9 @@ Deck = (function() {
   };
 
   Deck.trash = function(cardNum) {
+    if (cardNum === Card.CARD_NUM_CONSUMER) {
+      return false;
+    }
     return this.grave.push(Number(cardNum));
   };
 
