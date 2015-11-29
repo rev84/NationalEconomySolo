@@ -141,7 +141,7 @@ class window.Game
 
     if @isMustSell()
       # いくら足りないのか計算
-      rest = @objs.worker.getTotal() * @objs.round.getSalary() - @objs.stock.getAmount()
+      rest = Worker.getTotal() * RoundDeck.getSalary() - Stock.getAmount()
       message = """
                 給料が払えるようになるか、なくなるまで建物を売ってください
                 不足額：$#{rest}
@@ -383,6 +383,7 @@ class window.Game
     # 資金を増やす
     Stock.push Card.getClass(deletedCardNum).getPrice()
 
+    HandSpace.redraw()
     # ラウンド終了判定
     @roundEnd()
 

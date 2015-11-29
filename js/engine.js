@@ -1637,7 +1637,7 @@ window.Game = (function() {
     }
     this.isHandTrash = false;
     if (this.isMustSell()) {
-      rest = this.objs.worker.getTotal() * this.objs.round.getSalary() - this.objs.stock.getAmount();
+      rest = Worker.getTotal() * RoundDeck.getSalary() - Stock.getAmount();
       message = "給料が払えるようになるか、なくなるまで建物を売ってください\n不足額：$" + rest;
       LogSpace.addWarn(message.replace(/\n/g, '<br>'));
       this.isSell = true;
@@ -1883,6 +1883,7 @@ window.Game = (function() {
     deletedCardNum = this.objs["private"].pull(index);
     PublicSpace.push(deletedCardNum);
     Stock.push(Card.getClass(deletedCardNum).getPrice());
+    HandSpace.redraw();
     return this.roundEnd();
   };
 
