@@ -784,9 +784,6 @@ class Card34 extends CardBase
     # 建物と捨札を捨てる
     HandSpace.trash rightIndexs, leftIndexs
 
-    # カードを2枚引く
-    Game.pullDeck 2
-
     true
 
 # No.35 鉄道

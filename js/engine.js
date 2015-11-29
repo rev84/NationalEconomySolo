@@ -1352,7 +1352,6 @@ Card34 = (function(superClass) {
     PrivateSpace.push(buildCardNum0);
     PrivateSpace.push(buildCardNum1);
     HandSpace.trash(rightIndexs, leftIndexs);
-    Game.pullDeck(2);
     return true;
   };
 
