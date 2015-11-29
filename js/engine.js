@@ -1622,7 +1622,7 @@ window.Game = (function() {
     railPoint = railNum * industryNum * 3;
     honsyaPoint = honsyaNum * unworkNum * 3;
     logStr = "ゲーム終了　スコア：$" + point + "\n<hr>\n<table class=\"score\">\n<tr>\n  <td>資金</td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>$" + stock + "</td>\n</tr>\n<tr>\n  <td>建物の価値</td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>$" + buildPoint + "</td>\n</tr>\n<tr>\n  <td>未払い賃金</td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>-$" + unpaid + "</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>-$" + unpaidPoint + "</td>\n</tr>\n<tr>\n  <td>法律事務所</td>\n  <td>" + hourituNum + "件</td>\n  <td>×</td>\n  <td>未払い</td>\n  <td>$" + unpaid + "</td>\n  <td>×</td>\n  <td>5</td>\n  <td>=></td>\n  <td>$" + hourituOnkei + "</td>\n</tr>\n<tr>\n  <td>不動産屋</td>\n  <td>" + hudousanNum + "件</td>\n  <td>×</td>\n  <td>建物</td>\n  <td>" + buildNum + "件</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>$" + hudousanPoint + "</td>\n</tr>\n<tr>\n  <td>農協</td>\n  <td>" + noukyouNum + "件</td>\n  <td>×</td>\n  <td>消費財</td>\n  <td>" + consumerNum + "枚</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>$" + noukyouPoint + "</td>\n</tr>\n<tr>\n  <td>労働組合</td>\n  <td>" + rousoNum + "件</td>\n  <td>×</td>\n  <td>労働者</td>\n  <td>" + workerNum + "人</td>\n  <td>×</td>\n  <td>6</td>\n  <td>=></td>\n  <td>$" + rousoPoint + "</td>\n</tr>\n<tr>\n  <td>鉄道</td>\n  <td>" + railNum + "件</td>\n  <td>×</td>\n  <td>工業</td>\n  <td>" + industryNum + "件</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>$" + railPoint + "</td>\n</tr>\n<tr>\n  <td>本社ビル</td>\n  <td>" + honsyaNum + "件</td>\n  <td>×</td>\n  <td>施設</td>\n  <td>" + unworkNum + "件</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>$" + honsyaPoint + "</td>\n</tr>\n</table>\n<hr>\n<button id=\"start\" onclick=\"Game.gameStart()\">もう一度やる</button>";
-    return LogSpace.addWarn(logStr);
+    return LogSpace.addInfo(logStr);
   };
 
   Game.roundEnd = function() {
@@ -1658,7 +1658,7 @@ window.Game = (function() {
     if (penalty !== 0) {
       alertStr += "支払えなかった $" + penalty + " が未払いになります";
     }
-    LogSpace.addWarnInstant(alertStr.replace(/\n/g, '<br>'), 5);
+    LogSpace.addInfoInstant(alertStr.replace(/\n/g, '<br>'), 5);
     Stock.pull(minusSalary);
     Budget.push(minusSalary - penalty);
     Unpaid.push(penalty);
@@ -2133,6 +2133,8 @@ LogSpace = (function(superClass) {
 
   LogSpace.DIV_CLASS = 'log';
 
+  LogSpace.DIV_INFO_CLASS = 'log_info';
+
   LogSpace.DIV_WARN_CLASS = 'log_warn';
 
   LogSpace.DIV_FATAL_CLASS = 'log_fatal';
@@ -2158,6 +2160,12 @@ LogSpace = (function(superClass) {
     return this.getElement().append(e);
   };
 
+  LogSpace.addInfo = function(message) {
+    var e;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS).html(message);
+    return this.getElement().append(e);
+  };
+
   LogSpace.addFatalInstant = function(message, sec) {
     var e;
     if (sec == null) {
@@ -2175,6 +2183,17 @@ LogSpace = (function(superClass) {
       sec = 5;
     }
     e = $('<div>').addClass(this.DIV_WARN_CLASS).html(message);
+    this.getElement().append(e);
+    e.fadeOut(sec * 1000);
+    return setTimeout(e.remove, sec * 1000);
+  };
+
+  LogSpace.addInfoInstant = function(message, sec) {
+    var e;
+    if (sec == null) {
+      sec = 5;
+    }
+    e = $('<div>').addClass(this.DIV_INFO_CLASS).html(message);
     this.getElement().append(e);
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);

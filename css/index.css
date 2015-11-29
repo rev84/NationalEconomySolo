@@ -36,6 +36,11 @@ body {
   background:#fff8c4 url('../img/warning.png') no-repeat 20px 50%;
   border:1px solid #f2c779;
 }
+.log_info {
+  color:#555;
+  background:#f0f8ff url('../img/info.png') no-repeat 20px 50%;
+  border:1px solid #0000ff;
+}
 table.score td {
   padding-right: 35px;
   text-align:right;

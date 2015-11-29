@@ -216,7 +216,7 @@ class window.Game
     <hr>
     <button id="start" onclick="Game.gameStart()">もう一度やる</button>
     """
-    LogSpace.addWarn logStr
+    LogSpace.addInfo logStr
 
   # ラウンドの終了判定
   @roundEnd:->
@@ -259,7 +259,7 @@ class window.Game
     alertStr += "支払えなかった $"+penalty+" が未払いになります" if penalty isnt 0
 
     #alert alertStr
-    LogSpace.addWarnInstant alertStr.replace(/\n/g, '<br>'), 5
+    LogSpace.addInfoInstant alertStr.replace(/\n/g, '<br>'), 5
 
     # 資金を減らす
     Stock.pull minusSalary
