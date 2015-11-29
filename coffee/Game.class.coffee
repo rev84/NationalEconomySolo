@@ -373,6 +373,7 @@ class window.Game
     res = cardClass.use(left, right)
     # 使えた
     if res is true
+      LogSpace.removeAll()
       @turnEnd(kubun, cardIndex)
     # 使えなかった
     else

@@ -1768,6 +1768,7 @@ window.Game = (function() {
     }
     res = cardClass.use(left, right);
     if (res === true) {
+      LogSpace.removeAll();
       this.turnEnd(kubun, cardIndex);
     } else {
       LogSpace.addFatalInstant(res);
