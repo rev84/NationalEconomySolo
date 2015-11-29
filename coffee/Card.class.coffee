@@ -49,11 +49,14 @@ class CardBase
   @getSelectMessage:->
     false
 
+  # 使用前の下準備がある場合
+  @preUse:false
+
   # 労働者を派遣した時の挙動
   @use:(leftIndexs = [], rightIndexs = [])->
     # 数のバリデーション
-    [leftReqNum, rightReqNum] = @requireCards
-    return false unless leftIndexs.length is leftReqNum and rightReqNum.length is rightReqNum
+    [leftReqNum, rightReqNum] = @requireCards()
+    return false unless leftIndexs.length is leftReqNum and rightIndexs.length is rightReqNum
     true
 
   # カード名を取得
@@ -164,7 +167,7 @@ class Card4 extends CardBase
     "選択してください\n左クリック：建物1枚\n右クリック：捨札（建物コストの枚数）"
 
   @use:(leftIndexs, rightIndexs)->
-    #return "指定カードが足りません" if super()
+    #return "指定カードが足りません" unless super()
 
     # 建物は1枚でなければならない
     return "建物1枚を選択しなければなりません" if leftIndexs.length isnt 1
@@ -199,7 +202,7 @@ class Card5 extends CardBase
     "選択してください\n左クリック：捨札1枚"
 
   @use:(leftIndexs)->
-    return "捨札1枚が選択されていません" if super
+    return "捨札1枚が選択されていません" unless super
     return '家計が$6未満なので回収できません' if Budget.getAmount() < 6
 
     # 資金を増やす
@@ -224,7 +227,7 @@ class Card6 extends CardBase
     "選択してください\n左クリック：捨札2枚"
 
   @use:(leftIndexs)->
-    return "捨札2枚が選択されていません" if super
+    return "捨札2枚が選択されていません" unless super
     return '家計が$12未満なので回収できません' if Budget.getAmount() < 12
 
     # 資金を増やす
@@ -264,7 +267,7 @@ class Card8 extends CardBase
     "選択してください\n左クリック：捨札3枚"
 
   @use:(leftIndexs)->
-    return "捨札3枚が選択されていません" if super
+    return "捨札3枚が選択されていません" unless super
     return '家計が$18未満なので回収できません' if Budget.getAmount() < 18
 
     # 資金を増やす
@@ -304,7 +307,7 @@ class Card10 extends CardBase
     "選択してください\n左クリック：捨札4枚"
 
   @use:(leftIndexs)->
-    return "捨札4枚が選択されていません" if super
+    return "捨札4枚が選択されていません" unless super
     return '家計が$24未満なので回収できません' if Budget.getAmount() < 24
 
     # 資金を増やす
@@ -340,7 +343,7 @@ class Card12 extends CardBase
     "選択してください\n左クリック：捨札5枚"
 
   @use:(leftIndexs)->
-    return "捨札5枚が選択されていません" if super
+    return "捨札5枚が選択されていません" unless super
     return '家計が$30未満なので回収できません' if Budget.getAmount() < 30
 
     # 資金を増やす
@@ -372,6 +375,33 @@ class Card14 extends CardBase
   @DESCRIPTION = "カードを5枚めくり公開する\nうち1枚を引いて残りを捨てる"
   @COST        = 1
   @PRICE       = 4
+
+  @preUse:->
+    # 手札を引く
+    Game.pullDeck 5
+    # フラグを立てる
+    Game.flagSekkei = true
+
+  @requireCards:->
+    [4,0]
+
+  @getSelectMessage:->
+    "選択してください\n左クリック：捨札4枚\n（最後に引いた5枚の中から）"
+
+  @use:(leftIndexs)->
+    return "捨札4枚が選択されていません" unless super
+
+    count = 0
+    for index in [HandSpace.getAmount()-5...HandSpace.getAmount()]
+      count++ if leftIndexs.in_array index
+    
+    return "最後に引いた5枚のうちの4枚が選択されていません" if count isnt 4
+
+    # 捨札4枚を捨てる
+    HandSpace.trash leftIndexs
+    # フラグを削除
+    Game.flagSekkei = false
+    true
 
 # No.15 焼畑
 class Card15 extends CardBase
@@ -424,7 +454,7 @@ class Card17 extends CardBase
     "選択してください\n左クリック：捨札2枚"
 
   @use:(leftIndexs)->
-    return "捨札2枚が選択されていません" if super()
+    return "捨札2枚が選択されていません" unless super
 
     # 捨札2枚を捨てる
     HandSpace.trash leftIndexs
@@ -446,7 +476,7 @@ class Card18 extends CardBase
     "選択してください\n左クリック：建物1枚\n右クリック：捨札（建設コスト-1の枚数）"
 
   @use:(leftIndexs, rightIndexs)->
-    #return "指定カードが足りません" if super()
+    #return "指定カードが足りません" unless super()
 
     # 右クリックの建物は1枚でなければならない
     return "建物を1枚選択しなければなりません" if leftIndexs.length isnt 1
@@ -533,7 +563,7 @@ class Card24 extends CardBase
     "選択してください\n左クリック：捨札1枚"
 
   @use:(leftIndexs)->
-    return "捨札1枚が選択されていません" if super
+    return "捨札1枚が選択されていません" unless super
     return '家計が$15未満なので回収できません' if Stock.getAmount() < 15
 
     # 資金を増やす
@@ -559,7 +589,7 @@ class Card25 extends CardBase
     "選択してください\n左クリック：農業カテゴリの建物1枚"
 
   @use:(leftIndexs)->
-    #return "指定カードが足りません" if super()
+    #return "指定カードが足りません" unless super()
 
     # 建物は1枚でなければならない
     return "建物を1枚選択しなければなりません" if leftIndexs.length isnt 1
@@ -620,7 +650,7 @@ class Card29 extends CardBase
     "選択してください\n左クリック：建物1枚\n右クリック：捨札（建物コストの枚数）"
 
   @use:(leftIndexs, rightIndexs)->
-    #return "指定カードが足りません" if super()
+    #return "指定カードが足りません" unless super()
 
     # 右クリックの建物は1枚でなければならない
     return "建物を1枚選択しなければなりません" if leftIndexs.length isnt 1
@@ -693,11 +723,11 @@ class Card33 extends CardBase
     "選択してください\n左クリック：捨札3枚"
 
   @use:(leftIndexs)->
-    return "捨札3枚が選択されていません" if super
+    return "捨札3枚が選択されていません" unless super
 
     # 捨札3枚を捨てる
     HandSpace.trash leftIndexs
-    # カードを4枚引く
+    # カードを7枚引く
     Game.pullDeck 7
 
     true
@@ -716,7 +746,7 @@ class Card34 extends CardBase
     "選択してください\n左クリック：建物カード2枚\n右クリック：捨札（建物コストの枚数）"
 
   @use:(leftIndexs, rightIndexs)->
-    #return "指定カードが足りません" if super
+    #return "指定カードが足りません" unless super
 
     # 建物は2枚でなければならない
     return "建物を2枚選択しなければなりません" if leftIndexs.length isnt 2

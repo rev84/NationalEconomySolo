@@ -91,6 +91,7 @@ ButtonOK = (function(superClass) {
 
   ButtonOK.init = function() {
     this.disable();
+    this.getElement().off('click');
     return this.getElement().on('click', function() {
       return Game.pushOK();
     });
@@ -119,6 +120,7 @@ ButtonCANCEL = (function(superClass) {
 
   ButtonCANCEL.init = function() {
     this.disable();
+    this.getElement().off('click');
     return this.getElement().on('click', function() {
       return Game.pushCANCEL();
     });
@@ -199,6 +201,8 @@ CardBase = (function() {
     return false;
   };
 
+  CardBase.preUse = false;
+
   CardBase.use = function(leftIndexs, rightIndexs) {
     var leftReqNum, ref, rightReqNum;
     if (leftIndexs == null) {
@@ -207,8 +211,8 @@ CardBase = (function() {
     if (rightIndexs == null) {
       rightIndexs = [];
     }
-    ref = this.requireCards, leftReqNum = ref[0], rightReqNum = ref[1];
-    if (!(leftIndexs.length === leftReqNum && rightReqNum.length === rightReqNum)) {
+    ref = this.requireCards(), leftReqNum = ref[0], rightReqNum = ref[1];
+    if (!(leftIndexs.length === leftReqNum && rightIndexs.length === rightReqNum)) {
       return false;
     }
     return true;
@@ -411,7 +415,7 @@ Card5 = (function(superClass) {
   };
 
   Card5.use = function(leftIndexs) {
-    if (Card5.__super__.constructor.use.apply(this, arguments)) {
+    if (!Card5.__super__.constructor.use.apply(this, arguments)) {
       return "捨札1枚が選択されていません";
     }
     if (Budget.getAmount() < 6) {
@@ -449,7 +453,7 @@ Card6 = (function(superClass) {
   };
 
   Card6.use = function(leftIndexs) {
-    if (Card6.__super__.constructor.use.apply(this, arguments)) {
+    if (!Card6.__super__.constructor.use.apply(this, arguments)) {
       return "捨札2枚が選択されていません";
     }
     if (Budget.getAmount() < 12) {
@@ -512,7 +516,7 @@ Card8 = (function(superClass) {
   };
 
   Card8.use = function(leftIndexs) {
-    if (Card8.__super__.constructor.use.apply(this, arguments)) {
+    if (!Card8.__super__.constructor.use.apply(this, arguments)) {
       return "捨札3枚が選択されていません";
     }
     if (Budget.getAmount() < 18) {
@@ -575,7 +579,7 @@ Card10 = (function(superClass) {
   };
 
   Card10.use = function(leftIndexs) {
-    if (Card10.__super__.constructor.use.apply(this, arguments)) {
+    if (!Card10.__super__.constructor.use.apply(this, arguments)) {
       return "捨札4枚が選択されていません";
     }
     if (Budget.getAmount() < 24) {
@@ -638,7 +642,7 @@ Card12 = (function(superClass) {
   };
 
   Card12.use = function(leftIndexs) {
-    if (Card12.__super__.constructor.use.apply(this, arguments)) {
+    if (!Card12.__super__.constructor.use.apply(this, arguments)) {
       return "捨札5枚が選択されていません";
     }
     if (Budget.getAmount() < 30) {
@@ -694,6 +698,38 @@ Card14 = (function(superClass) {
   Card14.COST = 1;
 
   Card14.PRICE = 4;
+
+  Card14.preUse = function() {
+    Game.pullDeck(5);
+    return Game.flagSekkei = true;
+  };
+
+  Card14.requireCards = function() {
+    return [4, 0];
+  };
+
+  Card14.getSelectMessage = function() {
+    return "選択してください\n左クリック：捨札4枚\n（最後に引いた5枚の中から）";
+  };
+
+  Card14.use = function(leftIndexs) {
+    var count, index, j, ref, ref1;
+    if (!Card14.__super__.constructor.use.apply(this, arguments)) {
+      return "捨札4枚が選択されていません";
+    }
+    count = 0;
+    for (index = j = ref = HandSpace.getAmount() - 5, ref1 = HandSpace.getAmount(); ref <= ref1 ? j < ref1 : j > ref1; index = ref <= ref1 ? ++j : --j) {
+      if (leftIndexs.in_array(index)) {
+        count++;
+      }
+    }
+    if (count !== 4) {
+      return "最後に引いた5枚のうちの4枚が選択されていません";
+    }
+    HandSpace.trash(leftIndexs);
+    Game.flagSekkei = false;
+    return true;
+  };
 
   return Card14;
 
@@ -783,7 +819,7 @@ Card17 = (function(superClass) {
   };
 
   Card17.use = function(leftIndexs) {
-    if (Card17.__super__.constructor.use.call(this)) {
+    if (!Card17.__super__.constructor.use.apply(this, arguments)) {
       return "捨札2枚が選択されていません";
     }
     HandSpace.trash(leftIndexs);
@@ -980,7 +1016,7 @@ Card24 = (function(superClass) {
   };
 
   Card24.use = function(leftIndexs) {
-    if (Card24.__super__.constructor.use.apply(this, arguments)) {
+    if (!Card24.__super__.constructor.use.apply(this, arguments)) {
       return "捨札1枚が選択されていません";
     }
     if (Stock.getAmount() < 15) {
@@ -1249,7 +1285,7 @@ Card33 = (function(superClass) {
   };
 
   Card33.use = function(leftIndexs) {
-    if (Card33.__super__.constructor.use.apply(this, arguments)) {
+    if (!Card33.__super__.constructor.use.apply(this, arguments)) {
       return "捨札3枚が選択されていません";
     }
     HandSpace.trash(leftIndexs);
@@ -1505,6 +1541,8 @@ window.Game = (function() {
 
   Game.flagYakihata = false;
 
+  Game.flagSekkei = false;
+
   Game.init = function() {
     var name, obj, ref;
     this.isClickable = false;
@@ -1520,6 +1558,7 @@ window.Game = (function() {
     this.isSell = false;
     this.isGameEnd = false;
     this.flagYakihata = false;
+    this.flagSekkei = false;
     return this.isClickable = true;
   };
 
@@ -1698,22 +1737,23 @@ window.Game = (function() {
   };
 
   Game.pushOK = function() {
-    var _, cardClass, cardIndex, index, j, kubun, left, ref, ref1, res, right, spaceClass;
+    var _, backupWaitChoice, cardClass, cardIndex, index, j, kubun, left, ref, ref1, res, right, spaceClass;
     if (this.isGameEnd) {
       return false;
     }
     if (this.waitChoice === false) {
       return false;
     }
+    backupWaitChoice = this.waitChoice.concat();
     ref = this.waitChoice, kubun = ref[0], cardIndex = ref[1], _ = ref[2];
     this.waitChoice = false;
     left = [];
     right = [];
     for (index = j = 0, ref1 = this.objs.hand.getAmount(); 0 <= ref1 ? j < ref1 : j > ref1; index = 0 <= ref1 ? ++j : --j) {
-      if (this.objs.hand.getSelect(index) === this.objs.hand.SELECT_LEFT) {
+      if (HandSpace.getSelect(index) === HandSpace.SELECT_LEFT) {
         left.push(index);
       }
-      if (this.objs.hand.getSelect(index) === this.objs.hand.SELECT_RIGHT) {
+      if (HandSpace.getSelect(index) === HandSpace.SELECT_RIGHT) {
         right.push(index);
       }
     }
@@ -1722,14 +1762,21 @@ window.Game = (function() {
     ButtonCANCEL.disable();
     spaceClass = this.kubun2class(kubun);
     cardClass = spaceClass.getCardClass(cardIndex);
-    LogSpace.removeAll();
+    if (!this.flagSekkei) {
+      LogSpace.removeAll();
+    }
     res = cardClass.use(left, right);
     if (res === true) {
       this.turnEnd(kubun, cardIndex);
     } else {
       LogSpace.addFatalInstant(res);
       HandSpace.redraw();
-      this.clickable();
+      if (this.flagSekkei) {
+        ButtonOK.enable();
+        this.waitChoice = backupWaitChoice;
+      } else {
+        this.clickable();
+      }
     }
     return res === true;
   };
@@ -1739,6 +1786,9 @@ window.Game = (function() {
       return false;
     }
     if (this.waitChoice === false) {
+      return false;
+    }
+    if (this.flagSekkei === false) {
       return false;
     }
     this.waitChoice = false;
@@ -1768,6 +1818,9 @@ window.Game = (function() {
     this.isClickable = false;
     spaceClass = this.kubun2class(kubun);
     cardClass = spaceClass.getCardClass(index);
+    if (cardClass.preUse !== false) {
+      cardClass.preUse();
+    }
     ref = cardClass.requireCards(), leftReqNum = ref[0], rightReqNum = ref[1];
     if (leftReqNum === 0 && rightReqNum === 0) {
       res = cardClass.use([], [], kubun, index);
@@ -1781,7 +1834,9 @@ window.Game = (function() {
       this.waitChoice = [kubun, index, cardClass.isRightClick()];
       LogSpace.addWarn(cardClass.getSelectMessage().replace(/\n/g, '<br>'));
       ButtonOK.enable();
-      ButtonCANCEL.enable();
+      if (!this.flagSekkei) {
+        ButtonCANCEL.enable();
+      }
     }
     return true;
   };

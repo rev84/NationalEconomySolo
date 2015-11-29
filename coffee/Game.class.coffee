@@ -14,6 +14,8 @@ class window.Game
   @isGameEnd : false
   # 焼畑フラグ
   @flagYakihata : false
+  # 設計事務所フラグ
+  @flagSekkei : false
 
   @init : ->
     @isClickable = false
@@ -27,6 +29,7 @@ class window.Game
     @isSell       = false
     @isGameEnd    = false
     @flagYakihata = false
+    @flagSekkei   = false
     @isClickable  = true
 
   @refresh:->
@@ -255,14 +258,15 @@ class window.Game
     # 選択状態ではない
     return false if @waitChoice is false
     # 選択状態解除
+    backupWaitChoice = @waitChoice.concat()
     [kubun, cardIndex, _] = @waitChoice
     @waitChoice = false
     # ハンドのリストを作成
     left = []
     right = []
     for index in [0...@objs.hand.getAmount()]
-      left.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_LEFT
-      right.push index if @objs.hand.getSelect(index) is @objs.hand.SELECT_RIGHT
+      left.push index if HandSpace.getSelect(index) is HandSpace.SELECT_LEFT
+      right.push index if HandSpace.getSelect(index) is HandSpace.SELECT_RIGHT
 
     # 解除処理
     HandSpace.selectReset()
@@ -272,7 +276,7 @@ class window.Game
     # 使用する
     spaceClass = @kubun2class(kubun)
     cardClass = spaceClass.getCardClass cardIndex
-    LogSpace.removeAll()
+    LogSpace.removeAll() unless @flagSekkei
 
     res = cardClass.use(left, right)
     # 使えた
@@ -282,7 +286,12 @@ class window.Game
     else
       LogSpace.addFatalInstant res
       HandSpace.redraw()
-      @clickable()
+      # 設計事務所は後戻りできない
+      if @flagSekkei
+        ButtonOK.enable()
+        @waitChoice = backupWaitChoice
+      else
+        @clickable()
 
     res is true
 
@@ -291,6 +300,8 @@ class window.Game
     return false if @isGameEnd
     # 選択状態ではない
     return false if @waitChoice is false
+    # 設計事務所はキャンセルできない
+    return false if @flagSekkei is false
     @waitChoice = false
     HandSpace.selectReset()
     HandSpace.redraw()
@@ -319,6 +330,9 @@ class window.Game
     # 実行する
     cardClass = spaceClass.getCardClass index
 
+    # 事前実行
+    cardClass.preUse() if cardClass.preUse isnt false
+
     # 選択の必要があるか
     [leftReqNum, rightReqNum] = cardClass.requireCards()
     # ない
@@ -340,7 +354,7 @@ class window.Game
       LogSpace.addWarn(cardClass.getSelectMessage().replace /\n/g, '<br>')
       # ボタンを押せるようにする
       ButtonOK.enable()
-      ButtonCANCEL.enable()
+      ButtonCANCEL.enable() unless @flagSekkei
     return true
 
   # カードをデッキから手札に移動

@@ -2,6 +2,7 @@ class ButtonOK extends SpaceBase
   @DIV_ID = 'ok'
   @init:->
     @disable()
+    @getElement().off 'click'
     @getElement().on 'click', ->
       Game.pushOK()
 
@@ -15,6 +16,7 @@ class ButtonCANCEL extends SpaceBase
   @DIV_ID = 'cancel'
   @init:->
     @disable()
+    @getElement().off 'click'
     @getElement().on 'click', ->
       Game.pushCANCEL()
 
