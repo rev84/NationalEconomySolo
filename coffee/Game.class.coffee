@@ -433,7 +433,7 @@ class window.Game
       res = cardClass.use([], [], kubun, index)
       # 正常終了しなかった
       if res isnt true
-        alert res
+        LogSpace.addFatalInstant res
         @clickable()
         return false
       # 正常終了

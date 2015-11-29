@@ -1530,6 +1530,13 @@ Deck = (function() {
 
 })();
 
+$(function() {
+  $('body').bind('contextmenu', function() {
+    return false;
+  });
+  return Game.gameStart();
+});
+
 window.Game = (function() {
   function Game() {}
 
@@ -1834,7 +1841,7 @@ window.Game = (function() {
     if (leftReqNum === 0 && rightReqNum === 0) {
       res = cardClass.use([], [], kubun, index);
       if (res !== true) {
-        alert(res);
+        LogSpace.addFatalInstant(res);
         this.clickable();
         return false;
       }
@@ -2949,10 +2956,3 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
-
-$(function() {
-  $('body').bind('contextmenu', function() {
-    return false;
-  });
-  return Game.gameStart();
-});
