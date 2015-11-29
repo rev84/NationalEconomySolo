@@ -1614,14 +1614,14 @@ window.Game = (function() {
   Game.logScore = function() {
     var buildNum, buildPoint, consumerNum, honsyaNum, honsyaPoint, hourituNum, hourituOnkei, hudousanNum, hudousanPoint, industryNum, logStr, noukyouNum, noukyouPoint, point, railNum, railPoint, ref, rousoNum, rousoPoint, stock, unpaid, unpaidPoint, unworkNum, workerNum;
     ref = this.getPoint(true), stock = ref[0], buildPoint = ref[1], unpaid = ref[2], hourituNum = ref[3], hudousanNum = ref[4], buildNum = ref[5], noukyouNum = ref[6], consumerNum = ref[7], rousoNum = ref[8], workerNum = ref[9], railNum = ref[10], industryNum = ref[11], honsyaNum = ref[12], unworkNum = ref[13], point = ref[14];
-    unpaidPoint = unpaid * 5;
+    unpaidPoint = unpaid * 3;
     hourituOnkei = unpaid > hourituNum * 5 ? hourituNum * 5 * 3 : unpaid * 3;
     hudousanPoint = hudousanNum * buildNum * 3;
     noukyouPoint = noukyouNum * consumerNum * 3;
-    rousoPoint = rousoNum * consumerNum * 6;
+    rousoPoint = rousoNum * workerNum * 6;
     railPoint = railNum * industryNum * 3;
     honsyaPoint = honsyaNum * unworkNum * 3;
-    logStr = ("ゲーム終了　スコア：$" + point + "\n<hr>\n資金　　　　　　　　　　　　　　　　　　　　 $" + stock + "\n建物の価値　　　　　　　　　　　　　　　　　 $" + buildPoint + "\n未払い賃金　　　　　　　　　　$" + unpaid + "　×　3　=> -$" + unpaidPoint + "\n法律事務所　　" + hourituNum + "件　×　未払い　$" + unpaid + "　×　3　=>　$" + hourituOnkei + "\n不動産屋　　　" + hudousanNum + "件　×　建物　 " + buildNum + "件　×　3　=>　$" + hudousanPoint + "\n農協　　　　　" + noukyouNum + "件　×　消費財 " + consumerNum + "枚　×　3　=>　$" + noukyouPoint + "\n労働組合　　　" + rousoNum + "件　×　労働者 " + workerNum + "人　×　6　=>　$" + rousoPoint + "\n鉄道　　　　　" + railNum + "件　×　工業　 " + industryNum + "件　×　3　=>　$" + railPoint + "\n本社ビル　　　" + honsyaNum + "件　×　施設　 " + unworkNum + "件　×　3　=>　$" + honsyaPoint + "\n<hr>\n<button id=\"start\" onclick=\"Game.gameStart()\">もう一度やる</button>").replace(/\n/g, '<br>');
+    logStr = "ゲーム終了　スコア：$" + point + "\n<hr>\n<table class=\"score\">\n<tr>\n  <td>資金</td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>$" + stock + "</td>\n</tr>\n<tr>\n  <td>建物の価値</td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>$" + buildPoint + "</td>\n</tr>\n<tr>\n  <td>未払い賃金</td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>-$" + unpaid + "</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>-$" + unpaidPoint + "</td>\n</tr>\n<tr>\n  <td>法律事務所</td>\n  <td>" + hourituNum + "件</td>\n  <td>×</td>\n  <td>未払い</td>\n  <td>$" + unpaid + "</td>\n  <td>×</td>\n  <td>5</td>\n  <td>=></td>\n  <td>$" + hourituOnkei + "</td>\n</tr>\n<tr>\n  <td>不動産屋</td>\n  <td>" + hudousanNum + "件</td>\n  <td>×</td>\n  <td>建物</td>\n  <td>" + buildNum + "件</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>$" + hudousanPoint + "</td>\n</tr>\n<tr>\n  <td>農協</td>\n  <td>" + noukyouNum + "件</td>\n  <td>×</td>\n  <td>消費財</td>\n  <td>" + consumerNum + "枚</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>$" + noukyouPoint + "</td>\n</tr>\n<tr>\n  <td>労働組合</td>\n  <td>" + rousoNum + "件</td>\n  <td>×</td>\n  <td>労働者</td>\n  <td>" + workerNum + "人</td>\n  <td>×</td>\n  <td>6</td>\n  <td>=></td>\n  <td>$" + rousoPoint + "</td>\n</tr>\n<tr>\n  <td>鉄道</td>\n  <td>" + railNum + "件</td>\n  <td>×</td>\n  <td>工業</td>\n  <td>" + industryNum + "件</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>$" + railPoint + "</td>\n</tr>\n<tr>\n  <td>本社ビル</td>\n  <td>" + honsyaNum + "件</td>\n  <td>×</td>\n  <td>施設</td>\n  <td>" + unworkNum + "件</td>\n  <td>×</td>\n  <td>3</td>\n  <td>=></td>\n  <td>$" + honsyaPoint + "</td>\n</tr>\n</table>\n<hr>\n<button id=\"start\" onclick=\"Game.gameStart()\">もう一度やる</button>";
     return LogSpace.addWarn(logStr);
   };
 
@@ -1880,7 +1880,7 @@ window.Game = (function() {
     if (!PrivateSpace.getCardClass(index).isSellable()) {
       return false;
     }
-    deletedCardNum = this.objs["private"].pull(index);
+    deletedCardNum = PrivateSpace.pull(index);
     PublicSpace.push(deletedCardNum);
     Stock.push(Card.getClass(deletedCardNum).getPrice());
     HandSpace.redraw();

@@ -101,29 +101,121 @@ class window.Game
       unworkNum
       point
     ] = @getPoint true
-    unpaidPoint = unpaid*5
+    unpaidPoint = unpaid*3
     hourituOnkei = if unpaid > hourituNum*5 then hourituNum*5*3 else unpaid*3
     hudousanPoint = hudousanNum * buildNum*3
     noukyouPoint = noukyouNum * consumerNum*3
-    rousoPoint = rousoNum * consumerNum*6
+    rousoPoint = rousoNum * workerNum*6
     railPoint = railNum * industryNum*3
     honsyaPoint = honsyaNum * unworkNum*3
 
     logStr = """
     ゲーム終了　スコア：$#{point}
     <hr>
-    資金　　　　　　　　　　　　　　　　　　　　 $#{stock}
-    建物の価値　　　　　　　　　　　　　　　　　 $#{buildPoint}
-    未払い賃金　　　　　　　　　　$#{unpaid}　×　3　=> -$#{unpaidPoint}
-    法律事務所　　#{hourituNum}件　×　未払い　$#{unpaid}　×　3　=>　$#{hourituOnkei}
-    不動産屋　　　#{hudousanNum}件　×　建物　 #{buildNum}件　×　3　=>　$#{hudousanPoint}
-    農協　　　　　#{noukyouNum}件　×　消費財 #{consumerNum}枚　×　3　=>　$#{noukyouPoint}
-    労働組合　　　#{rousoNum}件　×　労働者 #{workerNum}人　×　6　=>　$#{rousoPoint}
-    鉄道　　　　　#{railNum}件　×　工業　 #{industryNum}件　×　3　=>　$#{railPoint}
-    本社ビル　　　#{honsyaNum}件　×　施設　 #{unworkNum}件　×　3　=>　$#{honsyaPoint}
+    <table class="score">
+    <tr>
+      <td>資金</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>$#{stock}</td>
+    </tr>
+    <tr>
+      <td>建物の価値</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>$#{buildPoint}</td>
+    </tr>
+    <tr>
+      <td>未払い賃金</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>-$#{unpaid}</td>
+      <td>×</td>
+      <td>3</td>
+      <td>=></td>
+      <td>-$#{unpaidPoint}</td>
+    </tr>
+    <tr>
+      <td>法律事務所</td>
+      <td>#{hourituNum}件</td>
+      <td>×</td>
+      <td>未払い</td>
+      <td>$#{unpaid}</td>
+      <td>×</td>
+      <td>5</td>
+      <td>=></td>
+      <td>$#{hourituOnkei}</td>
+    </tr>
+    <tr>
+      <td>不動産屋</td>
+      <td>#{hudousanNum}件</td>
+      <td>×</td>
+      <td>建物</td>
+      <td>#{buildNum}件</td>
+      <td>×</td>
+      <td>3</td>
+      <td>=></td>
+      <td>$#{hudousanPoint}</td>
+    </tr>
+    <tr>
+      <td>農協</td>
+      <td>#{noukyouNum}件</td>
+      <td>×</td>
+      <td>消費財</td>
+      <td>#{consumerNum}枚</td>
+      <td>×</td>
+      <td>3</td>
+      <td>=></td>
+      <td>$#{noukyouPoint}</td>
+    </tr>
+    <tr>
+      <td>労働組合</td>
+      <td>#{rousoNum}件</td>
+      <td>×</td>
+      <td>労働者</td>
+      <td>#{workerNum}人</td>
+      <td>×</td>
+      <td>6</td>
+      <td>=></td>
+      <td>$#{rousoPoint}</td>
+    </tr>
+    <tr>
+      <td>鉄道</td>
+      <td>#{railNum}件</td>
+      <td>×</td>
+      <td>工業</td>
+      <td>#{industryNum}件</td>
+      <td>×</td>
+      <td>3</td>
+      <td>=></td>
+      <td>$#{railPoint}</td>
+    </tr>
+    <tr>
+      <td>本社ビル</td>
+      <td>#{honsyaNum}件</td>
+      <td>×</td>
+      <td>施設</td>
+      <td>#{unworkNum}件</td>
+      <td>×</td>
+      <td>3</td>
+      <td>=></td>
+      <td>$#{honsyaPoint}</td>
+    </tr>
+    </table>
     <hr>
     <button id="start" onclick="Game.gameStart()">もう一度やる</button>
-    """.replace /\n/g, '<br>'
+    """
     LogSpace.addWarn logStr
 
   # ラウンドの終了判定
@@ -378,7 +470,7 @@ class window.Game
     return false unless PrivateSpace.getCardClass(index).isSellable()
 
     # 公共に移す
-    deletedCardNum = @objs.private.pull index
+    deletedCardNum = PrivateSpace.pull index
     PublicSpace.push deletedCardNum
     # 資金を増やす
     Stock.push Card.getClass(deletedCardNum).getPrice()

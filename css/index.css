@@ -36,6 +36,11 @@ body {
   background:#fff8c4 url('../img/warning.png') no-repeat 20px 50%;
   border:1px solid #f2c779;
 }
+table.score td {
+  padding-right: 35px;
+  text-align:right;
+  border-bottom:1px solid #000;
+}
 #info_space {
   /*border:1px solid #000;*/
   position:absolute;
