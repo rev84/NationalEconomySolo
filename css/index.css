@@ -7,13 +7,14 @@ body {
 }
 #game {
   position:fixed;
-  top:60;left:2.5%;
+  top:60px;left:10px;
   width:1200px; height:760px;
   min-height:600px;
   margin:0 auto;
 }
 #log_space {
   position:fixed;
+  right:30px;
   /*height:60px;*/
   z-index:100;
 }
@@ -49,25 +50,25 @@ table.score td {
 #info_space {
   /*border:1px solid #000;*/
   position:absolute;
-  top:0px; right:0px;
+  top:0px; left:0px;
   width:150px; height:760px;
 }
 #public_space {
   border:1px solid #000;
   position:absolute;
-  top:0px; left:0px;
+  top:0px; left:150px;
   width:1025px; height:375px;
 }
 #private_space {
   border:1px solid #000;
   position:absolute;
-  top:380px; left:0px;
+  top:380px; left:150px;
   width:1025px; height:125px;
 }
 #hand_space {
   border:1px solid #000;
   position:absolute;
-  top:510px; left:0px;
+  top:510px; left:150px;
   width:1025px; height:250px;
   padding:2px;
 }
@@ -78,11 +79,20 @@ table.score td {
 /* ハンドのカード */
 .hand {
   position:relative;
-  width:120px; height:115px;
-  border:1px solid #0000ff;
+  width:120px; height:120px;
+  border:4px double #000000;
   display:inline-block;
   margin:3px;
   padding:2px;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+.select_left {
+  border:4px solid #ff0000;
+}
+.select_right {
+  border:4px solid #006400;
 }
 .hand_header {
   position:absolute;
@@ -155,7 +165,7 @@ table.score td {
 }
 
 .used {
-  background-color:#111111;
+  background-color:#888888;
 }
 .worker {
   position:absolute;
@@ -167,7 +177,7 @@ table.score td {
 /* 情報 */
 .info {
   position:absolute;
-  width:150px; height:80px;
+  width:120px; height:80px;
   box-sizing:content-box;
 }
 #round_space {
@@ -183,21 +193,21 @@ table.score td {
   border: 4px double #0000ff;
 }
 #stock_space {
-  bottom:0px; left:0px;
+  bottom:20px; left:0px;
   border: 4px double #006400;
 }
 #unpaid_space {
-  bottom:100px; left:0px;
+  bottom:120px; left:0px;
   border: 4px double #ff0000;
 }
 #point_space {
-  bottom:200px; left:0px;
+  bottom:220px; left:0px;
   border: 4px double #000000;
 }
 .info_label {
   position:absolute;
   top:0px; left:0px;
-  width:150px; height:30px;
+  width:120px; height:30px;
   text-align:center;
   vertical-align:middle;
   color:#ffffff;
@@ -208,7 +218,7 @@ table.score td {
 .info_body {
   position:absolute;
   top:30px; left:0px;
-  width:150px; height:50px;
+  width:120px; height:50px;
   text-align:center;
   vertical-align:middle;
   font-size:34px;
@@ -248,41 +258,22 @@ table.score td {
 /* ボタン */
 button#ok, button#cancel {
   position:absolute;
-  width:150px; height:80px;
+  width:50px; height:50px;
   box-sizing:content-box;
-  width:140px; height:50px;
   font-size:34px;
   background-color:#aaaaaa;
   color:#000000;
+  left:30px;
 }
-#ok {
-  top:300px; left:0px;
+button#ok {
+  top:300px;
 }
-#cancel {
-  top:400px; left:0px;
+button#cancel {
+  top:380px;
 }
 .disabled {
   color:#aaaaaa;
 }
-.select_left, .select_left2 {
-  border:4px solid #ff0000;
-  box-sizing:border-box;
-  margin:2px !important;
-}
-.select_left2 .order {
-  position:absolute;
-  bottom:0px; right:0px;
-  background-color:#ff0000;
-  color:#ffffff;
-  font-weight:bold;
-  font-size:20px;
-}
-.select_right {
-  border:4px solid #ffff00;
-  box-sizing:border-box;
-  margin:2px !important;
-}
-
 .no_display {
   display:none;
 }

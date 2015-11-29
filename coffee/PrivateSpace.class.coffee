@@ -62,6 +62,7 @@ class PrivateSpace extends SpaceBase
   # 返値は削除したカード番号
   @pull:(cardIndex)->
     newCards = []
+    newStatus = []
     deletedCardNum = null
     for index in [0...@cards.length]
       # 削除するカード
@@ -70,7 +71,9 @@ class PrivateSpace extends SpaceBase
       # その他
       else
         newCards.push @cards[index]
+        newStatus.push @status[index]
     @cards = newCards
+    @status = newStatus
     deletedCardNum
 
   # 描画

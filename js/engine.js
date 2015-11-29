@@ -141,6 +141,10 @@ ButtonCANCEL = (function(superClass) {
 Card = (function() {
   function Card() {}
 
+  Card.CARD_NUM_KOUZAN = 2;
+
+  Card.CARD_NUM_YAKIHATA = 15;
+
   Card.CARD_NUM_SOUKO = 20;
 
   Card.CARD_NUM_HOURITU = 22;
@@ -746,11 +750,15 @@ Card15 = (function(superClass) {
 
   Card15.CATEGORY = "農業";
 
-  Card15.DESCRIPTION = "消費財を5枚引く\n焼畑は消滅する";
+  Card15.DESCRIPTION = "消費財を5枚引く\n焼畑は消滅する\n売却不可";
 
   Card15.COST = 1;
 
   Card15.PRICE = 0;
+
+  Card15.isSellable = function() {
+    return false;
+  };
 
   Card15.use = function(leftIndexs, rightIndexs, kubun, index) {
     var space;
@@ -893,9 +901,10 @@ Card19 = (function(superClass) {
   Card19.PRICE = 5;
 
   Card19.use = function() {
-    if (HandSpace.getAmount() < 4) {
-      Game.pullConsumer(4 - HandSpace.getAmount());
+    if (HandSpace.getAmount() >= 4) {
+      return "手札が4枚以上なので置けません";
     }
+    Game.pullConsumer(4 - HandSpace.getAmount());
     return true;
   };
 
@@ -1515,6 +1524,13 @@ Deck = (function() {
   return Deck;
 
 })();
+
+$(function() {
+  $('body').bind('contextmenu', function() {
+    return false;
+  });
+  return Game.gameStart();
+});
 
 window.Game = (function() {
   function Game() {}
@@ -2300,17 +2316,20 @@ PrivateSpace = (function(superClass) {
   };
 
   PrivateSpace.pull = function(cardIndex) {
-    var deletedCardNum, index, j, newCards, ref;
+    var deletedCardNum, index, j, newCards, newStatus, ref;
     newCards = [];
+    newStatus = [];
     deletedCardNum = null;
     for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
       if (index === cardIndex) {
         deletedCardNum = this.cards[index];
       } else {
         newCards.push(this.cards[index]);
+        newStatus.push(this.status[index]);
       }
     }
     this.cards = newCards;
+    this.status = newStatus;
     return deletedCardNum;
   };
 
@@ -2573,6 +2592,9 @@ PublicSpace = (function(superClass) {
   };
 
   PublicSpace.isUsable = function(index) {
+    if (this.cards[index] === Card.CARD_NUM_KOUZAN) {
+      return true;
+    }
     if (this.status[index] == null) {
       return false;
     }
@@ -2602,17 +2624,20 @@ PublicSpace = (function(superClass) {
   };
 
   PublicSpace.pull = function(cardIndex) {
-    var deletedCardNum, index, j, newCards, ref;
+    var deletedCardNum, index, j, newCards, newStatus, ref;
     newCards = [];
+    newStatus = [];
     deletedCardNum = null;
     for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
       if (index === cardIndex) {
         deletedCardNum = this.cards[index];
       } else {
         newCards.push(this.cards[index]);
+        newStatus.push(this.status[index]);
       }
     }
     this.cards = newCards;
+    this.status = newStatus;
     return deletedCardNum;
   };
 
@@ -2678,7 +2703,9 @@ PublicSpace = (function(superClass) {
     });
     switch (this.status[index]) {
       case this.STATUS_WORKED:
-        e.addClass('used');
+        if (this.cards[index] !== Card.CARD_NUM_KOUZAN) {
+          e.addClass('used');
+        }
         e.append($('<img>').attr('src', this.IMG_WORKER).addClass('worker'));
         break;
       case this.STATUS_DISABLED:
@@ -2924,10 +2951,3 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
-
-$(function() {
-  $('body').bind('contextmenu', function() {
-    return false;
-  });
-  return Game.gameStart();
-});

@@ -1,4 +1,8 @@
 class Card
+  # 鉱山のカードNo
+  @CARD_NUM_KOUZAN   = 2
+  # 焼畑のカードNo
+  @CARD_NUM_YAKIHATA = 15
   # 倉庫のカードNo
   @CARD_NUM_SOUKO   = 20
   # 法律事務所のカードNo
@@ -407,9 +411,13 @@ class Card14 extends CardBase
 class Card15 extends CardBase
   @NAME        = "焼畑"
   @CATEGORY    = "農業"
-  @DESCRIPTION = "消費財を5枚引く\n焼畑は消滅する"
+  @DESCRIPTION = "消費財を5枚引く\n焼畑は消滅する\n売却不可"
   @COST        = 1
   @PRICE       = 0
+
+  # 例外的に売却できない
+  @isSellable:->
+    false
 
   @use:(leftIndexs, rightIndexs, kubun, index)->
     # 消費財を5枚引く
@@ -506,7 +514,9 @@ class Card19 extends CardBase
   @PRICE       = 5
 
   @use:->
-    Game.pullConsumer(4-HandSpace.getAmount()) if HandSpace.getAmount() < 4
+    return "手札が4枚以上なので置けません" if HandSpace.getAmount() >= 4
+
+    Game.pullConsumer(4-HandSpace.getAmount())
 
     true
 
