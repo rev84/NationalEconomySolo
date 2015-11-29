@@ -255,8 +255,8 @@ CardBase = (function() {
     return this.CATEGORY === '工業';
   };
 
-  CardBase.isUnworkable = function() {
-    return this.CATEGORY === '非職場';
+  CardBase.isInstitution = function() {
+    return this.CATEGORY === '施設';
   };
 
   CardBase.isConsumer = function() {
@@ -267,7 +267,7 @@ CardBase = (function() {
     if (this.isConsumer()) {
       return false;
     }
-    if (this.isUnworkable()) {
+    if (this.isInstitution()) {
       return false;
     }
     return true;
@@ -912,7 +912,7 @@ Card20 = (function(superClass) {
 
   Card20.NAME = "倉庫";
 
-  Card20.CATEGORY = "非職場";
+  Card20.CATEGORY = "施設";
 
   Card20.DESCRIPTION = "手札上限+4\n（パッシブ）\n売却不可";
 
@@ -933,7 +933,7 @@ Card21 = (function(superClass) {
 
   Card21.NAME = "社宅";
 
-  Card21.CATEGORY = "非職場";
+  Card21.CATEGORY = "施設";
 
   Card21.DESCRIPTION = "労働者上限+1\n（パッシブ）\n売却不可";
 
@@ -954,7 +954,7 @@ Card22 = (function(superClass) {
 
   Card22.NAME = "法律事務所";
 
-  Card22.CATEGORY = "非職場";
+  Card22.CATEGORY = "施設";
 
   Card22.DESCRIPTION = "終了時：負債から5枚まで免除する";
 
@@ -1084,7 +1084,7 @@ Card26 = (function(superClass) {
 
   Card26.NAME = "不動産屋";
 
-  Card26.CATEGORY = "非職場";
+  Card26.CATEGORY = "施設";
 
   Card26.DESCRIPTION = "終了時：所有する建物1つにつき+3点\n（この建物を含む）\n売却不可";
 
@@ -1105,7 +1105,7 @@ Card27 = (function(superClass) {
 
   Card27.NAME = "農協";
 
-  Card27.CATEGORY = "非職場";
+  Card27.CATEGORY = "施設";
 
   Card27.DESCRIPTION = "終了時：手札の消費財1枚につき+3点\n売却不可";
 
@@ -1206,8 +1206,9 @@ Card30 = (function(superClass) {
   Card30.PRICE = 9;
 
   Card30.use = function() {
-    if (HandSpace.getAmount === 0) {
+    if (HandSpace.getAmount() === 0) {
       Game.pullDeck(4);
+    } else {
       Game.pullDeck(2);
     }
     return true;
@@ -1226,7 +1227,7 @@ Card31 = (function(superClass) {
 
   Card31.NAME = "労働組合";
 
-  Card31.CATEGORY = "非職場";
+  Card31.CATEGORY = "施設";
 
   Card31.DESCRIPTION = "終了時：労働者1人につき+6点\n売却不可";
 
@@ -1247,7 +1248,7 @@ Card32 = (function(superClass) {
 
   Card32.NAME = "邸宅";
 
-  Card32.CATEGORY = "非職場";
+  Card32.CATEGORY = "施設";
 
   Card32.DESCRIPTION = "売却不可";
 
@@ -1359,7 +1360,7 @@ Card35 = (function(superClass) {
 
   Card35.NAME = "鉄道";
 
-  Card35.CATEGORY = "非職場";
+  Card35.CATEGORY = "施設";
 
   Card35.DESCRIPTION = "終了時：所有する工業カテゴリの建物1つにつき+3点\n売却不可";
 
@@ -1380,9 +1381,9 @@ Card36 = (function(superClass) {
 
   Card36.NAME = "本社ビル";
 
-  Card36.CATEGORY = "非職場";
+  Card36.CATEGORY = "施設";
 
-  Card36.DESCRIPTION = "終了時：所有する非職場カテゴリの建物1つにつき+3点\n売却不可";
+  Card36.DESCRIPTION = "終了時：所有する施設カテゴリの建物1つにつき+3点\n売却不可";
 
   Card36.COST = 5;
 
@@ -1620,7 +1621,7 @@ window.Game = (function() {
     rousoPoint = rousoNum * consumerNum * 6;
     railPoint = railNum * industryNum * 3;
     honsyaPoint = honsyaNum * unworkNum * 3;
-    logStr = ("ゲーム終了　スコア：$" + point + "\n<hr>\n資金　　　　　　　　　　　　　　　　　　　　 $" + stock + "\n建物の価値　　　　　　　　　　　　　　　　　 $" + buildPoint + "\n未払い賃金　　　　　　　　　　$" + unpaid + "　×　3　=> -$" + unpaidPoint + "\n法律事務所　　" + hourituNum + "件　×　未払い　$" + unpaid + "　×　3　=>　$" + hourituOnkei + "\n不動産屋　　　" + hudousanNum + "件　×　建物　 " + buildNum + "件　×　3　=>　$" + hudousanPoint + "\n農協　　　　　" + noukyouNum + "件　×　消費財 " + consumerNum + "枚　×　3　=>　$" + noukyouPoint + "\n労働組合　　　" + rousoNum + "件　×　労働者 " + workerNum + "人　×　6　=>　$" + rousoPoint + "\n鉄道　　　　　" + railNum + "件　×　工業　 " + industryNum + "件　×　3　=>　$" + railPoint + "\n本社ビル　　　" + honsyaNum + "件　×　非職場 " + unworkNum + "件　×　3　=>　$" + honsyaPoint + "\n<hr>\n<button id=\"start\" onclick=\"Game.gameStart()\">もう一度やる</button>").replace(/\n/g, '<br>');
+    logStr = ("ゲーム終了　スコア：$" + point + "\n<hr>\n資金　　　　　　　　　　　　　　　　　　　　 $" + stock + "\n建物の価値　　　　　　　　　　　　　　　　　 $" + buildPoint + "\n未払い賃金　　　　　　　　　　$" + unpaid + "　×　3　=> -$" + unpaidPoint + "\n法律事務所　　" + hourituNum + "件　×　未払い　$" + unpaid + "　×　3　=>　$" + hourituOnkei + "\n不動産屋　　　" + hudousanNum + "件　×　建物　 " + buildNum + "件　×　3　=>　$" + hudousanPoint + "\n農協　　　　　" + noukyouNum + "件　×　消費財 " + consumerNum + "枚　×　3　=>　$" + noukyouPoint + "\n労働組合　　　" + rousoNum + "件　×　労働者 " + workerNum + "人　×　6　=>　$" + rousoPoint + "\n鉄道　　　　　" + railNum + "件　×　工業　 " + industryNum + "件　×　3　=>　$" + railPoint + "\n本社ビル　　　" + honsyaNum + "件　×　施設　 " + unworkNum + "件　×　3　=>　$" + honsyaPoint + "\n<hr>\n<button id=\"start\" onclick=\"Game.gameStart()\">もう一度やる</button>").replace(/\n/g, '<br>');
     return LogSpace.addWarn(logStr);
   };
 
@@ -1908,9 +1909,9 @@ window.Game = (function() {
     point += PrivateSpace.getAmountNoukyou() * HandSpace.getAmountConsumer() * 3;
     point += PrivateSpace.getAmountRouso() * Worker.getTotal() * 6;
     point += PrivateSpace.getAmountRail() * PrivateSpace.getAmountIndustry() * 6;
-    point += PrivateSpace.getAmountBuilding() * PrivateSpace.getAmountUnworkable() * 6;
+    point += PrivateSpace.getAmountBuilding() * PrivateSpace.getAmountInstitution() * 6;
     if (getDetail) {
-      return [Stock.getAmount(), PrivateSpace.getPoint(), Unpaid.getAmount(), PrivateSpace.getAmountHouritu(), PrivateSpace.getAmountHudousan(), PrivateSpace.getAmount(), PrivateSpace.getAmountNoukyou(), HandSpace.getAmountConsumer(), PrivateSpace.getAmountRouso(), Worker.getTotal(), PrivateSpace.getAmountRail(), PrivateSpace.getAmountIndustry(), PrivateSpace.getAmountBuilding(), PrivateSpace.getAmountUnworkable(), point];
+      return [Stock.getAmount(), PrivateSpace.getPoint(), Unpaid.getAmount(), PrivateSpace.getAmountHouritu(), PrivateSpace.getAmountHudousan(), PrivateSpace.getAmount(), PrivateSpace.getAmountNoukyou(), HandSpace.getAmountConsumer(), PrivateSpace.getAmountRouso(), Worker.getTotal(), PrivateSpace.getAmountRail(), PrivateSpace.getAmountIndustry(), PrivateSpace.getAmountBuilding(), PrivateSpace.getAmountInstitution(), point];
     } else {
       return point;
     }
@@ -2478,13 +2479,13 @@ PrivateSpace = (function(superClass) {
     return amount;
   };
 
-  PrivateSpace.getAmountUnworkable = function() {
+  PrivateSpace.getAmountInstitution = function() {
     var amount, cardNum, j, len, ref;
     amount = 0;
     ref = this.cards;
     for (j = 0, len = ref.length; j < len; j++) {
       cardNum = ref[j];
-      if (Card.getClass(cardNum).isUnworkable()) {
+      if (Card.getClass(cardNum).isInstitution()) {
         amount++;
       }
     }

@@ -93,9 +93,9 @@ class CardBase
   @isIndustry:->
     @CATEGORY is '工業'
 
-  # 非職場カテゴリであるか
-  @isUnworkable:->
-    @CATEGORY is '非職場'
+  # 施設カテゴリであるか
+  @isInstitution:->
+    @CATEGORY is '施設'
 
   # 消費財であるか
   @isConsumer:->
@@ -104,7 +104,7 @@ class CardBase
   # 労働者を置けるか
   @isWorkable:->
     return false if @isConsumer()
-    return false if @isUnworkable()
+    return false if @isInstitution()
     true
 
   # 売却できるか
@@ -514,7 +514,7 @@ class Card19 extends CardBase
 # No.20 倉庫
 class Card20 extends CardBase
   @NAME        = "倉庫"
-  @CATEGORY    = "非職場"
+  @CATEGORY    = "施設"
   @DESCRIPTION = "手札上限+4\n（パッシブ）\n売却不可"
   @COST        = 2
   @PRICE       = 5
@@ -522,7 +522,7 @@ class Card20 extends CardBase
 # No.21 社宅
 class Card21 extends CardBase
   @NAME        = "社宅"
-  @CATEGORY    = "非職場"
+  @CATEGORY    = "施設"
   @DESCRIPTION = "労働者上限+1\n（パッシブ）\n売却不可"
   @COST        = 2
   @PRICE       = 4
@@ -530,7 +530,7 @@ class Card21 extends CardBase
 # No.22 法律事務所
 class Card22 extends CardBase
   @NAME        = "法律事務所"
-  @CATEGORY    = "非職場"
+  @CATEGORY    = "施設"
   @DESCRIPTION = "終了時：負債から5枚まで免除する"
   @COST        = 2
   @PRICE       = 4
@@ -611,7 +611,7 @@ class Card25 extends CardBase
 # No.26 不動産屋
 class Card26 extends CardBase
   @NAME        = "不動産屋"
-  @CATEGORY    = "非職場"
+  @CATEGORY    = "施設"
   @DESCRIPTION = "終了時：所有する建物1つにつき+3点\n（この建物を含む）\n売却不可"
   @COST        = 3
   @PRICE       = 5
@@ -619,7 +619,7 @@ class Card26 extends CardBase
 # No.27 農協
 class Card27 extends CardBase
   @NAME        = "農協"
-  @CATEGORY    = "非職場"
+  @CATEGORY    = "施設"
   @DESCRIPTION = "終了時：手札の消費財1枚につき+3点\n売却不可"
   @COST        = 3
   @PRICE       = 6
@@ -683,10 +683,11 @@ class Card30 extends CardBase
 
   @use:->
     # 手札がなければ
-    if HandSpace.getAmount is 0
+    if HandSpace.getAmount() is 0
       # カードを4枚引く
       Game.pullDeck 4
     # あれば
+    else
       # カードを2枚引く
       Game.pullDeck 2
     
@@ -695,7 +696,7 @@ class Card30 extends CardBase
 # No.31 労働組合
 class Card31 extends CardBase
   @NAME        = "労働組合"
-  @CATEGORY    = "非職場"
+  @CATEGORY    = "施設"
   @DESCRIPTION = "終了時：労働者1人につき+6点\n売却不可"
   @COST        = 4
   @PRICE       = 0
@@ -703,7 +704,7 @@ class Card31 extends CardBase
 # No.32 邸宅
 class Card32 extends CardBase
   @NAME        = "邸宅"
-  @CATEGORY    = "非職場"
+  @CATEGORY    = "施設"
   @DESCRIPTION = "売却不可"
   @COST        = 4
   @PRICE       = 14
@@ -781,7 +782,7 @@ class Card34 extends CardBase
 # No.35 鉄道
 class Card35 extends CardBase
   @NAME        = "鉄道"
-  @CATEGORY    = "非職場"
+  @CATEGORY    = "施設"
   @DESCRIPTION = "終了時：所有する工業カテゴリの建物1つにつき+3点\n売却不可"
   @COST        = 5
   @PRICE       = 9
@@ -789,8 +790,8 @@ class Card35 extends CardBase
 # No.36 本社ビル
 class Card36 extends CardBase
   @NAME        = "本社ビル"
-  @CATEGORY    = "非職場"
-  @DESCRIPTION = "終了時：所有する非職場カテゴリの建物1つにつき+3点\n売却不可"
+  @CATEGORY    = "施設"
+  @DESCRIPTION = "終了時：所有する施設カテゴリの建物1つにつき+3点\n売却不可"
   @COST        = 5
   @PRICE       = 10
 

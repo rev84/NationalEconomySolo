@@ -120,7 +120,7 @@ class window.Game
     農協　　　　　#{noukyouNum}件　×　消費財 #{consumerNum}枚　×　3　=>　$#{noukyouPoint}
     労働組合　　　#{rousoNum}件　×　労働者 #{workerNum}人　×　6　=>　$#{rousoPoint}
     鉄道　　　　　#{railNum}件　×　工業　 #{industryNum}件　×　3　=>　$#{railPoint}
-    本社ビル　　　#{honsyaNum}件　×　非職場 #{unworkNum}件　×　3　=>　$#{honsyaPoint}
+    本社ビル　　　#{honsyaNum}件　×　施設　 #{unworkNum}件　×　3　=>　$#{honsyaPoint}
     <hr>
     <button id="start" onclick="Game.gameStart()">もう一度やる</button>
     """.replace /\n/g, '<br>'
@@ -413,7 +413,7 @@ class window.Game
   # [10] 鉄道の数
   # [11] 所有する工業カテゴリの建物の数
   # [12] 本社ビルの数
-  # [13] 所有する非職場カテゴリの建物の数
+  # [13] 所有する施設カテゴリの建物の数
   # [14] 合計点
   @getPoint:(getDetail = false)->
     point = 0
@@ -442,8 +442,8 @@ class window.Game
     # 鉄道の数*所有する工業カテゴリの建物の数*3 加点
     point += PrivateSpace.getAmountRail()*PrivateSpace.getAmountIndustry()*6
 
-    # 本社ビルの数*所有する非職場カテゴリの建物の数*3 加点
-    point += PrivateSpace.getAmountBuilding()*PrivateSpace.getAmountUnworkable()*6
+    # 本社ビルの数*所有する施設カテゴリの建物の数*3 加点
+    point += PrivateSpace.getAmountBuilding()*PrivateSpace.getAmountInstitution()*6
 
     if getDetail
       return [
@@ -460,7 +460,7 @@ class window.Game
         PrivateSpace.getAmountRail()
         PrivateSpace.getAmountIndustry()
         PrivateSpace.getAmountBuilding()
-        PrivateSpace.getAmountUnworkable()
+        PrivateSpace.getAmountInstitution()
         point
       ]
     else

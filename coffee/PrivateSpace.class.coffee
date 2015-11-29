@@ -228,11 +228,11 @@ class PrivateSpace extends SpaceBase
       amount++ if cardNum is Card.CARD_NUM_SYATAKU
     amount
 
-  # 所有する非職場カテゴリの数
-  @getAmountUnworkable:->
+  # 所有する施設カテゴリの数
+  @getAmountInstitution:->
     amount = 0
     for cardNum in @cards
-      amount++ if Card.getClass(cardNum).isUnworkable()
+      amount++ if Card.getClass(cardNum).isInstitution()
     amount
 
   # 所有する農業カテゴリの数
