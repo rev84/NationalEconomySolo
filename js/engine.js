@@ -1019,7 +1019,7 @@ Card24 = (function(superClass) {
     if (!Card24.__super__.constructor.use.apply(this, arguments)) {
       return "捨札1枚が選択されていません";
     }
-    if (Stock.getAmount() < 15) {
+    if (Budget.getAmount() < 15) {
       return '家計が$15未満なので回収できません';
     }
     Stock.push(15);

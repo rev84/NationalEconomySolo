@@ -564,7 +564,7 @@ class Card24 extends CardBase
 
   @use:(leftIndexs)->
     return "捨札1枚が選択されていません" unless super
-    return '家計が$15未満なので回収できません' if Stock.getAmount() < 15
+    return '家計が$15未満なので回収できません' if Budget.getAmount() < 15
 
     # 資金を増やす
     Stock.push 15
