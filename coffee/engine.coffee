@@ -1,4 +1,4 @@
 $ ->
   $('body').bind 'contextmenu', ->
     false
-  Game.init()
+  Game.gameStart()

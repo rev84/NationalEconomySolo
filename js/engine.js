@@ -1519,7 +1519,7 @@ $(function() {
   $('body').bind('contextmenu', function() {
     return false;
   });
-  return Game.init();
+  return Game.gameStart();
 });
 
 window.Game = (function() {
