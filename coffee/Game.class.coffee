@@ -150,10 +150,10 @@ class window.Game
       <td>法律事務所</td>
       <td>#{hourituNum}件</td>
       <td>×</td>
-      <td>未払い</td>
-      <td>$#{unpaid}</td>
+      <td></td>
+      <td>$5</td>
       <td>×</td>
-      <td>5</td>
+      <td>3</td>
       <td>=></td>
       <td>$#{hourituOnkei}</td>
     </tr>

@@ -180,7 +180,7 @@ class PrivateSpace extends SpaceBase
   @getAmountHouritu:->
     amount = 0
     for cardNum in @cards
-      return true if cardNum is Card.CARD_NUM_HOURITU
+      amount++ if cardNum is Card.CARD_NUM_HOURITU
     amount
 
   # 所有する不動産屋の数
