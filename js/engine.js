@@ -968,7 +968,7 @@ Card22 = (function(superClass) {
 
   Card22.CATEGORY = "施設";
 
-  Card22.DESCRIPTION = "終了時：負債から5枚まで免除する法律\n売却不可";
+  Card22.DESCRIPTION = "終了時：負債から5枚まで免除する\n売却不可";
 
   Card22.COST = 2;
 
