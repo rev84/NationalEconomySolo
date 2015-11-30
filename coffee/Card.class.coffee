@@ -546,7 +546,7 @@ class Card21 extends CardBase
 class Card22 extends CardBase
   @NAME        = "法律事務所"
   @CATEGORY    = "施設"
-  @DESCRIPTION = "終了時：負債から5枚まで免除する"
+  @DESCRIPTION = "終了時：負債から5枚まで免除する法律\n売却不可"
   @COST        = 2
   @PRICE       = 4
 
