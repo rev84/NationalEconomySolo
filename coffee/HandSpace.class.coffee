@@ -65,7 +65,7 @@ class HandSpace extends SpaceBase
       else
         newCardNums.push @cards[index]
     @cards = newCardNums
-    Deck.trash for trashCardNum in trashCardNums
+    Deck.trash trashCardNum for trashCardNum in trashCardNums
 
   # 手札を増やす
   @push:(cardNum)->

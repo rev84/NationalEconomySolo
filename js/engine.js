@@ -2033,7 +2033,7 @@ HandSpace = (function(superClass) {
     results = [];
     for (k = 0, len = trashCardNums.length; k < len; k++) {
       trashCardNum = trashCardNums[k];
-      results.push(Deck.trash);
+      results.push(Deck.trash(trashCardNum));
     }
     return results;
   };
