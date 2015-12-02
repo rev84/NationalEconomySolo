@@ -56,16 +56,16 @@ class HandSpace extends SpaceBase
 
   # 手札を捨てる（墓地行きと、消滅）
   @trash:(trashCardIndexs, dropCardIndexs = [])->
-    newCardNum = []
-    trashCardNum = []
+    newCardNums = []
+    trashCardNums = []
     for index in [0...@cards.length]
       if trashCardIndexs.in_array index
-        trashCardNum.push @cards[index]
+        trashCardNums.push @cards[index]
       else if dropCardIndexs.in_array index
       else
-        newCardNum.push @cards[index]
-    @cards = newCardNum
-    Deck.trash trashCardNum
+        newCardNums.push @cards[index]
+    @cards = newCardNums
+    Deck.trash for trashCardNum in trashCardNums
 
   # 手札を増やす
   @push:(cardNum)->

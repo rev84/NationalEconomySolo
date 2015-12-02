@@ -2014,23 +2014,28 @@ HandSpace = (function(superClass) {
   };
 
   HandSpace.trash = function(trashCardIndexs, dropCardIndexs) {
-    var index, j, newCardNum, ref, trashCardNum;
+    var index, j, k, len, newCardNums, ref, results, trashCardNum, trashCardNums;
     if (dropCardIndexs == null) {
       dropCardIndexs = [];
     }
-    newCardNum = [];
-    trashCardNum = [];
+    newCardNums = [];
+    trashCardNums = [];
     for (index = j = 0, ref = this.cards.length; 0 <= ref ? j < ref : j > ref; index = 0 <= ref ? ++j : --j) {
       if (trashCardIndexs.in_array(index)) {
-        trashCardNum.push(this.cards[index]);
+        trashCardNums.push(this.cards[index]);
       } else if (dropCardIndexs.in_array(index)) {
 
       } else {
-        newCardNum.push(this.cards[index]);
+        newCardNums.push(this.cards[index]);
       }
     }
-    this.cards = newCardNum;
-    return Deck.trash(trashCardNum);
+    this.cards = newCardNums;
+    results = [];
+    for (k = 0, len = trashCardNums.length; k < len; k++) {
+      trashCardNum = trashCardNums[k];
+      results.push(Deck.trash);
+    }
+    return results;
   };
 
   HandSpace.push = function(cardNum) {
