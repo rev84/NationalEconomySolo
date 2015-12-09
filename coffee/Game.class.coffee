@@ -106,8 +106,8 @@ class window.Game
     hudousanPoint = hudousanNum * buildNum*3
     noukyouPoint = noukyouNum * consumerNum*3
     rousoPoint = rousoNum * workerNum*6
-    railPoint = railNum * industryNum*3
-    honsyaPoint = honsyaNum * unworkNum*3
+    railPoint = railNum * industryNum*8
+    honsyaPoint = honsyaNum * unworkNum*6
 
     logStr = """
     ゲーム終了　スコア：$#{point}
@@ -197,7 +197,7 @@ class window.Game
       <td>工業</td>
       <td>#{industryNum}件</td>
       <td>×</td>
-      <td>3</td>
+      <td>8</td>
       <td>=></td>
       <td>$#{railPoint}</td>
     </tr>
@@ -208,7 +208,7 @@ class window.Game
       <td>施設</td>
       <td>#{unworkNum}件</td>
       <td>×</td>
-      <td>3</td>
+      <td>6</td>
       <td>=></td>
       <td>$#{honsyaPoint}</td>
     </tr>
