@@ -795,7 +795,7 @@ class Card34 extends CardBase
 class Card35 extends CardBase
   @NAME        = "鉄道"
   @CATEGORY    = "施設"
-  @DESCRIPTION = "終了時：所有する工業カテゴリの建物1つにつき+3点\n売却不可"
+  @DESCRIPTION = "終了時：所有する工業カテゴリの建物1つにつき+8点\n売却不可"
   @COST        = 5
   @PRICE       = 9
 
@@ -803,7 +803,7 @@ class Card35 extends CardBase
 class Card36 extends CardBase
   @NAME        = "本社ビル"
   @CATEGORY    = "施設"
-  @DESCRIPTION = "終了時：所有する施設カテゴリの建物1つにつき+3点\n売却不可"
+  @DESCRIPTION = "終了時：所有する施設カテゴリの建物1つにつき+6点\n売却不可"
   @COST        = 5
   @PRICE       = 10
 
