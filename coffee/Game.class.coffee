@@ -106,8 +106,8 @@ class window.Game
     hudousanPoint = hudousanNum * buildNum*3
     noukyouPoint = noukyouNum * consumerNum*3
     rousoPoint = rousoNum * workerNum*6
-    railPoint = railNum * industryNum*3
-    honsyaPoint = honsyaNum * unworkNum*3
+    railPoint = railNum * industryNum*8
+    honsyaPoint = honsyaNum * unworkNum*6
 
     logStr = """
     ゲーム終了　スコア：$#{point}
@@ -197,7 +197,7 @@ class window.Game
       <td>工業</td>
       <td>#{industryNum}件</td>
       <td>×</td>
-      <td>3</td>
+      <td>8</td>
       <td>=></td>
       <td>$#{railPoint}</td>
     </tr>
@@ -208,7 +208,7 @@ class window.Game
       <td>施設</td>
       <td>#{unworkNum}件</td>
       <td>×</td>
-      <td>3</td>
+      <td>6</td>
       <td>=></td>
       <td>$#{honsyaPoint}</td>
     </tr>
@@ -534,10 +534,10 @@ class window.Game
     # 労働組合の数*労働者の数*6 加点
     point += PrivateSpace.getAmountRouso()*Worker.getTotal()*6
 
-    # 鉄道の数*所有する工業カテゴリの建物の数*3 加点
-    point += PrivateSpace.getAmountRail()*PrivateSpace.getAmountIndustry()*6
+    # 鉄道の数*所有する工業カテゴリの建物の数*8 加点
+    point += PrivateSpace.getAmountRail()*PrivateSpace.getAmountIndustry()*8
 
-    # 本社ビルの数*所有する施設カテゴリの建物の数*3 加点
+    # 本社ビルの数*所有する施設カテゴリの建物の数*6 加点
     point += PrivateSpace.getAmountBuilding()*PrivateSpace.getAmountInstitution()*6
 
     if getDetail
