@@ -321,9 +321,6 @@ Card2 = (function(superClass) {
   Card2.DESCRIPTION = "カードを1枚引く";
 
   Card2.use = function() {
-    var debug;
-    debug = [];
-    debug.notExist();
     Game.pullDeck();
     return true;
   };
