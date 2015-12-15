@@ -318,7 +318,7 @@ Card2 = (function(superClass) {
 
   Card2.CATEGORY = "公共";
 
-  Card2.DESCRIPTION = "カードを1枚引く";
+  Card2.DESCRIPTION = "カードを1枚引く\n何度でも使える";
 
   Card2.use = function() {
     Game.pullDeck();

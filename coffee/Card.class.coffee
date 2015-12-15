@@ -143,7 +143,7 @@ class CardBase
 class Card2 extends CardBase
   @NAME        = "鉱山"
   @CATEGORY    = "公共"
-  @DESCRIPTION = "カードを1枚引く"
+  @DESCRIPTION = "カードを1枚引く\n何度でも使える"
 
   @use:->
     Game.pullDeck()
