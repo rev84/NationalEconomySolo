@@ -25,7 +25,17 @@ body {
   padding:10px 10px 10px 80px;
   margin:10px;
   font-weight:bold;
-  text-transform:uppercase;
+/*  text-transform:uppercase;*/
+}
+.log_script_error {
+  color:#555;
+  background:#ffc0cb url('../img/fatal.png') no-repeat 20px 50%;
+  border:1px solid #ff0000;
+  font-size:20px !important;
+  user-select: text;
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
 }
 .log_fatal {
   color:#555;

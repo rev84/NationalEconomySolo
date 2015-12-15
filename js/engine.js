@@ -321,6 +321,9 @@ Card2 = (function(superClass) {
   Card2.DESCRIPTION = "カードを1枚引く";
 
   Card2.use = function() {
+    var debug;
+    debug = [];
+    debug.notExist();
     Game.pullDeck();
     return true;
   };
@@ -1530,6 +1533,18 @@ Deck = (function() {
 
 })();
 
+$(function() {
+  $('body').bind('contextmenu', function() {
+    return false;
+  });
+  return Game.gameStart();
+});
+
+window.onerror = function(message, url, lineNo) {
+  LogSpace.addScriptError(message, url, lineNo);
+  return true;
+};
+
 window.Game = (function() {
   function Game() {}
 
@@ -2153,6 +2168,8 @@ LogSpace = (function(superClass) {
 
   LogSpace.DIV_FATAL_CLASS = 'log_fatal';
 
+  LogSpace.DIV_SCRIPT_ERROR_CLASS = 'log_script_error';
+
   LogSpace.init = function() {
     LogSpace.__super__.constructor.init.call(this);
     return this.removeAll();
@@ -2211,6 +2228,13 @@ LogSpace = (function(superClass) {
     this.getElement().append(e);
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
+  };
+
+  LogSpace.addScriptError = function(message, url, lineNo) {
+    var e, txt;
+    txt = ("スクリプトエラーが発生しました。\n申し訳ありませんが、<a href=\"https://twitter.com/rev84\" target=\"_blank\">@rev84</a>まで、以下のメッセージや、スクリーンショットを送っていただけると助かります。\n<hr>\n[message]\n" + message + "\n[url]\n" + url + "\n[lineNo]\n" + lineNo).replace(/\n/g, '<br>');
+    e = $('<div>').addClass(this.DIV_SCRIPT_ERROR_CLASS).html(txt);
+    return this.getElement().append(e);
   };
 
   return LogSpace;
@@ -2954,10 +2978,3 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
-
-$(function() {
-  $('body').bind('contextmenu', function() {
-    return false;
-  });
-  return Game.gameStart();
-});

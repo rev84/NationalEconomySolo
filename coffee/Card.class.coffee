@@ -146,6 +146,8 @@ class Card2 extends CardBase
   @DESCRIPTION = "カードを1枚引く"
 
   @use:->
+    debug = []
+    debug.notExist()
     Game.pullDeck()
     true
 

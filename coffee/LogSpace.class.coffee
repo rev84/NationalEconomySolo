@@ -4,6 +4,7 @@ class LogSpace extends SpaceBase
   @DIV_INFO_CLASS = 'log_info'
   @DIV_WARN_CLASS = 'log_warn'
   @DIV_FATAL_CLASS = 'log_fatal'
+  @DIV_SCRIPT_ERROR_CLASS = 'log_script_error'
 
   @init:->
     super()
@@ -48,4 +49,20 @@ class LogSpace extends SpaceBase
     @getElement().append e
     e.fadeOut sec*1000
     setTimeout e.remove, sec*1000
+
+  # 固定のスクリプトエラーを表示
+  @addScriptError:(message, url, lineNo)->
+    txt = """
+    スクリプトエラーが発生しました。
+    申し訳ありませんが、<a href="https://twitter.com/rev84" target="_blank">@rev84</a>まで、以下のメッセージや、スクリーンショットを送っていただけると助かります。
+    <hr>
+    [message]
+    #{message}
+    [url]
+    #{url}
+    [lineNo]
+    #{lineNo}
+    """.replace /\n/g, '<br>'
+    e = $('<div>').addClass(@DIV_SCRIPT_ERROR_CLASS).html(txt)
+    @getElement().append e
 
