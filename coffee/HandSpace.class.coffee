@@ -34,7 +34,7 @@ class HandSpace extends SpaceBase
   # 選択状態を全解除
   @selectReset:->
     @select = []
-    @select.push @SELECT_NOT for i in [0...@cards.length]    
+    @select.push @SELECT_NOT for i in [0...@cards.length]
 
   # ソートする
   @sort:->
@@ -82,8 +82,8 @@ class HandSpace extends SpaceBase
     for index in [0...@cards.length]
       e = @createElement index
       me.append e if e isnt false
-      e.addClass "select_left"  if @select[index] is @SELECT_LEFT
-      e.addClass "select_right" if @select[index] is @SELECT_RIGHT
+      e.addClass "card_select_left"  if @select[index] is @SELECT_LEFT
+      e.addClass "card_select_right" if @select[index] is @SELECT_RIGHT
 
   # 要素作成
   @createElement:(index)->
@@ -106,21 +106,21 @@ class HandSpace extends SpaceBase
     desc = cardClass.getDescription()
 
     # カードの外側
-    e = $('<div>').attr('data-index', index).addClass('hand')
+    e = $('<div>').attr('data-index', index).addClass('card')
 
     # ヘッダ
     # [コスト]カード名
-    header = $('<span>').addClass('hand_header').html('['+cost+']'+cardClass.getName())
+    header = $('<span>').addClass('card_header').html('['+cost+']'+cardClass.getName())
 
     # 画像
-    img = cardClass.getImageObj().addClass('hand_image')
+    img = cardClass.getImageObj().addClass('card_image')
 
     # フッタ
     # カテゴリ
     catStr = if cat? then '['+cat+']' else ''
-    categorySpan = $('<span>').addClass('hand_footer hand_category').html(catStr)
+    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr)
     # 得点
-    pointSpan = $('<span>').addClass('hand_footer hand_point').html('[$'+point+']')
+    pointSpan = $('<span>').addClass('card_footer card_point').html('[$'+point+']')
 
     # 説明の吹き出し
     catBalloon = if cat? then cat else 'なし'
