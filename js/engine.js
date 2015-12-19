@@ -1530,18 +1530,6 @@ Deck = (function() {
 
 })();
 
-$(function() {
-  $('body').bind('contextmenu', function() {
-    return false;
-  });
-  return Game.gameStart();
-});
-
-window.onerror = function(message, url, lineNo) {
-  LogSpace.addScriptError(message, url, lineNo);
-  return true;
-};
-
 window.Game = (function() {
   function Game() {}
 
@@ -2067,10 +2055,10 @@ HandSpace = (function(superClass) {
         me.append(e);
       }
       if (this.select[index] === this.SELECT_LEFT) {
-        e.addClass("select_left");
+        e.addClass("card_select_left");
       }
       if (this.select[index] === this.SELECT_RIGHT) {
-        results.push(e.addClass("select_right"));
+        results.push(e.addClass("card_select_right"));
       } else {
         results.push(void 0);
       }
@@ -2090,12 +2078,12 @@ HandSpace = (function(superClass) {
     price = cardClass.getPrice();
     point = cardClass.getPoint();
     desc = cardClass.getDescription();
-    e = $('<div>').attr('data-index', index).addClass('hand');
-    header = $('<span>').addClass('hand_header').html('[' + cost + ']' + cardClass.getName());
-    img = cardClass.getImageObj().addClass('hand_image');
+    e = $('<div>').attr('data-index', index).addClass('card');
+    header = $('<span>').addClass('card_header').html('[' + cost + ']' + cardClass.getName());
+    img = cardClass.getImageObj().addClass('card_image');
     catStr = cat != null ? '[' + cat + ']' : '';
-    categorySpan = $('<span>').addClass('hand_footer hand_category').html(catStr);
-    pointSpan = $('<span>').addClass('hand_footer hand_point').html('[$' + point + ']');
+    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr);
+    pointSpan = $('<span>').addClass('card_footer card_point').html('[$' + point + ']');
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
     e.attr('data-tooltip', balloonStr).darkTooltip({
@@ -2167,6 +2155,14 @@ LogSpace = (function(superClass) {
 
   LogSpace.DIV_SCRIPT_ERROR_CLASS = 'log_script_error';
 
+  LogSpace.MESSAGE_CLASS = 'log_message';
+
+  LogSpace.IMG_INFO = './img/info.png';
+
+  LogSpace.IMG_WARN = './img/warning.png';
+
+  LogSpace.IMG_FATAL = './img/fatal.png';
+
   LogSpace.init = function() {
     LogSpace.__super__.constructor.init.call(this);
     return this.removeAll();
@@ -2177,52 +2173,59 @@ LogSpace = (function(superClass) {
   };
 
   LogSpace.addFatal = function(message) {
-    var e;
+    var e, img;
     e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS).html(message);
-    return this.getElement().append(e);
+    img = $('<img>').attr('src', this.IMG_FATAL);
+    return this.getElement().append(e).append(img);
   };
 
   LogSpace.addWarn = function(message) {
-    var e;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS).html(message);
-    return this.getElement().append(e);
+    var e, img, msg;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS);
+    img = $('<img>').attr('src', this.IMG_WARN);
+    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
+    return this.getElement().append(e.append(img).append(msg));
   };
 
   LogSpace.addInfo = function(message) {
-    var e;
+    var e, img;
     e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS).html(message);
-    return this.getElement().append(e);
+    img = $('<img>').attr('src', this.IMG_INFO);
+    return this.getElement().append(e).append(img);
   };
 
   LogSpace.addFatalInstant = function(message, sec) {
-    var e;
+    var e, img;
     if (sec == null) {
       sec = 5;
     }
     e = $('<div>').addClass(this.DIV_FATAL_CLASS).html(message);
-    this.getElement().append(e);
+    img = $('<img>').attr('src', this.IMG_FATAL);
+    this.getElement().append(e).append(img);
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
   };
 
   LogSpace.addWarnInstant = function(message, sec) {
-    var e;
+    var e, img;
     if (sec == null) {
       sec = 5;
     }
     e = $('<div>').addClass(this.DIV_WARN_CLASS).html(message);
-    this.getElement().append(e);
+    img = $('<img>').attr('src', this.IMG_WARN);
+    this.getElement().append(e).append(img);
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
   };
 
   LogSpace.addInfoInstant = function(message, sec) {
-    var e;
+    var e, img;
     if (sec == null) {
       sec = 5;
     }
     e = $('<div>').addClass(this.DIV_INFO_CLASS).html(message);
-    this.getElement().append(e);
+    img = $('<img>').attr('src', this.IMG_INFO);
+    this.getElement().append(e).append(img);
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
   };
@@ -2386,22 +2389,22 @@ PrivateSpace = (function(superClass) {
     price = cardClass.getPrice();
     point = cardClass.getPoint();
     desc = cardClass.getDescription();
-    e = $('<div>').attr('data-index', index).addClass('private');
+    e = $('<div>').attr('data-index', index).addClass('card');
     costStr = cardClass.isPublicOnly() ? '' : '[' + cost + ']';
-    header = $('<span>').addClass('private_header').html(costStr + cardClass.getName());
-    img = cardClass.getImageObj().addClass('private_image');
+    header = $('<span>').addClass('card_header').html(costStr + cardClass.getName());
+    img = cardClass.getImageObj().addClass('card_image');
     catStr = cat != null ? '[' + cat + ']' : '';
-    categorySpan = $('<span>').addClass('private_footer private_category').html(catStr);
+    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr);
     pointStr = cardClass.isPublicOnly() ? '' : '[$' + point + ']';
-    pointSpan = $('<span>').addClass('private_footer private_point').html(pointStr);
+    pointSpan = $('<span>').addClass('card_footer card_point').html(pointStr);
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
     e.attr('data-tooltip', balloonStr).darkTooltip({
       addClass: this.BALLOON_CLASS_NAME
     });
     if (this.status[index] === this.STATUS_WORKED) {
-      e.addClass('used');
-      e.append($('<img>').attr('src', this.IMG_WORKER).addClass('worker'));
+      e.addClass('card_used');
+      e.append($('<img>').attr('src', this.IMG_WORKER).addClass('card_worker'));
     }
     e.dblclick(function() {
       if (Game.isClickable) {
@@ -2708,14 +2711,14 @@ PublicSpace = (function(superClass) {
     price = cardClass.getPrice();
     point = cardClass.getPoint();
     desc = cardClass.getDescription();
-    e = $('<div>').attr('data-index', index).addClass('public');
+    e = $('<div>').attr('data-index', index).addClass('card');
     costStr = cardClass.isPublicOnly() ? '' : '[' + cost + ']';
-    header = $('<span>').addClass('public_header').html(costStr + cardClass.getName());
-    img = cardClass.getImageObj().addClass('public_image');
+    header = $('<span>').addClass('card_header').html(costStr + cardClass.getName());
+    img = cardClass.getImageObj().addClass('card_image');
     catStr = cat != null ? '[' + cat + ']' : '';
-    categorySpan = $('<span>').addClass('public_footer public_category').html(catStr);
+    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr);
     pointStr = cardClass.isPublicOnly() ? '' : '[$' + point + ']';
-    pointSpan = $('<span>').addClass('public_footer public_point').html(pointStr);
+    pointSpan = $('<span>').addClass('card_footer card_point').html(pointStr);
     costBalloon = cardClass.isPublicOnly() ? '-' : cost;
     priceBalloon = cardClass.isPublicOnly() ? '-' : price;
     pointBalloon = cardClass.isPublicOnly() ? '-' : point;
@@ -2730,11 +2733,11 @@ PublicSpace = (function(superClass) {
         if (this.cards[index] !== Card.CARD_NUM_KOUZAN) {
           e.addClass('used');
         }
-        e.append($('<img>').attr('src', this.IMG_WORKER).addClass('worker'));
+        e.append($('<img>').attr('src', this.IMG_WORKER).addClass('card_worker'));
         break;
       case this.STATUS_DISABLED:
         e.addClass('used');
-        e.append($('<img>').attr('src', this.IMG_DISABLER).addClass('worker'));
+        e.append($('<img>').attr('src', this.IMG_DISABLER).addClass('card_worker'));
     }
     e.dblclick(function() {
       index = Number($(this).attr('data-index'));
@@ -2975,3 +2978,15 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
+
+$(function() {
+  $('body').bind('contextmenu', function() {
+    return false;
+  });
+  return Game.gameStart();
+});
+
+window.onerror = function(message, url, lineNo) {
+  LogSpace.addScriptError(message, url, lineNo);
+  return true;
+};

@@ -1,289 +1,312 @@
+html {
+  font-size: 10px;
+}
+
+/* 1remのサイズを変える。 */
+
+@media screen and (min-width:768px) {
+  html {
+    font-size: 14px;
+  }
+}
+@media screen and (min-width:1024px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* navbar collapse for tablet (bootstrap) */
+
+@media (max-width: 1024px) {
+  .navbar-header {
+    float: none;
+  }
+  .navbar-toggle {
+    display: block;
+  }
+  .navbar-collapse {
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .navbar-collapse.collapse {
+    display: none!important;
+  }
+  .navbar-nav {
+    float: none!important;
+    margin: 7.5px -15px;
+  }
+  .navbar-nav>li {
+    float: none;
+  }
+  .navbar-nav>li>a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .navbar-text {
+    float: none;
+    margin: 15px 0;
+  }
+  .navbar-collapse.collapse.in {
+    display: block!important;
+  }
+  .collapsing {
+    overflow: hidden!important;
+  }
+}
 body {
+  font-family: "Helvetica Neue", Helvetica, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
   padding-top: 60px;
-  user-select: none; /* CSS3 */
-  -moz-user-select: none; /* Firefox */
-  -webkit-user-select: none; /* Safari、Chromeなど */
-  -ms-user-select: none; /* IE10かららしい */
+  user-select: none;
+  /* CSS3 */
+  -moz-user-select: none;
+  /* Firefox */
+  -webkit-user-select: none;
+  /* Safari、Chromeなど */
+  -ms-user-select: none;
+  /* IE10かららしい */
 }
-#game {
-  position:fixed;
-  top:60px;left:10px;
-  width:1200px; height:760px;
-  min-height:600px;
-  margin:0 auto;
-}
+#game {}
 #log_space {
-  position:fixed;
-  right:30px;
-  /*height:60px;*/
-  z-index:100;
+  position: fixed;
+  z-index: 100;
 }
 #log_space div {
-  position:relative;
-  border-radius:10px;
-  font-size:30px;
-  padding:10px 10px 10px 80px;
-  margin:10px;
-  font-weight:bold;
-/*  text-transform:uppercase;*/
+  position: relative;
+  min-height: 4.0rem;
+  border-radius: 0.5rem;
+  font-size: 1.0rem;
+  padding: 0.5rem;
+  margin: 0.5rem;
+  font-weight: bold;
+  /*  text-transform:uppercase;*/
+}
+#log_space img {
+  width: 2.0rem;
+  height: 2.0rem;
+}
+.log_message {
+  padding-left: 1.0rem
 }
 .log_script_error {
-  color:#555;
-  background:#ffc0cb url('../img/fatal.png') no-repeat 20px 50%;
-  border:1px solid #ff0000;
-  font-size:20px !important;
+  color: #555;
+  background: #ffc0cb border: 0.1rem solid #ff0000;
+  font-size: 1.5rem !important;
   user-select: text;
   -moz-user-select: text;
   -webkit-user-select: text;
   -ms-user-select: text;
 }
 .log_fatal {
-  color:#555;
-  background:#ffc0cb url('../img/fatal.png') no-repeat 20px 50%;
-  border:1px solid #ff0000;
+  color: #555;
+  background: #ffc0cb;
+  border: 0.5rem solid #ff0000;
 }
 .log_warn {
-  color:#555;
-  background:#fff8c4 url('../img/warning.png') no-repeat 20px 50%;
-  border:1px solid #f2c779;
+  color: #555;
+  background: #fff8c4;
+  border: 0.1rem solid #f2c779;
 }
 .log_info {
-  color:#555;
-  background:#f0f8ff url('../img/info.png') no-repeat 20px 50%;
-  border:1px solid #0000ff;
+  color: #555;
+  background: #f0f8ff;
+  border: 0.1rem solid #0000ff;
 }
 table.score td {
-  padding-right: 35px;
-  text-align:right;
-  border-bottom:1px solid #000;
+  padding-right: 2.0rem;
+  text-align: right;
+  border-bottom: 0.1rem solid #000;
 }
-#info_space {
-  /*border:1px solid #000;*/
-  position:absolute;
-  top:0px; left:0px;
-  width:150px; height:760px;
+
+/* カードが置かれるスペース */
+
+.card_space {
+  min-height: 9.0rem;
+  margin: 0.3rem auto;
+  padding: 0.2rem;
+  border: 0.2rem solid #000;
+  box-sizing: content-box;
 }
 #public_space {
-  border:1px solid #000;
-  position:absolute;
-  top:0px; left:150px;
-  width:1025px; height:375px;
+  background-color: #f8f8ff;
 }
 #private_space {
-  border:1px solid #000;
-  position:absolute;
-  top:380px; left:150px;
-  width:1025px; height:125px;
+  background-color: #fff8f8;
 }
 #hand_space {
-  border:1px solid #000;
-  position:absolute;
-  top:510px; left:150px;
-  width:1025px; height:250px;
-  padding:2px;
+  background-color: #fafffa;
 }
 #form_space {
-  border:1px solid #000;
-  position:absolute;
-}
-/* ハンドのカード */
-.hand {
-  position:relative;
-  width:120px; height:120px;
-  border:4px double #000000;
-  display:inline-block;
-  margin:3px;
-  padding:2px;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-}
-.select_left {
-  border:4px solid #ff0000;
-}
-.select_right {
-  border:4px solid #006400;
-}
-.hand_header {
-  position:absolute;
-  top:0px; left:0px;
-  width:120px; height:20px;
-  text-align:center;
-  vertical-align:middle;
-  font-size:16px;
-  font-weight:bold;
-}
-.hand_footer {
-  position:absolute;
-  text-align:right;
-  vertical-align:middle;
-  font-size:16px;
-  font-weight:bold;
-  width:60px; height:20px;
-}
-.hand_category {
-  bottom:0px; left:0px;
-  text-align:left;
-}
-.hand_point {
-  bottom:0px; right:0px;
-  text-align:right;
-}
-.hand_image {
-  position:absolute;
-  top:20px; left:10px;
-  width:100px; height:75px;
+  border: 0.1rem solid #000;
 }
 
-/* 公共のカード */
-.public, .private {
-  position:relative;
-  width:120px; height:115px;
-  border:1px solid #0000ff;
-  display:inline-block;
-  margin:2px;
+/* カード */
+
+.card {
+  position: relative;
+  width: 8.0rem;
+  height: 8.0rem;
+  border: 0.2rem solid #000000;
+  display: inline-block;
+  margin: 0.1rem;
+  padding: 0.1rem;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 }
-.public_header, .private_header {
-  position:absolute;
-  top:0px; left:0px;
-  width:120px; height:20px;
-  text-align:center;
-  vertical-align:middle;
-  font-size:16px;
-  font-weight:bold;
+.card_select_left {
+  border: 0.2rem solid #ff0000;
 }
-.public_footer, .private_footer {
-  position:absolute;
-  text-align:right;
-  vertical-align:middle;
-  font-size:16px;
-  font-weight:bold;
-  width:60px; height:20px;
+.card_select_right {
+  border: 0.2rem solid #006400;
 }
-.public_category, .private_category {
-  bottom:0px; left:0px;
-  text-align:left;
+.card_header {
+  position: absolute;
+  margin: 0 auto;
+  top: 0;
+  left: 0;
+  width: 8.0rem;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 1.0rem;
+  font-weight: bold;
 }
-.public_point, .private_point {
-  bottom:0px; right:0px;
-  text-align:right;
+.card_footer {
+  position: absolute;
+  text-align: right;
+  vertical-align: middle;
+  font-size: 1.0rem;
+  font-weight: bold;
+  width: 8.0rem;
 }
-.public_image, .private_image {
-  position:absolute;
-  top:20px; right:10px;
-  width:100px; height:75px;
+.card_category {
+  bottom: 0;
+  left: 0;
+  text-align: left;
+}
+.card_point {
+  bottom: 0;
+  right: 0;
+  text-align: right;
+}
+.card_image {
+  position: absolute;
+  margin: auto;
+  padding: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 7.2rem;
+  height: 5.4rem;
+}
+.card_used {
+  background-color: #888888;
+}
+.card_worker {
+  position: absolute;
+  margin: auto;
+  padding: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4.0rem;
+  height: 6.0rem;
+  z-index: 10;
+  border: 0.2rem solid #ff0000;
 }
 
-.used {
-  background-color:#888888;
-}
-.worker {
-  position:absolute;
-  top:20px; right:30px;
-  height:80px;
-  z-index:10;
-  border:4px solid #ff0000;
-}
 /* 情報 */
+
+#info_space {
+  /*border:1px solid #000;*/
+}
 .info {
-  position:absolute;
-  width:120px; height:80px;
-  box-sizing:content-box;
+  box-sizing: content-box;
+  display: inline-block;
+  height: 3rem;
+  width: 6rem;
 }
 #round_space {
-  top:0px; left:0px;
-  border: 4px double #ff8c00;
+  border: 0.2rem double #ff8c00;
 }
 #budget_space {
-  top:100px; left:0px;
-  border: 4px double #9966ff;
+  border: 0.2rem double #9966ff;
 }
 #worker_space {
-  top:200px; left:0px;
-  border: 4px double #0000ff;
+  border: 0.2rem double #0000ff;
 }
 #stock_space {
-  bottom:20px; left:0px;
-  border: 4px double #006400;
+  border: 0.2rem double #006400;
 }
 #unpaid_space {
-  bottom:120px; left:0px;
-  border: 4px double #ff0000;
+  border: 0.2rem double #ff0000;
 }
 #point_space {
-  bottom:220px; left:0px;
-  border: 4px double #000000;
+  border: 0.2rem double #000000;
 }
 .info_label {
-  position:absolute;
-  top:0px; left:0px;
-  width:120px; height:30px;
-  text-align:center;
-  vertical-align:middle;
-  color:#ffffff;
-  font-size:25px;
-  font-weight:bold;
-  box-sizing:content-box;
+  text-align: center;
+  vertical-align: middle;
+  color: #ffffff;
+  font-size: 1.0rem;
+  font-weight: bold;
+  box-sizing: content-box;
 }
 .info_body {
-  position:absolute;
-  top:30px; left:0px;
-  width:120px; height:50px;
-  text-align:center;
-  vertical-align:middle;
-  font-size:34px;
-  font-weight:bold;
-  box-sizing:content-box;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 1.0rem;
+  font-weight: bold;
+  box-sizing: content-box;
 }
-
 #round_label {
-  border-bottom: 1px solid #ff8c00;
-  background-color:#ff8c00;
+  background-color: #ff8c00;
 }
 #budget_label {
-  border-bottom: 1px solid #9966ff;
-  background-color:#9966ff;
+  background-color: #9966ff;
 }
 #budget_label {
-  border-bottom: 1px solid #9966ff;
-  background-color:#9966ff;
+  background-color: #9966ff;
 }
 #worker_label {
-  border-bottom: 1px solid #0000ff;
-  background-color:#0000ff;
+  background-color: #0000ff;
 }
 #stock_label {
-  border-bottom: 1px solid #006400;
-  background-color:#006400;
+  background-color: #006400;
 }
 #unpaid_label {
-  border-bottom: 1px solid #ff0000;
-  background-color:#ff0000;
+  background-color: #ff0000;
 }
 #point_label {
-  border-bottom: 1px solid #000000;
-  background-color:#000000;
+  background-color: #000000;
 }
 
 /* ボタン */
+
 button#ok, button#cancel {
-  position:absolute;
-  width:50px; height:50px;
-  box-sizing:content-box;
-  font-size:34px;
-  background-color:#aaaaaa;
-  color:#000000;
-  left:30px;
+  box-sizing: content-box;
+  display: block;
+  margin: 0;
+  padding: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  font-size: 2.0rem;
+  width: 3.0rem;
+  height: 3.0rem;
 }
-button#ok {
-  top:300px;
+@media screen and (max-width:768px) {
+  button#ok, button#cancel {
+    display: inline-block;
+  }
 }
-button#cancel {
-  top:380px;
-}
+button#ok {}
+button#cancel {}
 .disabled {
-  color:#aaaaaa;
+  color: #aaaaaa;
 }
 .no_display {
-  display:none;
+  display: none;
 }

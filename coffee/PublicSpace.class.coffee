@@ -102,23 +102,23 @@ class PublicSpace extends SpaceBase
     desc = cardClass.getDescription()
 
     # カードの外側
-    e = $('<div>').attr('data-index', index).addClass('public')
+    e = $('<div>').attr('data-index', index).addClass('card')
 
     # ヘッダ
     # [コスト]カード名
     costStr = if cardClass.isPublicOnly() then '' else '['+cost+']'
-    header = $('<span>').addClass('public_header').html(costStr+cardClass.getName())
+    header = $('<span>').addClass('card_header').html(costStr+cardClass.getName())
 
     # 画像
-    img = cardClass.getImageObj().addClass('public_image')
+    img = cardClass.getImageObj().addClass('card_image')
 
     # フッタ
     # カテゴリ
     catStr = if cat? then '['+cat+']' else ''
-    categorySpan = $('<span>').addClass('public_footer public_category').html(catStr)
+    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr)
     # 得点
     pointStr = if cardClass.isPublicOnly() then '' else '[$'+point+']'
-    pointSpan = $('<span>').addClass('public_footer public_point').html(pointStr)
+    pointSpan = $('<span>').addClass('card_footer card_point').html(pointStr)
 
     # 説明の吹き出し
     costBalloon = if cardClass.isPublicOnly() then '-' else cost
@@ -142,10 +142,10 @@ class PublicSpace extends SpaceBase
     switch @status[index]
       when @STATUS_WORKED
         e.addClass('used') if @cards[index] isnt Card.CARD_NUM_KOUZAN
-        e.append $('<img>').attr('src', @IMG_WORKER).addClass('worker')
+        e.append $('<img>').attr('src', @IMG_WORKER).addClass('card_worker')
       when @STATUS_DISABLED
         e.addClass('used')
-        e.append $('<img>').attr('src', @IMG_DISABLER).addClass('worker')
+        e.append $('<img>').attr('src', @IMG_DISABLER).addClass('card_worker')
 
 
     # ダブルクリック時には使用する
