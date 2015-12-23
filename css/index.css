@@ -11,7 +11,7 @@ html {
 }
 @media screen and (min-width:1024px) {
   html {
-    font-size: 16px;
+    font-size: 18px;
   }
 }
 
@@ -143,8 +143,8 @@ table.score td {
 
 .card {
   position: relative;
-  width: 8.0rem;
-  height: 8.0rem;
+  width: 7.0rem;
+  height: 7.0rem;
   border: 0.2rem solid #000000;
   display: inline-block;
   margin: 0.1rem;
@@ -164,7 +164,7 @@ table.score td {
   margin: 0 auto;
   top: 0;
   left: 0;
-  width: 8.0rem;
+  width: 7.0rem;
   text-align: center;
   vertical-align: middle;
   font-size: 1.0rem;
@@ -176,7 +176,7 @@ table.score td {
   vertical-align: middle;
   font-size: 1.0rem;
   font-weight: bold;
-  width: 8.0rem;
+  width: 7.0rem;
 }
 .card_category {
   bottom: 0;
@@ -196,8 +196,8 @@ table.score td {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 7.2rem;
-  height: 5.4rem;
+  width: 6.0rem;
+  height: 4.5rem;
 }
 .card_used {
   background-color: #888888;
