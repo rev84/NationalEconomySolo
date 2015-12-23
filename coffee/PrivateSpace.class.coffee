@@ -136,9 +136,12 @@ class PrivateSpace extends SpaceBase
     売却価格：#{price}
     得点：#{point}
     """.replace /\n/g, '<br>'
-    e.attr('data-tooltip', balloonStr).darkTooltip(
-      addClass : @BALLOON_CLASS_NAME
-    )
+
+    # darkTooltipはスマホに非対応。
+    unless (DeviceChecker.isTouchDevice)
+      e.attr('data-tooltip', balloonStr).darkTooltip(
+        addClass : @BALLOON_CLASS_NAME
+      )
 
     # 労働者により使用不可
     if @status[index] is @STATUS_WORKED
@@ -146,15 +149,25 @@ class PrivateSpace extends SpaceBase
       e.append $('<img>').attr('src', @IMG_WORKER).addClass('card_worker')
 
     # ダブルクリック時
-    e.dblclick ->
-      # 通常時は労働者を派遣
-      if Game.isClickable
-        index = Number $(this).attr('data-index')
-        Game.work 'private', index
-      # 建物を売る
-      else if Game.isSell
-        index = Number $(this).attr('data-index')
-        Game.sellPrivate index
+    if (DeviceChecker.isTouchDevice)
+      mc = new Hammer(e.get(0))
+      e.on 'doubletap', ->
+        # 通常時は労働者を派遣
+        if Game.isClickable
+          index = Number $(this).attr('data-index')
+          Game.work 'private', index
+        # 建物を売る
+        else if Game.isSell
+          index = Number $(this).attr('data-index')
+          Game.sellPrivate index
+    else
+      e.on 'dblclick', ->
+        if Game.isClickable
+          index = Number $(this).attr('data-index')
+          Game.work 'private', index
+        else if Game.isSell
+          index = Number $(this).attr('data-index')
+          Game.sellPrivate index
 
 
 
