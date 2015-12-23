@@ -132,21 +132,38 @@ class HandSpace extends SpaceBase
     売却価格：#{price}
     得点：#{point}
     """.replace /\n/g, '<br>'
-    e.attr('data-tooltip', balloonStr).darkTooltip(
-      addClass : @BALLOON_CLASS_NAME
-    )
+
+    # darkTooltipはスマホに非対応。
+    unless (DeviceChecker.isTouchDevice)
+      e.attr('data-tooltip', balloonStr).darkTooltip(
+        gravity : 'north'
+        addClass : @BALLOON_CLASS_NAME
+        )
 
     # 選択状態にする
-    e.on 'click', ->
-      index = $(this).attr('data-index')
-      Game.handClickLeft Number index
-    e.on 'contextmenu', ->
-      index = $(this).attr('data-index')
-      Game.handClickRight Number index
-    # ダブルクリックにする
-    e.dblclick ->
-      index = $(this).attr('data-index')
-      Game.handDoubleClick Number index
+    if (DeviceChecker.isTouchDevice)
+      mc = new Hammer(e.get(0))
+      e.on 'panleft', ->
+        index = $(this).attr('data-index')
+        Game.handClickLeft Number index
+      e.on 'panright', ->
+        index = $(this).attr('data-index')
+        Game.handClickRight Number index
+      # ダブルクリックにする
+      e.on 'doubletap', ->
+        index = $(this).attr('data-index')
+        Game.handDoubleClick Number index
+    else
+      e.on 'click', ->
+        index = $(this).attr('data-index')
+        Game.handClickLeft Number index
+      e.on 'contextmenu', ->
+        index = $(this).attr('data-index')
+        Game.handClickRight Number index
+      # ダブルクリックにする
+      e.on 'dblclick', ->
+        index = $(this).attr('data-index')
+        Game.handDoubleClick Number index
 
     e.append header
     e.append img

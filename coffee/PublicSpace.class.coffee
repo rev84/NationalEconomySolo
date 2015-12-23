@@ -133,10 +133,13 @@ class PublicSpace extends SpaceBase
     売却価格：#{priceBalloon}
     得点：#{pointBalloon}
     """.replace /\n/g, '<br>'
-    e.attr('data-tooltip', balloonStr).darkTooltip(
-      gravity : 'north'
-      addClass : @BALLOON_CLASS_NAME
-    )
+
+    # darkTooltipはスマホに非対応。
+    unless (DeviceChecker.isTouchDevice)
+      e.attr('data-tooltip', balloonStr).darkTooltip(
+        gravity : 'north'
+        addClass : @BALLOON_CLASS_NAME
+        )
 
     # 労働者により使用不可
     switch @status[index]
@@ -149,9 +152,15 @@ class PublicSpace extends SpaceBase
 
 
     # ダブルクリック時には使用する
-    e.dblclick ->
-      index = Number $(this).attr('data-index')
-      Game.work 'public', index
+    if (DeviceChecker.isTouchDevice)
+      mc = new Hammer(e.get(0))
+      e.on 'doubletap', ->
+        index = Number $(this).attr('data-index')
+        Game.work 'public', index
+    else
+      e.on 'dblclick', ->
+        index = Number $(this).attr('data-index')
+        Game.work 'public', index
 
     e.append header
     e.append img
