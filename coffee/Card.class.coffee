@@ -185,7 +185,7 @@ class Card4 extends CardBase
 
     # 建物は消費財であってはならない
     return "消費財は建設できません" unless cardClass.isBuildable()
-    # 左クリックの捨札は、コストと同一でなければならない
+    # 捨札は、コストと同一でなければならない
     return "捨札が建設コストと一致していません" if cost isnt rightIndexs.length
 
     # 建物を建てる
@@ -491,7 +491,7 @@ class Card18 extends CardBase
   @use:(leftIndexs, rightIndexs)->
     #return "指定カードが足りません" unless super()
 
-    # 右クリックの建物は1枚でなければならない
+    # 建物は1枚でなければならない
     return "建物を1枚選択しなければなりません" if leftIndexs.length isnt 1
 
     buildCardIndex = leftIndexs[0]
@@ -499,7 +499,10 @@ class Card18 extends CardBase
     cardClass    = HandSpace.getCardClass buildCardIndex
     cost = cardClass.getCost()
 
-    # 左クリックの捨札は、コストと同一でなければならない
+    # 建物は消費財であってはならない
+    return "消費財は建設できません" unless cardClass.isBuildable()
+
+    # 捨札は、コスト-1と同一でなければならない
     return "捨札が建設コストと一致していません" if cost-1 isnt rightIndexs.length
 
     # 建物を建てる
@@ -667,7 +670,7 @@ class Card29 extends CardBase
   @use:(leftIndexs, rightIndexs)->
     #return "指定カードが足りません" unless super()
 
-    # 右クリックの建物は1枚でなければならない
+    # 建物は1枚でなければならない
     return "建物を1枚選択しなければなりません" if leftIndexs.length isnt 1
 
     buildCardIndex = leftIndexs[0]
@@ -675,7 +678,10 @@ class Card29 extends CardBase
     cardClass    = HandSpace.getCardClass buildCardIndex
     cost = cardClass.getCost()
 
-    # 左クリックの捨札は、コストと同一でなければならない
+    # 建物は消費財であってはならない
+    return "消費財は建設できません" unless cardClass.isBuildable()
+
+    # 捨札は、コストと同一でなければならない
     return "捨札が建設コストと一致していません" if cost isnt rightIndexs.length
 
     # 建物を建てる
@@ -776,6 +782,9 @@ class Card34 extends CardBase
     buildCardNum1 = HandSpace.getCardNum buildCardIndex1
     cardClass1    = HandSpace.getCardClass buildCardIndex1
     cost1 = cardClass1.getCost()
+
+    # 建物は消費財であってはならない
+    return "消費財は建設できません" unless cardClass.isBuildable()
 
     # コストが一致していなければならない
     return "建物カードのコストが一致していません" if cost0 isnt cost1

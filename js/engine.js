@@ -874,6 +874,9 @@ Card18 = (function(superClass) {
     buildCardNum = HandSpace.getCardNum(buildCardIndex);
     cardClass = HandSpace.getCardClass(buildCardIndex);
     cost = cardClass.getCost();
+    if (!cardClass.isBuildable()) {
+      return "消費財は建設できません";
+    }
     if (cost - 1 !== rightIndexs.length) {
       return "捨札が建設コストと一致していません";
     }
@@ -1187,6 +1190,9 @@ Card29 = (function(superClass) {
     buildCardNum = HandSpace.getCardNum(buildCardIndex);
     cardClass = HandSpace.getCardClass(buildCardIndex);
     cost = cardClass.getCost();
+    if (!cardClass.isBuildable()) {
+      return "消費財は建設できません";
+    }
     if (cost !== rightIndexs.length) {
       return "捨札が建設コストと一致していません";
     }
@@ -1346,6 +1352,9 @@ Card34 = (function(superClass) {
     buildCardNum1 = HandSpace.getCardNum(buildCardIndex1);
     cardClass1 = HandSpace.getCardClass(buildCardIndex1);
     cost1 = cardClass1.getCost();
+    if (!cardClass.isBuildable()) {
+      return "消費財は建設できません";
+    }
     if (cost0 !== cost1) {
       return "建物カードのコストが一致していません";
     }
@@ -1529,18 +1538,6 @@ Deck = (function() {
   return Deck;
 
 })();
-
-$(function() {
-  $('body').bind('contextmenu', function() {
-    return false;
-  });
-  return Game.gameStart();
-});
-
-window.onerror = function(message, url, lineNo) {
-  LogSpace.addScriptError(message, url, lineNo);
-  return true;
-};
 
 window.Game = (function() {
   function Game() {}
@@ -2975,3 +2972,15 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
+
+$(function() {
+  $('body').bind('contextmenu', function() {
+    return false;
+  });
+  return Game.gameStart();
+});
+
+window.onerror = function(message, url, lineNo) {
+  LogSpace.addScriptError(message, url, lineNo);
+  return true;
+};
