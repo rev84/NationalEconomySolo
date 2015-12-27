@@ -108,23 +108,23 @@ class PrivateSpace extends SpaceBase
     desc = cardClass.getDescription()
 
     # カードの外側
-    e = $('<div>').attr('data-index', index).addClass('private')
+    e = $('<div>').attr('data-index', index).addClass('card')
 
     # ヘッダ
     # [コスト]カード名
     costStr = if cardClass.isPublicOnly() then '' else '['+cost+']'
-    header = $('<span>').addClass('private_header').html(costStr+cardClass.getName())
+    header = $('<span>').addClass('card_header').html(costStr+cardClass.getName())
 
     # 画像
-    img = cardClass.getImageObj().addClass('private_image')
+    img = cardClass.getImageObj().addClass('card_image')
 
     # フッタ
     # カテゴリ
     catStr = if cat? then '['+cat+']' else ''
-    categorySpan = $('<span>').addClass('private_footer private_category').html(catStr)
+    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr)
     # 得点
     pointStr = if cardClass.isPublicOnly() then '' else '[$'+point+']'
-    pointSpan = $('<span>').addClass('private_footer private_point').html(pointStr)
+    pointSpan = $('<span>').addClass('card_footer card_point').html(pointStr)
 
     # 説明の吹き出し
     catBalloon = if cat? then cat else 'なし'
@@ -136,25 +136,38 @@ class PrivateSpace extends SpaceBase
     売却価格：#{price}
     得点：#{point}
     """.replace /\n/g, '<br>'
-    e.attr('data-tooltip', balloonStr).darkTooltip(
-      addClass : @BALLOON_CLASS_NAME
-    )
+
+    # darkTooltipはスマホに非対応。
+    unless (DeviceChecker.isTouchDevice)
+      e.attr('data-tooltip', balloonStr).darkTooltip(
+        addClass : @BALLOON_CLASS_NAME
+      )
 
     # 労働者により使用不可
     if @status[index] is @STATUS_WORKED
-      e.addClass('used')
-      e.append $('<img>').attr('src', @IMG_WORKER).addClass('worker')
+      e.addClass('card_used')
+      e.append $('<img>').attr('src', @IMG_WORKER).addClass('card_worker')
 
     # ダブルクリック時
-    e.dblclick ->
-      # 通常時は労働者を派遣
-      if Game.isClickable
-        index = Number $(this).attr('data-index')
-        Game.work 'private', index
-      # 建物を売る
-      else if Game.isSell
-        index = Number $(this).attr('data-index')
-        Game.sellPrivate index
+    if (DeviceChecker.isTouchDevice)
+      mc = new Hammer(e.get(0))
+      e.on 'doubletap', ->
+        # 通常時は労働者を派遣
+        if Game.isClickable
+          index = Number $(this).attr('data-index')
+          Game.work 'private', index
+        # 建物を売る
+        else if Game.isSell
+          index = Number $(this).attr('data-index')
+          Game.sellPrivate index
+    else
+      e.on 'dblclick', ->
+        if Game.isClickable
+          index = Number $(this).attr('data-index')
+          Game.work 'private', index
+        else if Game.isSell
+          index = Number $(this).attr('data-index')
+          Game.sellPrivate index
 
 
 
