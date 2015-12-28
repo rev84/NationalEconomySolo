@@ -784,7 +784,7 @@ class Card34 extends CardBase
     cost1 = cardClass1.getCost()
 
     # 建物は消費財であってはならない
-    return "消費財は建設できません" unless cardClass.isBuildable()
+    return "消費財は建設できません" unless cardClass0.isBuildable() and cardClass1.isBuildable()
 
     # コストが一致していなければならない
     return "建物カードのコストが一致していません" if cost0 isnt cost1
