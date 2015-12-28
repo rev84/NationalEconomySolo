@@ -136,7 +136,6 @@ class HandSpace extends SpaceBase
     # darkTooltipはスマホに非対応。
     unless (DeviceChecker.isTouchDevice)
       e.attr('data-tooltip', balloonStr).darkTooltip(
-        gravity : 'north'
         addClass : @BALLOON_CLASS_NAME
         )
 
