@@ -1352,7 +1352,7 @@ Card34 = (function(superClass) {
     buildCardNum1 = HandSpace.getCardNum(buildCardIndex1);
     cardClass1 = HandSpace.getCardClass(buildCardIndex1);
     cost1 = cardClass1.getCost();
-    if (!cardClass.isBuildable()) {
+    if (!(cardClass0.isBuildable() && cardClass1.isBuildable())) {
       return "消費財は建設できません";
     }
     if (cost0 !== cost1) {
