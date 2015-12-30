@@ -73,35 +73,30 @@ body {
 
 #game {}
 #log_space {
-  padding: auto auto;
-  margin: auto auto;
   position: fixed;
+  right: 2.0rem;
   z-index: 100;
   max-height: 70vh;
   overflow-y: scroll;
 }
 #log_space div {
   position: relative;
-  min-height: 4.0rem;
   border-radius: 0.5rem;
   font-size: 1.0rem;
-  padding: 0 auto;
   margin: 0 auto;
+  padding: 0.5rem 0.5rem 0.5rem 3.0rem;
+  background-repeat: no-repeat;
+  background-position: 0.5rem center;
+  background-size: 2.0rem 2.0rem;
+  min-height: 3.0rem;
   font-weight: bold;
   box-sizing: content-box;
   /*  text-transform:uppercase;*/
 }
-#log_space img {
-  width: 2.0rem;
-  height: 2.0rem;
-}
-.log_message {
-  padding-left: 1.0rem
-}
 .log_script_error {
   color: #555;
   background: #ffc0cb border: 0.1rem solid #ff0000;
-  font-size: 1.0rem !important;
+  font-size: 1.0rem;
   user-select: text;
   -moz-user-select: text;
   -webkit-user-select: text;
@@ -109,17 +104,20 @@ body {
 }
 .log_fatal {
   color: #555;
-  background: #ffc0cb;
+  background-color: #ffc0cb;
+  background-image: url('../img/fatal.png');
   border: 0.3rem solid #ff0000;
 }
 .log_warn {
   color: #555;
-  background: #fff8c4;
+  background-color: #fff8c4;
+  background-image: url('../img/warning.png');
   border: 0.3rem solid #f2c779;
 }
 .log_info {
   color: #555;
-  background: #f0f8ff;
+  background-color: #f0f8ff;
+  background-image: url('../img/info.png');
   border: 0.3rem solid #0000ff;
 }
 table.score td {
