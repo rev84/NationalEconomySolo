@@ -88,62 +88,26 @@ table.score td {
 }
 /* ハンドのカード */
 .hand {
-  position:relative;
   width:120px; height:120px;
   border:4px double #000000;
-  display:inline-block;
   margin:3px;
   padding:2px;
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
           box-sizing: border-box;
 }
-.select_left {
-  border:4px solid #ff0000;
-}
-.select_right {
-  border:4px solid #006400;
-}
-.hand_header {
-  position:absolute;
-  top:0px; left:0px;
-  width:120px; height:20px;
-  text-align:center;
-  vertical-align:middle;
-  font-size:16px;
-  font-weight:bold;
-}
-.hand_footer {
-  position:absolute;
-  text-align:right;
-  vertical-align:middle;
-  font-size:16px;
-  font-weight:bold;
-  width:60px; height:20px;
-}
-.hand_category {
-  bottom:0px; left:0px;
-  text-align:left;
-}
-.hand_point {
-  bottom:0px; right:0px;
-  text-align:right;
-}
-.hand_image {
-  position:absolute;
-  top:20px; left:10px;
-  width:100px; height:75px;
-}
-
 /* 公共のカード */
 .public, .private {
-  position:relative;
   width:120px; height:115px;
   border:1px solid #0000ff;
-  display:inline-block;
   margin:2px;
 }
-.public_header, .private_header {
+/* カード共通 */
+.card {
+  position:relative;
+  display:inline-block;
+}
+.card_header {
   position:absolute;
   top:0px; left:0px;
   width:120px; height:20px;
@@ -152,7 +116,7 @@ table.score td {
   font-size:16px;
   font-weight:bold;
 }
-.public_footer, .private_footer {
+.card_footer {
   position:absolute;
   text-align:right;
   vertical-align:middle;
@@ -160,24 +124,33 @@ table.score td {
   font-weight:bold;
   width:60px; height:20px;
 }
-.public_category, .private_category {
+.card_category {
   bottom:0px; left:0px;
   text-align:left;
 }
-.public_point, .private_point {
+.card_point {
   bottom:0px; right:0px;
   text-align:right;
 }
-.public_image, .private_image {
+.card_image {
   position:absolute;
-  top:20px; right:10px;
+  margin: auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   width:100px; height:75px;
 }
-
-.used {
+.card_select_left {
+  border:4px solid #ff0000;
+}
+.card_select_right {
+  border:4px solid #006400;
+}
+.card_used {
   background-color:#888888;
 }
-.worker {
+.card_worker {
   position:absolute;
   top:20px; right:30px;
   height:80px;
