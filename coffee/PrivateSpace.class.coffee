@@ -7,15 +7,24 @@ class PrivateSpace extends SpaceBase
   # 建物の状態の定数
   @STATUS_USABLE = 0
   @STATUS_WORKED = 1
+  @STATUS_SELLING = 2
 
   @cards:[]
   # 建物の状態
   @status:[]
 
+  # 売却予定の建物を入れる箱。カード番号を格納する。
+  @sellingBox:[]
+
+  # 売却不可の時のロールバックに使うキャッシュ
+  @cacheObj: {}
+
   @init:->
     super()
     @cards = []
     @status = []
+    @sellingBox = []
+    @cacheObj = {}
 
   # すべて使用可能にする
   @resetStatus:->
@@ -171,8 +180,6 @@ class PrivateSpace extends SpaceBase
           index = Number $(this).attr('data-index')
           Game.sellPrivate index
 
-
-
     e.append header
     e.append img
     e.append categorySpan
@@ -186,6 +193,34 @@ class PrivateSpace extends SpaceBase
       cardClass = @getCardClass index
       return true if cardClass.isSellable()
     false
+
+  # 売却候補の総額
+  @getTotalSell:->
+    result = 0
+    for cardNum in @sellingBox
+      result += Card.getClass(cardNum).getPrice()
+    return result
+
+  # キャッシュが空ならキャッシュする
+  @cache:->
+    if Object.keys(@cacheObj).length == 0
+      @cacheObj = {
+        cards: @cards.concat(),
+        status: @status.concat()
+      }
+    return
+
+  @uncache:->
+    @cacheObj = {}
+    return
+
+  # キャッシュの状態に戻る。
+  @rollback:->
+    @cards = @cacheObj['cards']
+    @status = @cacheObj['status']
+    @uncache()
+    @redraw()
+    return
 
   # 所有する建物の数
   @getAmount:->
