@@ -2258,7 +2258,7 @@ LogSpace = (function(superClass) {
 
   LogSpace.addFatal = function(message) {
     var e, msg;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS);
     msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
     return this.getElement().append(e.append(msg));
   };
@@ -2272,17 +2272,17 @@ LogSpace = (function(superClass) {
 
   LogSpace.addInfo = function(message) {
     var e, msg;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
     msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
     return this.getElement().append(e.append(msg));
   };
 
-  LogSpace.addInfoInstant = function(message, sec) {
+  LogSpace.addFatalInstant = function(message, sec) {
     var e, msg;
     if (sec == null) {
       sec = 5;
     }
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS);
     msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
     this.getElement().append(e.append(msg));
     e.fadeOut(sec * 1000);
@@ -2302,18 +2302,6 @@ LogSpace = (function(superClass) {
   };
 
   LogSpace.addInfoInstant = function(message, sec) {
-    var e, msg;
-    if (sec == null) {
-      sec = 5;
-    }
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
-    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
-    this.getElement().append(e.append(msg));
-    e.fadeOut(sec * 1000);
-    return setTimeout(e.remove, sec * 1000);
-  };
-
-  LogSpace.addFatalInstant = function(message, sec) {
     var e, msg;
     if (sec == null) {
       sec = 5;
