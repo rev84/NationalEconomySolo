@@ -150,8 +150,9 @@ class PrivateSpace extends SpaceBase
 
     # ダブルクリック時
     if (DeviceChecker.isTouchDevice)
-      mc = new Hammer(e.get(0))
-      e.on 'doubletap', ->
+      e.on('touchend', (ev) ->
+        ev.preventDefault()
+      ).hammer().on('doubletap', ->
         # 通常時は労働者を派遣
         if Game.isClickable
           index = Number $(this).attr('data-index')
@@ -160,6 +161,7 @@ class PrivateSpace extends SpaceBase
         else if Game.isSell
           index = Number $(this).attr('data-index')
           Game.sellPrivate index
+      )
     else
       e.on 'dblclick', ->
         if Game.isClickable
