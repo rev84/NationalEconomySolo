@@ -372,7 +372,7 @@ Card4 = (function(superClass) {
   };
 
   Card4.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物1枚\n右クリック：捨札（建物コストの枚数）";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物1枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建物コストの枚数）";
   };
 
   Card4.use = function(leftIndexs, rightIndexs) {
@@ -417,7 +417,7 @@ Card5 = (function(superClass) {
   };
 
   Card5.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札1枚";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札1枚";
   };
 
   Card5.use = function(leftIndexs) {
@@ -455,7 +455,7 @@ Card6 = (function(superClass) {
   };
 
   Card6.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札2枚";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札2枚";
   };
 
   Card6.use = function(leftIndexs) {
@@ -518,7 +518,7 @@ Card8 = (function(superClass) {
   };
 
   Card8.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札3枚";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札3枚";
   };
 
   Card8.use = function(leftIndexs) {
@@ -581,7 +581,7 @@ Card10 = (function(superClass) {
   };
 
   Card10.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札4枚";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札4枚";
   };
 
   Card10.use = function(leftIndexs) {
@@ -644,7 +644,7 @@ Card12 = (function(superClass) {
   };
 
   Card12.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札5枚";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札5枚";
   };
 
   Card12.use = function(leftIndexs) {
@@ -715,7 +715,7 @@ Card14 = (function(superClass) {
   };
 
   Card14.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札4枚\n（最後に引いた5枚の中から）";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札4枚\n（最後に引いた5枚の中から）";
   };
 
   Card14.use = function(leftIndexs) {
@@ -826,7 +826,7 @@ Card17 = (function(superClass) {
   };
 
   Card17.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札2枚";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札2枚";
   };
 
   Card17.use = function(leftIndexs) {
@@ -862,7 +862,7 @@ Card18 = (function(superClass) {
   };
 
   Card18.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物1枚\n右クリック：捨札（建設コスト-1の枚数）";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物1枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建設コスト-1の枚数）";
   };
 
   Card18.use = function(leftIndexs, rightIndexs) {
@@ -1027,7 +1027,7 @@ Card24 = (function(superClass) {
   };
 
   Card24.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札1枚";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札1枚";
   };
 
   Card24.use = function(leftIndexs) {
@@ -1067,7 +1067,7 @@ Card25 = (function(superClass) {
   };
 
   Card25.getSelectMessage = function() {
-    return "選択してください\n左クリック：農業カテゴリの建物1枚";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：農業カテゴリの建物1枚";
   };
 
   Card25.use = function(leftIndexs) {
@@ -1178,7 +1178,7 @@ Card29 = (function(superClass) {
   };
 
   Card29.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物1枚\n右クリック：捨札（建物コストの枚数）";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物1枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建物コストの枚数）";
   };
 
   Card29.use = function(leftIndexs, rightIndexs) {
@@ -1300,7 +1300,7 @@ Card33 = (function(superClass) {
   };
 
   Card33.getSelectMessage = function() {
-    return "選択してください\n左クリック：捨札3枚";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札3枚";
   };
 
   Card33.use = function(leftIndexs) {
@@ -1336,7 +1336,7 @@ Card34 = (function(superClass) {
   };
 
   Card34.getSelectMessage = function() {
-    return "選択してください\n左クリック：建物カード2枚\n右クリック：捨札（建物コストの枚数）";
+    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物カード2枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建物コストの枚数）";
   };
 
   Card34.use = function(leftIndexs, rightIndexs) {
@@ -1538,6 +1538,63 @@ Deck = (function() {
   return Deck;
 
 })();
+
+DeviceChecker = (function() {
+  function DeviceChecker() {}
+
+  DeviceChecker.isTouchDevice = device.mobile() || device.tablet();
+
+  DeviceChecker.leftClickMessage = function() {
+    if (DeviceChecker.isTouchDevice()) {
+      return "左フリック";
+    } else {
+      return "左クリック";
+    }
+  };
+
+  DeviceChecker.rightClickMessage = function() {
+    if (DeviceChecker.isTouchDevice()) {
+      return "右フリック";
+    } else {
+      return "右クリック";
+    }
+  };
+
+  DeviceChecker.doubleClickMessage = function() {
+    if (DeviceChecker.isTouchDevice()) {
+      return "ダブルタップ";
+    } else {
+      return "ダブルクリック";
+    }
+  };
+
+  return DeviceChecker;
+
+})();
+
+$(function() {
+  var srcCss, srcHtml;
+  if (DeviceChecker.isTouchDevice) {
+    srcHtml = './index-sm.html';
+    srcCss = './css/index-sm.css';
+  } else {
+    srcHtml = './index-pc.html';
+    srcCss = './css/index-pc.css';
+  }
+  return $.get(srcHtml, function(data) {
+    $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + srcCss + '">');
+    $('#game').append(data);
+    $('body').bind('contextmenu', function() {
+      return false;
+    });
+    return Game.gameStart();
+  });
+});
+
+window.onerror = function(message, url, lineNo) {
+  LogSpace.addScriptError(message, url, lineNo);
+  return true;
+};
 
 window.Game = (function() {
   function Game() {}
@@ -2182,6 +2239,14 @@ LogSpace = (function(superClass) {
 
   LogSpace.DIV_SCRIPT_ERROR_CLASS = 'log_script_error';
 
+  LogSpace.MESSAGE_CLASS = 'log_message';
+
+  LogSpace.IMG_INFO = './img/info.png';
+
+  LogSpace.IMG_WARN = './img/warning.png';
+
+  LogSpace.IMG_FATAL = './img/fatal.png';
+
   LogSpace.init = function() {
     LogSpace.__super__.constructor.init.call(this);
     return this.removeAll();
@@ -2192,52 +2257,77 @@ LogSpace = (function(superClass) {
   };
 
   LogSpace.addFatal = function(message) {
-    var e;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS).html(message);
-    return this.getElement().append(e);
+    var e, img, msg;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
+    img = $('<img>').attr('src', this.IMG_INFO);
+    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
+    return this.getElement().append(e.append(img).append(msg));
   };
 
   LogSpace.addWarn = function(message) {
-    var e;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS).html(message);
-    return this.getElement().append(e);
+    var e, img, msg;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS);
+    img = $('<img>').attr('src', this.IMG_WARN);
+    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
+    return this.getElement().append(e.append(img).append(msg));
   };
 
   LogSpace.addInfo = function(message) {
-    var e;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS).html(message);
-    return this.getElement().append(e);
+    var e, img, msg;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS);
+    img = $('<img>').attr('src', this.IMG_FATAL);
+    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
+    return this.getElement().append(e.append(img).append(msg));
   };
 
-  LogSpace.addFatalInstant = function(message, sec) {
-    var e;
+  LogSpace.addInfoInstant = function(message, sec) {
+    var e, img, msg;
     if (sec == null) {
       sec = 5;
     }
-    e = $('<div>').addClass(this.DIV_FATAL_CLASS).html(message);
-    this.getElement().append(e);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
+    img = $('<img>').attr('src', this.IMG_INFO);
+    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
+    this.getElement().append(e.append(img).append(msg));
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
   };
 
   LogSpace.addWarnInstant = function(message, sec) {
-    var e;
+    var e, img, msg;
     if (sec == null) {
       sec = 5;
     }
-    e = $('<div>').addClass(this.DIV_WARN_CLASS).html(message);
-    this.getElement().append(e);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS);
+    img = $('<img>').attr('src', this.IMG_WARN);
+    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
+    this.getElement().append(e.append(img).append(msg));
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
   };
 
   LogSpace.addInfoInstant = function(message, sec) {
-    var e;
+    var e, img, msg;
     if (sec == null) {
       sec = 5;
     }
-    e = $('<div>').addClass(this.DIV_INFO_CLASS).html(message);
-    this.getElement().append(e);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
+    img = $('<img>').attr('src', this.IMG_INFO);
+    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
+    this.getElement().append(e.append(img).append(msg));
+    e.fadeOut(sec * 1000);
+    return setTimeout(e.remove, sec * 1000);
+  };
+
+  LogSpace.addFatalInstant = function(message, sec) {
+    var e, img, msg;
+    if (sec == null) {
+      sec = 5;
+    }
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
+    img = $('<img>').attr('src', this.IMG_INFO);
+    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
+    this.getElement().append(e.append(img).append(msg));
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
   };
@@ -3015,36 +3105,3 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
-
-$(function() {
-  var srcCss, srcHtml;
-  if (DeviceChecker.isTouchDevice) {
-    srcHtml = './index-sm.html';
-    srcCss = './css/index-sm.css';
-  } else {
-    srcHtml = './index-pc.html';
-    srcCss = './css/index-pc.css';
-  }
-  return $.get(srcHtml, function(data) {
-    $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + srcCss + '">');
-    $('#game').append(data);
-    $('body').bind('contextmenu', function() {
-      return false;
-    });
-    return Game.gameStart();
-  });
-});
-
-window.onerror = function(message, url, lineNo) {
-  LogSpace.addScriptError(message, url, lineNo);
-  return true;
-};
-
-DeviceChecker = (function() {
-  function DeviceChecker() {}
-
-  DeviceChecker.isTouchDevice = device.mobile() || device.tablet();
-
-  return DeviceChecker;
-
-})();
