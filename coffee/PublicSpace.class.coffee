@@ -81,6 +81,11 @@ class PublicSpace extends SpaceBase
       e = @createElement index
       me.append e if e isnt false
 
+  # ダブルクリック時には労働者を配置する
+  @doubleClickAction:(elem)->
+    index = $(elem).attr('data-index')
+    Game.work 'public', index
+
   # 要素作成
   @createElement:(index)->
     # ハンドになければ脱出
@@ -150,19 +155,8 @@ class PublicSpace extends SpaceBase
         e.addClass('card_used')
         e.append $('<img>').attr('src', @IMG_DISABLER).addClass('card_worker')
 
-
-    # ダブルクリック時には使用する
-    if (DeviceChecker.isTouchDevice)
-      e.on('touchend', (ev) ->
-        ev.preventDefault()
-      ).hammer().on('doubletap', ->
-        index = Number $(this).attr('data-index')
-        Game.work 'public', index
-      )
-    else
-      e.on 'dblclick', ->
-        index = Number $(this).attr('data-index')
-        Game.work 'public', index
+    # クリックアクションを登録
+    DeviceChecker.setDoubleClickAction(e, PublicSpace.doubleClickAction)
 
     e.append header
     e.append img

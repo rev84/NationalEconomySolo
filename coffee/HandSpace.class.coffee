@@ -85,6 +85,21 @@ class HandSpace extends SpaceBase
       e.addClass "card_select_left"  if @select[index] is @SELECT_LEFT
       e.addClass "card_select_right" if @select[index] is @SELECT_RIGHT
 
+  # 左クリックで選択状態にする。
+  @leftClickAction:(elem) ->
+    index = $(elem).attr('data-index')
+    Game.handClickLeft Number index
+
+  # 右クリックで選択状態にする。
+  @rightClickAction:(elem) ->
+    index = $(elem).attr('data-index')
+    Game.handClickRight Number index
+
+  # ダブルクリックで捨てる。
+  @doubleClickAction:(elem) ->
+    index = $(elem).attr('data-index')
+    Game.handDoubleClick Number index
+
   # 要素作成
   @createElement:(index)->
     # ハンドになければ脱出
@@ -139,33 +154,10 @@ class HandSpace extends SpaceBase
         addClass : @BALLOON_CLASS_NAME
         )
 
-    # 選択状態にする
-    if (DeviceChecker.isTouchDevice)
-      mc = new Hammer(e.get(0))
-      e.on 'panleft', ->
-        index = $(this).attr('data-index')
-        Game.handClickLeft Number index
-      e.on 'panright', ->
-        index = $(this).attr('data-index')
-        Game.handClickRight Number index
-      # ダブルクリックにする
-      e.on('touchend', (ev) ->
-        ev.preventDefault()
-      ).on('doubletap', ->
-        index = $(this).attr('data-index')
-        Game.handDoubleClick Number index
-      )
-    else
-      e.on 'click', ->
-        index = $(this).attr('data-index')
-        Game.handClickLeft Number index
-      e.on 'contextmenu', ->
-        index = $(this).attr('data-index')
-        Game.handClickRight Number index
-      # ダブルクリックにする
-      e.on 'dblclick', ->
-        index = $(this).attr('data-index')
-        Game.handDoubleClick Number index
+    # クリックアクションを登録
+    DeviceChecker.setLeftClickAction(e, HandSpace.leftClickAction)
+    DeviceChecker.setRightClickAction(e, HandSpace.rightClickAction)
+    DeviceChecker.setDoubleClickAction(e, HandSpace.doubleClickAction)
 
     e.append header
     e.append img

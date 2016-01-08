@@ -96,6 +96,17 @@ class PrivateSpace extends SpaceBase
       e = @createElement index
       me.append e if e isnt false
 
+  # ダブルクリック時
+  @doubleClickAction:(elem) ->
+    # 通常時は労働者を派遣
+    if Game.isClickable
+      index = Number $(elem).attr('data-index')
+      Game.work 'private', index
+    # 建物を売る
+    else if Game.isSell
+      index = Number $(elem).attr('data-index')
+      Game.pushSellingBox index
+
   # 要素作成
   @createElement:(index)->
     # なければ脱出
@@ -157,28 +168,8 @@ class PrivateSpace extends SpaceBase
       e.addClass('card_used')
       e.append $('<img>').attr('src', @IMG_WORKER).addClass('card_worker')
 
-    # ダブルクリック時
-    if (DeviceChecker.isTouchDevice)
-      e.on('touchend', (ev) ->
-        ev.preventDefault()
-      ).hammer().on('doubletap', ->
-        # 通常時は労働者を派遣
-        if Game.isClickable
-          index = Number $(this).attr('data-index')
-          Game.work 'private', index
-        # 建物を売る
-        else if Game.isSell
-          index = Number $(this).attr('data-index')
-          Game.pushSellingBox index
-      )
-    else
-      e.on 'dblclick', ->
-        if Game.isClickable
-          index = Number $(this).attr('data-index')
-          Game.work 'private', index
-        else if Game.isSell
-          index = Number $(this).attr('data-index')
-          Game.pushSellingBox index
+    # クリックアクションを登録
+    DeviceChecker.setDoubleClickAction(e, PrivateSpace.doubleClickAction)
 
     e.append header
     e.append img
