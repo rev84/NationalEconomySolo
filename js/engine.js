@@ -874,6 +874,9 @@ Card18 = (function(superClass) {
     buildCardNum = HandSpace.getCardNum(buildCardIndex);
     cardClass = HandSpace.getCardClass(buildCardIndex);
     cost = cardClass.getCost();
+    if (!cardClass.isBuildable()) {
+      return "消費財は建設できません";
+    }
     if (cost - 1 !== rightIndexs.length) {
       return "捨札が建設コストと一致していません";
     }
@@ -1187,6 +1190,9 @@ Card29 = (function(superClass) {
     buildCardNum = HandSpace.getCardNum(buildCardIndex);
     cardClass = HandSpace.getCardClass(buildCardIndex);
     cost = cardClass.getCost();
+    if (!cardClass.isBuildable()) {
+      return "消費財は建設できません";
+    }
     if (cost !== rightIndexs.length) {
       return "捨札が建設コストと一致していません";
     }
@@ -1346,6 +1352,9 @@ Card34 = (function(superClass) {
     buildCardNum1 = HandSpace.getCardNum(buildCardIndex1);
     cardClass1 = HandSpace.getCardClass(buildCardIndex1);
     cost1 = cardClass1.getCost();
+    if (!(cardClass0.isBuildable() && cardClass1.isBuildable())) {
+      return "消費財は建設できません";
+    }
     if (cost0 !== cost1) {
       return "建物カードのコストが一致していません";
     }
@@ -1527,15 +1536,6 @@ Deck = (function() {
   };
 
   return Deck;
-
-})();
-
-DeviceChecker = (function() {
-  function DeviceChecker() {}
-
-  DeviceChecker.isTouchDevice = device.mobile() || device.tablet();
-
-  return DeviceChecker;
 
 })();
 
@@ -2087,7 +2087,7 @@ HandSpace = (function(superClass) {
     price = cardClass.getPrice();
     point = cardClass.getPoint();
     desc = cardClass.getDescription();
-    e = $('<div>').attr('data-index', index).addClass('card');
+    e = $('<div>').attr('data-index', index).addClass('card hand');
     header = $('<span>').addClass('card_header').html('[' + cost + ']' + cardClass.getName());
     img = cardClass.getImageObj().addClass('card_image');
     catStr = cat != null ? '[' + cat + ']' : '';
@@ -2097,7 +2097,6 @@ HandSpace = (function(superClass) {
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
     if (!DeviceChecker.isTouchDevice) {
       e.attr('data-tooltip', balloonStr).darkTooltip({
-        gravity: 'north',
         addClass: this.BALLOON_CLASS_NAME
       });
     }
@@ -2183,14 +2182,6 @@ LogSpace = (function(superClass) {
 
   LogSpace.DIV_SCRIPT_ERROR_CLASS = 'log_script_error';
 
-  LogSpace.MESSAGE_CLASS = 'log_message';
-
-  LogSpace.IMG_INFO = './img/info.png';
-
-  LogSpace.IMG_WARN = './img/warning.png';
-
-  LogSpace.IMG_FATAL = './img/fatal.png';
-
   LogSpace.init = function() {
     LogSpace.__super__.constructor.init.call(this);
     return this.removeAll();
@@ -2201,77 +2192,52 @@ LogSpace = (function(superClass) {
   };
 
   LogSpace.addFatal = function(message) {
-    var e, img, msg;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
-    img = $('<img>').attr('src', this.IMG_INFO);
-    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
-    return this.getElement().append(e.append(img).append(msg));
+    var e;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS).html(message);
+    return this.getElement().append(e);
   };
 
   LogSpace.addWarn = function(message) {
-    var e, img, msg;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS);
-    img = $('<img>').attr('src', this.IMG_WARN);
-    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
-    return this.getElement().append(e.append(img).append(msg));
+    var e;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS).html(message);
+    return this.getElement().append(e);
   };
 
   LogSpace.addInfo = function(message) {
-    var e, img, msg;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS);
-    img = $('<img>').attr('src', this.IMG_FATAL);
-    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
-    return this.getElement().append(e.append(img).append(msg));
+    var e;
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS).html(message);
+    return this.getElement().append(e);
   };
 
-  LogSpace.addInfoInstant = function(message, sec) {
-    var e, img, msg;
+  LogSpace.addFatalInstant = function(message, sec) {
+    var e;
     if (sec == null) {
       sec = 5;
     }
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
-    img = $('<img>').attr('src', this.IMG_INFO);
-    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
-    this.getElement().append(e.append(img).append(msg));
+    e = $('<div>').addClass(this.DIV_FATAL_CLASS).html(message);
+    this.getElement().append(e);
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
   };
 
   LogSpace.addWarnInstant = function(message, sec) {
-    var e, img, msg;
+    var e;
     if (sec == null) {
       sec = 5;
     }
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS);
-    img = $('<img>').attr('src', this.IMG_WARN);
-    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
-    this.getElement().append(e.append(img).append(msg));
+    e = $('<div>').addClass(this.DIV_WARN_CLASS).html(message);
+    this.getElement().append(e);
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
   };
 
   LogSpace.addInfoInstant = function(message, sec) {
-    var e, img, msg;
+    var e;
     if (sec == null) {
       sec = 5;
     }
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
-    img = $('<img>').attr('src', this.IMG_INFO);
-    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
-    this.getElement().append(e.append(img).append(msg));
-    e.fadeOut(sec * 1000);
-    return setTimeout(e.remove, sec * 1000);
-  };
-
-  LogSpace.addFatalInstant = function(message, sec) {
-    var e, img, msg;
-    if (sec == null) {
-      sec = 5;
-    }
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
-    img = $('<img>').attr('src', this.IMG_INFO);
-    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
-    this.getElement().append(e.append(img).append(msg));
+    e = $('<div>').addClass(this.DIV_INFO_CLASS).html(message);
+    this.getElement().append(e);
     e.fadeOut(sec * 1000);
     return setTimeout(e.remove, sec * 1000);
   };
@@ -2435,7 +2401,7 @@ PrivateSpace = (function(superClass) {
     price = cardClass.getPrice();
     point = cardClass.getPoint();
     desc = cardClass.getDescription();
-    e = $('<div>').attr('data-index', index).addClass('card');
+    e = $('<div>').attr('data-index', index).addClass('card private');
     costStr = cardClass.isPublicOnly() ? '' : '[' + cost + ']';
     header = $('<span>').addClass('card_header').html(costStr + cardClass.getName());
     img = cardClass.getImageObj().addClass('card_image');
@@ -2772,7 +2738,7 @@ PublicSpace = (function(superClass) {
     price = cardClass.getPrice();
     point = cardClass.getPoint();
     desc = cardClass.getDescription();
-    e = $('<div>').attr('data-index', index).addClass('card');
+    e = $('<div>').attr('data-index', index).addClass('card public');
     costStr = cardClass.isPublicOnly() ? '' : '[' + cost + ']';
     header = $('<span>').addClass('card_header').html(costStr + cardClass.getName());
     img = cardClass.getImageObj().addClass('card_image');
@@ -2794,12 +2760,12 @@ PublicSpace = (function(superClass) {
     switch (this.status[index]) {
       case this.STATUS_WORKED:
         if (this.cards[index] !== Card.CARD_NUM_KOUZAN) {
-          e.addClass('used');
+          e.addClass('card_used');
         }
         e.append($('<img>').attr('src', this.IMG_WORKER).addClass('card_worker'));
         break;
       case this.STATUS_DISABLED:
-        e.addClass('used');
+        e.addClass('card_used');
         e.append($('<img>').attr('src', this.IMG_DISABLER).addClass('card_worker'));
     }
     if (DeviceChecker.isTouchDevice) {
@@ -3051,13 +3017,34 @@ Worker = (function(superClass) {
 })(SpaceBase);
 
 $(function() {
-  $('body').bind('contextmenu', function() {
-    return false;
+  var srcCss, srcHtml;
+  if (DeviceChecker.isTouchDevice) {
+    srcHtml = './index-sm.html';
+    srcCss = './css/index-sm.css';
+  } else {
+    srcHtml = './index-pc.html';
+    srcCss = './css/index-pc.css';
+  }
+  return $.get(srcHtml, function(data) {
+    $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + srcCss + '">');
+    $('#game').append(data);
+    $('body').bind('contextmenu', function() {
+      return false;
+    });
+    return Game.gameStart();
   });
-  return Game.gameStart();
 });
 
 window.onerror = function(message, url, lineNo) {
   LogSpace.addScriptError(message, url, lineNo);
   return true;
 };
+
+DeviceChecker = (function() {
+  function DeviceChecker() {}
+
+  DeviceChecker.isTouchDevice = device.mobile() || device.tablet();
+
+  return DeviceChecker;
+
+})();

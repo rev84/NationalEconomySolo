@@ -106,7 +106,7 @@ class HandSpace extends SpaceBase
     desc = cardClass.getDescription()
 
     # カードの外側
-    e = $('<div>').attr('data-index', index).addClass('card')
+    e = $('<div>').attr('data-index', index).addClass('card hand')
 
     # ヘッダ
     # [コスト]カード名
@@ -136,7 +136,6 @@ class HandSpace extends SpaceBase
     # darkTooltipはスマホに非対応。
     unless (DeviceChecker.isTouchDevice)
       e.attr('data-tooltip', balloonStr).darkTooltip(
-        gravity : 'north'
         addClass : @BALLOON_CLASS_NAME
         )
 

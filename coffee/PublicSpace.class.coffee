@@ -102,7 +102,7 @@ class PublicSpace extends SpaceBase
     desc = cardClass.getDescription()
 
     # カードの外側
-    e = $('<div>').attr('data-index', index).addClass('card')
+    e = $('<div>').attr('data-index', index).addClass('card public')
 
     # ヘッダ
     # [コスト]カード名
@@ -144,10 +144,10 @@ class PublicSpace extends SpaceBase
     # 労働者により使用不可
     switch @status[index]
       when @STATUS_WORKED
-        e.addClass('used') if @cards[index] isnt Card.CARD_NUM_KOUZAN
+        e.addClass('card_used') if @cards[index] isnt Card.CARD_NUM_KOUZAN
         e.append $('<img>').attr('src', @IMG_WORKER).addClass('card_worker')
       when @STATUS_DISABLED
-        e.addClass('used')
+        e.addClass('card_used')
         e.append $('<img>').attr('src', @IMG_DISABLER).addClass('card_worker')
 
 

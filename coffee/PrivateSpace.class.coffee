@@ -108,7 +108,7 @@ class PrivateSpace extends SpaceBase
     desc = cardClass.getDescription()
 
     # カードの外側
-    e = $('<div>').attr('data-index', index).addClass('card')
+    e = $('<div>').attr('data-index', index).addClass('card private')
 
     # ヘッダ
     # [コスト]カード名
