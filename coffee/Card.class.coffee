@@ -42,7 +42,7 @@ class CardBase
   # 得点
   @PRICE = 0
 
-  # 選択時に”+DeviceChecker.rightClickMessage()+”可能か
+  # 選択時に"+DeviceChecker.rightClickMessage()+"可能か
   @isRightClick:->
     [l, r] = @requireCards()
     r > 0
@@ -170,7 +170,7 @@ class Card4 extends CardBase
     [1,1]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物1枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建物コストの枚数）"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：建物1枚\n"+DeviceChecker.rightClickMessage()+"：捨札（建物コストの枚数）"
 
   @use:(leftIndexs, rightIndexs)->
     #return "指定カードが足りません" unless super()
@@ -205,7 +205,7 @@ class Card5 extends CardBase
     [1,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札1枚"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：捨札1枚"
 
   @use:(leftIndexs)->
     return "捨札1枚が選択されていません" unless super
@@ -230,7 +230,7 @@ class Card6 extends CardBase
     [2,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札2枚"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：捨札2枚"
 
   @use:(leftIndexs)->
     return "捨札2枚が選択されていません" unless super
@@ -270,7 +270,7 @@ class Card8 extends CardBase
     [3,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札3枚"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：捨札3枚"
 
   @use:(leftIndexs)->
     return "捨札3枚が選択されていません" unless super
@@ -310,7 +310,7 @@ class Card10 extends CardBase
     [4,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札4枚"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：捨札4枚"
 
   @use:(leftIndexs)->
     return "捨札4枚が選択されていません" unless super
@@ -346,7 +346,7 @@ class Card12 extends CardBase
     [5,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札5枚"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：捨札5枚"
 
   @use:(leftIndexs)->
     return "捨札5枚が選択されていません" unless super
@@ -392,7 +392,7 @@ class Card14 extends CardBase
     [4,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札4枚\n（最後に引いた5枚の中から）"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：捨札4枚\n（最後に引いた5枚の中から）"
 
   @use:(leftIndexs)->
     return "捨札4枚が選択されていません" unless super
@@ -464,7 +464,7 @@ class Card17 extends CardBase
     [2,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札2枚"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：捨札2枚"
 
   @use:(leftIndexs)->
     return "捨札2枚が選択されていません" unless super
@@ -486,7 +486,7 @@ class Card18 extends CardBase
     [1,1]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物1枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建設コスト-1の枚数）"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：建物1枚\n"+DeviceChecker.rightClickMessage()+"：捨札（建設コスト-1の枚数）"
 
   @use:(leftIndexs, rightIndexs)->
     #return "指定カードが足りません" unless super()
@@ -578,7 +578,7 @@ class Card24 extends CardBase
     [1,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札1枚"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：捨札1枚"
 
   @use:(leftIndexs)->
     return "捨札1枚が選択されていません" unless super
@@ -604,7 +604,7 @@ class Card25 extends CardBase
     [1,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：農業カテゴリの建物1枚"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：農業カテゴリの建物1枚"
 
   @use:(leftIndexs)->
     #return "指定カードが足りません" unless super()
@@ -665,7 +665,7 @@ class Card29 extends CardBase
     [1,1]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物1枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建物コストの枚数）"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：建物1枚\n"+DeviceChecker.rightClickMessage()+"：捨札（建物コストの枚数）"
 
   @use:(leftIndexs, rightIndexs)->
     #return "指定カードが足りません" unless super()
@@ -742,7 +742,7 @@ class Card33 extends CardBase
     [3,0]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札3枚"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：捨札3枚"
 
   @use:(leftIndexs)->
     return "捨札3枚が選択されていません" unless super
@@ -765,7 +765,7 @@ class Card34 extends CardBase
     [2,1]
 
   @getSelectMessage:->
-    "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物カード2枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建物コストの枚数）"
+    "選択してください\n"+DeviceChecker.leftClickMessage()+"：建物カード2枚\n"+DeviceChecker.rightClickMessage()+"：捨札（建物コストの枚数）"
 
   @use:(leftIndexs, rightIndexs)->
     #return "指定カードが足りません" unless super

@@ -372,7 +372,7 @@ Card4 = (function(superClass) {
   };
 
   Card4.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物1枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建物コストの枚数）";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：建物1枚\n" + DeviceChecker.rightClickMessage() + "：捨札（建物コストの枚数）";
   };
 
   Card4.use = function(leftIndexs, rightIndexs) {
@@ -417,7 +417,7 @@ Card5 = (function(superClass) {
   };
 
   Card5.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札1枚";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：捨札1枚";
   };
 
   Card5.use = function(leftIndexs) {
@@ -455,7 +455,7 @@ Card6 = (function(superClass) {
   };
 
   Card6.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札2枚";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：捨札2枚";
   };
 
   Card6.use = function(leftIndexs) {
@@ -518,7 +518,7 @@ Card8 = (function(superClass) {
   };
 
   Card8.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札3枚";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：捨札3枚";
   };
 
   Card8.use = function(leftIndexs) {
@@ -581,7 +581,7 @@ Card10 = (function(superClass) {
   };
 
   Card10.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札4枚";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：捨札4枚";
   };
 
   Card10.use = function(leftIndexs) {
@@ -644,7 +644,7 @@ Card12 = (function(superClass) {
   };
 
   Card12.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札5枚";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：捨札5枚";
   };
 
   Card12.use = function(leftIndexs) {
@@ -715,7 +715,7 @@ Card14 = (function(superClass) {
   };
 
   Card14.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札4枚\n（最後に引いた5枚の中から）";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：捨札4枚\n（最後に引いた5枚の中から）";
   };
 
   Card14.use = function(leftIndexs) {
@@ -826,7 +826,7 @@ Card17 = (function(superClass) {
   };
 
   Card17.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札2枚";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：捨札2枚";
   };
 
   Card17.use = function(leftIndexs) {
@@ -862,7 +862,7 @@ Card18 = (function(superClass) {
   };
 
   Card18.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物1枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建設コスト-1の枚数）";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：建物1枚\n" + DeviceChecker.rightClickMessage() + "：捨札（建設コスト-1の枚数）";
   };
 
   Card18.use = function(leftIndexs, rightIndexs) {
@@ -1027,7 +1027,7 @@ Card24 = (function(superClass) {
   };
 
   Card24.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札1枚";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：捨札1枚";
   };
 
   Card24.use = function(leftIndexs) {
@@ -1067,7 +1067,7 @@ Card25 = (function(superClass) {
   };
 
   Card25.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：農業カテゴリの建物1枚";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：農業カテゴリの建物1枚";
   };
 
   Card25.use = function(leftIndexs) {
@@ -1178,7 +1178,7 @@ Card29 = (function(superClass) {
   };
 
   Card29.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物1枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建物コストの枚数）";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：建物1枚\n" + DeviceChecker.rightClickMessage() + "：捨札（建物コストの枚数）";
   };
 
   Card29.use = function(leftIndexs, rightIndexs) {
@@ -1300,7 +1300,7 @@ Card33 = (function(superClass) {
   };
 
   Card33.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：捨札3枚";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：捨札3枚";
   };
 
   Card33.use = function(leftIndexs) {
@@ -1336,7 +1336,7 @@ Card34 = (function(superClass) {
   };
 
   Card34.getSelectMessage = function() {
-    return "選択してください\n”+DeviceChecker.leftClickMessage()+”：建物カード2枚\n”+DeviceChecker.rightClickMessage()+”：捨札（建物コストの枚数）";
+    return "選択してください\n" + DeviceChecker.leftClickMessage() + "：建物カード2枚\n" + DeviceChecker.rightClickMessage() + "：捨札（建物コストの枚数）";
   };
 
   Card34.use = function(leftIndexs, rightIndexs) {
@@ -1545,7 +1545,7 @@ DeviceChecker = (function() {
   DeviceChecker.isTouchDevice = device.mobile() || device.tablet();
 
   DeviceChecker.leftClickMessage = function() {
-    if (DeviceChecker.isTouchDevice()) {
+    if (DeviceChecker.isTouchDevice) {
       return "左フリック";
     } else {
       return "左クリック";
@@ -1553,7 +1553,7 @@ DeviceChecker = (function() {
   };
 
   DeviceChecker.rightClickMessage = function() {
-    if (DeviceChecker.isTouchDevice()) {
+    if (DeviceChecker.isTouchDevice) {
       return "右フリック";
     } else {
       return "右クリック";
@@ -1561,7 +1561,7 @@ DeviceChecker = (function() {
   };
 
   DeviceChecker.doubleClickMessage = function() {
-    if (DeviceChecker.isTouchDevice()) {
+    if (DeviceChecker.isTouchDevice) {
       return "ダブルタップ";
     } else {
       return "ダブルクリック";
