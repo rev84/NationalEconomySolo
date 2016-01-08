@@ -1573,10 +1573,22 @@ DeviceChecker = (function() {
 })();
 
 $(function() {
-  $('body').bind('contextmenu', function() {
-    return false;
+  var srcCss, srcHtml;
+  if (DeviceChecker.isTouchDevice) {
+    srcHtml = './index-sm.html';
+    srcCss = './css/index-sm.css';
+  } else {
+    srcHtml = './index-pc.html';
+    srcCss = './css/index-pc.css';
+  }
+  return $.get(srcHtml, function(data) {
+    $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + srcCss + '">');
+    $('#game').append(data);
+    $('body').bind('contextmenu', function() {
+      return false;
+    });
+    return Game.gameStart();
   });
-  return Game.gameStart();
 });
 
 window.onerror = function(message, url, lineNo) {
@@ -2109,10 +2121,10 @@ HandSpace = (function(superClass) {
         me.append(e);
       }
       if (this.select[index] === this.SELECT_LEFT) {
-        e.addClass("select_left");
+        e.addClass("card_select_left");
       }
       if (this.select[index] === this.SELECT_RIGHT) {
-        results.push(e.addClass("select_right"));
+        results.push(e.addClass("card_select_right"));
       } else {
         results.push(void 0);
       }
@@ -2121,7 +2133,7 @@ HandSpace = (function(superClass) {
   };
 
   HandSpace.createElement = function(index) {
-    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, desc, e, header, img, name, point, pointSpan, price;
+    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, desc, e, header, img, mc, name, point, pointSpan, price;
     if (this.cards[index] == null) {
       return false;
     }
@@ -2132,29 +2144,47 @@ HandSpace = (function(superClass) {
     price = cardClass.getPrice();
     point = cardClass.getPoint();
     desc = cardClass.getDescription();
-    e = $('<div>').attr('data-index', index).addClass('hand');
-    header = $('<span>').addClass('hand_header').html('[' + cost + ']' + cardClass.getName());
-    img = cardClass.getImageObj().addClass('hand_image');
+    e = $('<div>').attr('data-index', index).addClass('card hand');
+    header = $('<span>').addClass('card_header').html('[' + cost + ']' + cardClass.getName());
+    img = cardClass.getImageObj().addClass('card_image');
     catStr = cat != null ? '[' + cat + ']' : '';
-    categorySpan = $('<span>').addClass('hand_footer hand_category').html(catStr);
-    pointSpan = $('<span>').addClass('hand_footer hand_point').html('[$' + point + ']');
+    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr);
+    pointSpan = $('<span>').addClass('card_footer card_point').html('[$' + point + ']');
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
-    e.attr('data-tooltip', balloonStr).darkTooltip({
-      addClass: this.BALLOON_CLASS_NAME
-    });
-    e.on('click', function() {
-      index = $(this).attr('data-index');
-      return Game.handClickLeft(Number(index));
-    });
-    e.on('contextmenu', function() {
-      index = $(this).attr('data-index');
-      return Game.handClickRight(Number(index));
-    });
-    e.dblclick(function() {
-      index = $(this).attr('data-index');
-      return Game.handDoubleClick(Number(index));
-    });
+    if (!DeviceChecker.isTouchDevice) {
+      e.attr('data-tooltip', balloonStr).darkTooltip({
+        addClass: this.BALLOON_CLASS_NAME
+      });
+    }
+    if (DeviceChecker.isTouchDevice) {
+      mc = new Hammer(e.get(0));
+      e.on('panleft', function() {
+        index = $(this).attr('data-index');
+        return Game.handClickLeft(Number(index));
+      });
+      e.on('panright', function() {
+        index = $(this).attr('data-index');
+        return Game.handClickRight(Number(index));
+      });
+      e.on('doubletap', function() {
+        index = $(this).attr('data-index');
+        return Game.handDoubleClick(Number(index));
+      });
+    } else {
+      e.on('click', function() {
+        index = $(this).attr('data-index');
+        return Game.handClickLeft(Number(index));
+      });
+      e.on('contextmenu', function() {
+        index = $(this).attr('data-index');
+        return Game.handClickRight(Number(index));
+      });
+      e.on('dblclick', function() {
+        index = $(this).attr('data-index');
+        return Game.handDoubleClick(Number(index));
+      });
+    }
     e.append(header);
     e.append(img);
     e.append(categorySpan);
@@ -2242,17 +2272,17 @@ LogSpace = (function(superClass) {
 
   LogSpace.addInfo = function(message) {
     var e, msg;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS);
     msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
     return this.getElement().append(e.append(msg));
   };
 
-  LogSpace.addFatalInstant = function(message, sec) {
+  LogSpace.addInfoInstant = function(message, sec) {
     var e, msg;
     if (sec == null) {
       sec = 5;
     }
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
     msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
     this.getElement().append(e.append(msg));
     e.fadeOut(sec * 1000);
@@ -2272,6 +2302,18 @@ LogSpace = (function(superClass) {
   };
 
   LogSpace.addInfoInstant = function(message, sec) {
+    var e, msg;
+    if (sec == null) {
+      sec = 5;
+    }
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
+    msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
+    this.getElement().append(e.append(msg));
+    e.fadeOut(sec * 1000);
+    return setTimeout(e.remove, sec * 1000);
+  };
+
+  LogSpace.addFatalInstant = function(message, sec) {
     var e, msg;
     if (sec == null) {
       sec = 5;
@@ -2431,7 +2473,7 @@ PrivateSpace = (function(superClass) {
   };
 
   PrivateSpace.createElement = function(index) {
-    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costStr, desc, e, header, img, name, point, pointSpan, pointStr, price;
+    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costStr, desc, e, header, img, mc, name, point, pointSpan, pointStr, price;
     if (this.cards[index] == null) {
       return false;
     }
@@ -2442,32 +2484,47 @@ PrivateSpace = (function(superClass) {
     price = cardClass.getPrice();
     point = cardClass.getPoint();
     desc = cardClass.getDescription();
-    e = $('<div>').attr('data-index', index).addClass('private');
+    e = $('<div>').attr('data-index', index).addClass('card private');
     costStr = cardClass.isPublicOnly() ? '' : '[' + cost + ']';
-    header = $('<span>').addClass('private_header').html(costStr + cardClass.getName());
-    img = cardClass.getImageObj().addClass('private_image');
+    header = $('<span>').addClass('card_header').html(costStr + cardClass.getName());
+    img = cardClass.getImageObj().addClass('card_image');
     catStr = cat != null ? '[' + cat + ']' : '';
-    categorySpan = $('<span>').addClass('private_footer private_category').html(catStr);
+    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr);
     pointStr = cardClass.isPublicOnly() ? '' : '[$' + point + ']';
-    pointSpan = $('<span>').addClass('private_footer private_point').html(pointStr);
+    pointSpan = $('<span>').addClass('card_footer card_point').html(pointStr);
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + cost + "\n売却価格：" + price + "\n得点：" + point).replace(/\n/g, '<br>');
-    e.attr('data-tooltip', balloonStr).darkTooltip({
-      addClass: this.BALLOON_CLASS_NAME
-    });
-    if (this.status[index] === this.STATUS_WORKED) {
-      e.addClass('used');
-      e.append($('<img>').attr('src', this.IMG_WORKER).addClass('worker'));
+    if (!DeviceChecker.isTouchDevice) {
+      e.attr('data-tooltip', balloonStr).darkTooltip({
+        addClass: this.BALLOON_CLASS_NAME
+      });
     }
-    e.dblclick(function() {
-      if (Game.isClickable) {
-        index = Number($(this).attr('data-index'));
-        return Game.work('private', index);
-      } else if (Game.isSell) {
-        index = Number($(this).attr('data-index'));
-        return Game.sellPrivate(index);
-      }
-    });
+    if (this.status[index] === this.STATUS_WORKED) {
+      e.addClass('card_used');
+      e.append($('<img>').attr('src', this.IMG_WORKER).addClass('card_worker'));
+    }
+    if (DeviceChecker.isTouchDevice) {
+      mc = new Hammer(e.get(0));
+      e.on('doubletap', function() {
+        if (Game.isClickable) {
+          index = Number($(this).attr('data-index'));
+          return Game.work('private', index);
+        } else if (Game.isSell) {
+          index = Number($(this).attr('data-index'));
+          return Game.sellPrivate(index);
+        }
+      });
+    } else {
+      e.on('dblclick', function() {
+        if (Game.isClickable) {
+          index = Number($(this).attr('data-index'));
+          return Game.work('private', index);
+        } else if (Game.isSell) {
+          index = Number($(this).attr('data-index'));
+          return Game.sellPrivate(index);
+        }
+      });
+    }
     e.append(header);
     e.append(img);
     e.append(categorySpan);
@@ -2753,7 +2810,7 @@ PublicSpace = (function(superClass) {
   };
 
   PublicSpace.createElement = function(index) {
-    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costBalloon, costStr, desc, e, header, img, name, point, pointBalloon, pointSpan, pointStr, price, priceBalloon;
+    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costBalloon, costStr, desc, e, header, img, mc, name, point, pointBalloon, pointSpan, pointStr, price, priceBalloon;
     if (this.cards[index] == null) {
       return false;
     }
@@ -2764,38 +2821,48 @@ PublicSpace = (function(superClass) {
     price = cardClass.getPrice();
     point = cardClass.getPoint();
     desc = cardClass.getDescription();
-    e = $('<div>').attr('data-index', index).addClass('public');
+    e = $('<div>').attr('data-index', index).addClass('card public');
     costStr = cardClass.isPublicOnly() ? '' : '[' + cost + ']';
-    header = $('<span>').addClass('public_header').html(costStr + cardClass.getName());
-    img = cardClass.getImageObj().addClass('public_image');
+    header = $('<span>').addClass('card_header').html(costStr + cardClass.getName());
+    img = cardClass.getImageObj().addClass('card_image');
     catStr = cat != null ? '[' + cat + ']' : '';
-    categorySpan = $('<span>').addClass('public_footer public_category').html(catStr);
+    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr);
     pointStr = cardClass.isPublicOnly() ? '' : '[$' + point + ']';
-    pointSpan = $('<span>').addClass('public_footer public_point').html(pointStr);
+    pointSpan = $('<span>').addClass('card_footer card_point').html(pointStr);
     costBalloon = cardClass.isPublicOnly() ? '-' : cost;
     priceBalloon = cardClass.isPublicOnly() ? '-' : price;
     pointBalloon = cardClass.isPublicOnly() ? '-' : point;
     catBalloon = cat != null ? cat : 'なし';
     balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + costBalloon + "\n売却価格：" + priceBalloon + "\n得点：" + pointBalloon).replace(/\n/g, '<br>');
-    e.attr('data-tooltip', balloonStr).darkTooltip({
-      gravity: 'north',
-      addClass: this.BALLOON_CLASS_NAME
-    });
+    if (!DeviceChecker.isTouchDevice) {
+      e.attr('data-tooltip', balloonStr).darkTooltip({
+        gravity: 'north',
+        addClass: this.BALLOON_CLASS_NAME
+      });
+    }
     switch (this.status[index]) {
       case this.STATUS_WORKED:
         if (this.cards[index] !== Card.CARD_NUM_KOUZAN) {
-          e.addClass('used');
+          e.addClass('card_used');
         }
-        e.append($('<img>').attr('src', this.IMG_WORKER).addClass('worker'));
+        e.append($('<img>').attr('src', this.IMG_WORKER).addClass('card_worker'));
         break;
       case this.STATUS_DISABLED:
-        e.addClass('used');
-        e.append($('<img>').attr('src', this.IMG_DISABLER).addClass('worker'));
+        e.addClass('card_used');
+        e.append($('<img>').attr('src', this.IMG_DISABLER).addClass('card_worker'));
     }
-    e.dblclick(function() {
-      index = Number($(this).attr('data-index'));
-      return Game.work('public', index);
-    });
+    if (DeviceChecker.isTouchDevice) {
+      mc = new Hammer(e.get(0));
+      e.on('doubletap', function() {
+        index = Number($(this).attr('data-index'));
+        return Game.work('public', index);
+      });
+    } else {
+      e.on('dblclick', function() {
+        index = Number($(this).attr('data-index'));
+        return Game.work('public', index);
+      });
+    }
     e.append(header);
     e.append(img);
     e.append(categorySpan);
