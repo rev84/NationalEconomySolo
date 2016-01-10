@@ -128,7 +128,7 @@ class CardBase
   # 得点を取得
   @getPoint:->
     @PRICE*2
-  
+
   # カードの画像パスを取得
   @getImagePath:->
     './img/card/'+@getNumber()+'.jpg'
@@ -400,7 +400,7 @@ class Card14 extends CardBase
     count = 0
     for index in [HandSpace.getAmount()-5...HandSpace.getAmount()]
       count++ if leftIndexs.in_array index
-    
+
     return "最後に引いた5枚のうちの4枚が選択されていません" if count isnt 4
 
     # 捨札4枚を捨てる
@@ -711,7 +711,7 @@ class Card30 extends CardBase
     else
       # カードを2枚引く
       Game.pullDeck 2
-    
+
     true
 
 # No.31 労働組合
