@@ -1572,30 +1572,6 @@ DeviceChecker = (function() {
 
 })();
 
-$(function() {
-  var srcCss, srcHtml;
-  if (DeviceChecker.isTouchDevice) {
-    srcHtml = './index-sm.html';
-    srcCss = './css/index-sm.css';
-  } else {
-    srcHtml = './index-pc.html';
-    srcCss = './css/index-pc.css';
-  }
-  return $.get(srcHtml, function(data) {
-    $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + srcCss + '">');
-    $('#game').append(data);
-    $('body').bind('contextmenu', function() {
-      return false;
-    });
-    return Game.gameStart();
-  });
-});
-
-window.onerror = function(message, url, lineNo) {
-  LogSpace.addScriptError(message, url, lineNo);
-  return true;
-};
-
 window.Game = (function() {
   function Game() {}
 
@@ -1710,11 +1686,25 @@ window.Game = (function() {
     }
     this.isHandTrash = false;
     if (this.isMustSell()) {
-      rest = Worker.getTotal() * RoundDeck.getSalary() - Stock.getAmount();
+      rest = Worker.getTotal() * RoundDeck.getSalary() - Stock.getAmount() - PrivateSpace.getTotalSell();
       message = "給料が払えるようになるか、なくなるまで建物を売ってください\n不足額：$" + rest;
       LogSpace.addWarn(message.replace(/\n/g, '<br>'));
       this.isSell = true;
+      PrivateSpace.cache();
       return;
+    }
+    if (PrivateSpace.sellingBox.length > 0) {
+      if (this.canSell()) {
+        this.sellPrivate();
+        return;
+      } else {
+        message = '売る必要のない建物が含まれています。';
+        LogSpace.addFatalInstant(message);
+        PrivateSpace.rollback();
+        PrivateSpace.sellingBox = [];
+        this.roundEnd();
+        return;
+      }
     }
     this.isSell = false;
     return this.settle();
@@ -1949,24 +1939,49 @@ window.Game = (function() {
     return PublicSpace.redraw();
   };
 
-  Game.sellPrivate = function(index) {
-    var deletedCardNum;
+  Game.pushSellingBox = function(index) {
     if (!PrivateSpace.getCardClass(index).isSellable()) {
       return false;
     }
-    deletedCardNum = PrivateSpace.pull(index);
-    PublicSpace.push(deletedCardNum);
-    Stock.push(Card.getClass(deletedCardNum).getPrice());
+    PrivateSpace.sellingBox.push(PrivateSpace.pull(index));
     PrivateSpace.redraw();
+    return this.roundEnd();
+  };
+
+  Game.sellPrivate = function() {
+    var cardNum, j, len, ref;
+    ref = PrivateSpace.sellingBox;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      PublicSpace.push(cardNum);
+      Stock.push(Card.getClass(cardNum).getPrice());
+    }
+    PrivateSpace.sellingBox = [];
+    PrivateSpace.uncache();
     PublicSpace.redraw();
     return this.roundEnd();
   };
 
   Game.isMustSell = function() {
     var canSell, cantPaySalary;
-    cantPaySalary = Stock.getAmount() - Worker.getTotal() * RoundDeck.getSalary() < 0;
+    cantPaySalary = Stock.getAmount() + PrivateSpace.getTotalSell() < Worker.getTotal() * RoundDeck.getSalary();
     canSell = PrivateSpace.isExistSellable();
     return cantPaySalary && canSell;
+  };
+
+  Game.canSell = function() {
+    var cardNum, cost, j, len, minCost, ref, totalSell;
+    totalSell = PrivateSpace.getTotalSell();
+    minCost = null;
+    ref = PrivateSpace.sellingBox;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      cost = Card.getClass(cardNum).getPrice();
+      if (minCost === null || cost < minCost) {
+        minCost = cost;
+      }
+    }
+    return Stock.getAmount() + totalSell - Worker.getTotal() * RoundDeck.getSalary() < minCost;
   };
 
   Game.getPoint = function(getDetail) {
@@ -2360,14 +2375,22 @@ PrivateSpace = (function(superClass) {
 
   PrivateSpace.STATUS_WORKED = 1;
 
+  PrivateSpace.STATUS_SELLING = 2;
+
   PrivateSpace.cards = [];
 
   PrivateSpace.status = [];
 
+  PrivateSpace.sellingBox = [];
+
+  PrivateSpace.cacheObj = {};
+
   PrivateSpace.init = function() {
     PrivateSpace.__super__.constructor.init.call(this);
     this.cards = [];
-    return this.status = [];
+    this.status = [];
+    this.sellingBox = [];
+    return this.cacheObj = {};
   };
 
   PrivateSpace.resetStatus = function() {
@@ -2529,6 +2552,37 @@ PrivateSpace = (function(superClass) {
       }
     }
     return false;
+  };
+
+  PrivateSpace.getTotalSell = function() {
+    var cardNum, j, len, ref, result;
+    result = 0;
+    ref = this.sellingBox;
+    for (j = 0, len = ref.length; j < len; j++) {
+      cardNum = ref[j];
+      result += Card.getClass(cardNum).getPrice();
+    }
+    return result;
+  };
+
+  PrivateSpace.cache = function() {
+    if (Object.keys(this.cacheObj).length === 0) {
+      this.cacheObj = {
+        cards: this.cards.concat(),
+        status: this.status.concat()
+      };
+    }
+  };
+
+  PrivateSpace.uncache = function() {
+    this.cacheObj = {};
+  };
+
+  PrivateSpace.rollback = function() {
+    this.cards = this.cacheObj['cards'];
+    this.status = this.cacheObj['status'];
+    this.uncache();
+    this.redraw();
   };
 
   PrivateSpace.getAmount = function() {
@@ -3086,3 +3140,27 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
+
+$(function() {
+  var srcCss, srcHtml;
+  if (DeviceChecker.isTouchDevice) {
+    srcHtml = './index-sm.html';
+    srcCss = './css/index-sm.css';
+  } else {
+    srcHtml = './index-pc.html';
+    srcCss = './css/index-pc.css';
+  }
+  return $.get(srcHtml, function(data) {
+    $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + srcCss + '">');
+    $('#game').append(data);
+    $('body').bind('contextmenu', function() {
+      return false;
+    });
+    return Game.gameStart();
+  });
+});
+
+window.onerror = function(message, url, lineNo) {
+  LogSpace.addScriptError(message, url, lineNo);
+  return true;
+};

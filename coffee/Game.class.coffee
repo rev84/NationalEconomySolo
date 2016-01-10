@@ -233,16 +233,29 @@ class window.Game
 
     if @isMustSell()
       # いくら足りないのか計算
-      rest = Worker.getTotal() * RoundDeck.getSalary() - Stock.getAmount()
+      rest = Worker.getTotal() * RoundDeck.getSalary() - Stock.getAmount() - PrivateSpace.getTotalSell()
       message = """
                 給料が払えるようになるか、なくなるまで建物を売ってください
                 不足額：$#{rest}
                 """
       LogSpace.addWarn(message.replace /\n/g, '<br>')
       @isSell = true
+      PrivateSpace.cache()
       return
-    @isSell = false
 
+    if PrivateSpace.sellingBox.length > 0
+      if @canSell()
+        @sellPrivate()
+        return
+      else
+        message = '売る必要のない建物が含まれています。'
+        LogSpace.addFatalInstant(message)
+        PrivateSpace.rollback()
+        PrivateSpace.sellingBox = []
+        @roundEnd()
+        return
+
+    @isSell = false
     @settle()
 
   # ラウンド終了精算
@@ -304,7 +317,7 @@ class window.Game
     if @flagYakihata
       @flagYakihata = false
     else
-      spaceClass.setWorked index 
+      spaceClass.setWorked index
     PublicSpace.disableLastest()  # 最新の職場を潰す
     @refresh()
     # 終わったら
@@ -319,7 +332,7 @@ class window.Game
     return false if @isGameEnd
     # 選択待ちでなければならない
     return false if @waitChoice is false
-    # 
+    #
     HandSpace.clickLeft index
     HandSpace.redraw()
 
@@ -330,7 +343,7 @@ class window.Game
     return false if @waitChoice is false
     # 右クリック可能でなければならない
     return false if @waitChoice[2] is false
-    # 
+    #
     HandSpace.clickRight index
     HandSpace.redraw()
 
@@ -465,19 +478,27 @@ class window.Game
     PublicSpace.push @objs.round.pull() for i in [0...amount]
     PublicSpace.redraw()
 
-  # 建物を売る
-  @sellPrivate:(index)->
+  # 建物を売る候補に入れる
+  @pushSellingBox:(index)->
     # 売却不可
     return false unless PrivateSpace.getCardClass(index).isSellable()
-
-    # 公共に移す
-    deletedCardNum = PrivateSpace.pull index
-    PublicSpace.push deletedCardNum
-    # 資金を増やす
-    Stock.push Card.getClass(deletedCardNum).getPrice()
-
+    PrivateSpace.sellingBox.push(PrivateSpace.pull index)
     PrivateSpace.redraw()
+    # ラウンド終了判定
+    @roundEnd()
+
+  # 建物を売る
+  @sellPrivate:->
+    for cardNum in PrivateSpace.sellingBox
+      # sellingBoxの中身を公共に移す
+      PublicSpace.push cardNum
+      # 資金を増やす
+      Stock.push(Card.getClass(cardNum).getPrice())
+
+    PrivateSpace.sellingBox = []
+    PrivateSpace.uncache()
     PublicSpace.redraw()
+
     # ラウンド終了判定
     @roundEnd()
 
@@ -486,11 +507,22 @@ class window.Game
     # TODO:焼畑は手放さなくてはならない前提
 
     # (1)給料が支払えない
-    cantPaySalary = Stock.getAmount() - Worker.getTotal() * RoundDeck.getSalary() < 0
+    cantPaySalary = Stock.getAmount() + PrivateSpace.getTotalSell() < Worker.getTotal() * RoundDeck.getSalary()
     # (2)売れる建物がある
     canSell = PrivateSpace.isExistSellable()
 
     cantPaySalary and canSell
+
+  # 選択した建物を実際に売れるかどうか
+  @canSell:->
+    totalSell = PrivateSpace.getTotalSell()
+    minCost = null
+    for cardNum in PrivateSpace.sellingBox
+      cost = Card.getClass(cardNum).getPrice()
+      if (minCost is null || cost < minCost)
+        minCost = cost
+    # 候補を全て売却した後の資金が、候補の中で最も安い建物の価格より低い。
+    Stock.getAmount() + totalSell - Worker.getTotal() * RoundDeck.getSalary() < minCost
 
 
   # 得点の再計算・表示
