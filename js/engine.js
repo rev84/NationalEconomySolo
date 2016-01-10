@@ -1443,8 +1443,14 @@ Consumer = (function() {
 
 })();
 
-Deck = (function() {
-  function Deck() {}
+Deck = (function(superClass) {
+  extend(Deck, superClass);
+
+  function Deck() {
+    return Deck.__super__.constructor.apply(this, arguments);
+  }
+
+  Deck.DIV_ID = 'deck';
 
   Deck.deck = [];
 
@@ -1462,6 +1468,10 @@ Deck = (function() {
     }
     this.shuffle();
     return this.grave = [];
+  };
+
+  Deck.getDeckLength = function() {
+    return this.deck.length;
   };
 
   Deck.pull = function() {
@@ -1535,9 +1545,13 @@ Deck = (function() {
     return res;
   };
 
+  Deck.redraw = function() {
+    return this.getElement().html(this.getDeckLength());
+  };
+
   return Deck;
 
-})();
+})(SpaceBase);
 
 DeviceChecker = (function() {
   function DeviceChecker() {}
@@ -1621,7 +1635,8 @@ window.Game = (function() {
     this.objs.unpaid.redraw();
     this.objs.point.redraw();
     this.objs.worker.redraw();
-    return this.objs.round.redraw();
+    this.objs.round.redraw();
+    return this.objs.deck.redraw();
   };
 
   Game.setObj = function() {
@@ -1651,6 +1666,7 @@ window.Game = (function() {
     this.pullDeck(3);
     this.objs.deck.place(17);
     this.pullPublic(4);
+    this.refresh();
     return this.clickable();
   };
 
