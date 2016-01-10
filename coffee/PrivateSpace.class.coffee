@@ -169,7 +169,7 @@ class PrivateSpace extends SpaceBase
         # 建物を売る
         else if Game.isSell
           index = Number $(this).attr('data-index')
-          Game.sellPrivate index
+          Game.pushSellingBox index
       )
     else
       e.on 'dblclick', ->
@@ -178,7 +178,7 @@ class PrivateSpace extends SpaceBase
           Game.work 'private', index
         else if Game.isSell
           index = Number $(this).attr('data-index')
-          Game.sellPrivate index
+          Game.pushSellingBox index
 
     e.append header
     e.append img
