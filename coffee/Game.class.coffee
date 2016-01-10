@@ -42,6 +42,7 @@ class window.Game
     @objs.point.redraw()
     @objs.worker.redraw()
     @objs.round.redraw()
+    @objs.deck.redraw()
 
   @setObj : ->
     return if @isSetObj
@@ -73,6 +74,7 @@ class window.Game
     # 4枚公共に置く
     @pullPublic 4
 
+    @refresh()
     @clickable()
 
   # ゲーム終了

@@ -1,4 +1,6 @@
-class Deck
+class Deck extends SpaceBase
+  @DIV_ID = 'deck'
+
   # 山札
   @deck : []
   # 墓地
@@ -12,6 +14,10 @@ class Deck
     @shuffle()
 
     @grave = []
+
+  # デッキの残り枚数を取得
+  @getDeckLength:->
+    @deck.length
 
   # カードを引く
   @pull:->
@@ -71,3 +77,7 @@ class Deck
       35 : 1
       36 : 1
     res
+
+  # 描画
+  @redraw:->
+    @getElement().html @getDeckLength()

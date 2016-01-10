@@ -160,7 +160,7 @@ table.score td {
 /* 情報 */
 .info {
   position:absolute;
-  width:120px; height:80px;
+  width:120px; height:70px;
   box-sizing:content-box;
 }
 #round_space {
@@ -168,23 +168,27 @@ table.score td {
   border: 4px double #ff8c00;
 }
 #budget_space {
-  top:100px; left:0px;
+  top:90px; left:0px;
   border: 4px double #9966ff;
 }
 #worker_space {
-  top:200px; left:0px;
+  top:180px; left:0px;
   border: 4px double #0000ff;
 }
 #stock_space {
-  bottom:20px; left:0px;
+  bottom:0px; left:0px;
   border: 4px double #006400;
 }
 #unpaid_space {
-  bottom:120px; left:0px;
+  bottom:90px; left:0px;
   border: 4px double #ff0000;
 }
 #point_space {
-  bottom:220px; left:0px;
+  bottom:180px; left:0px;
+  border: 4px double #000000;
+}
+#deck_space {
+  bottom:270px; left:0px;
   border: 4px double #000000;
 }
 .info_label {
@@ -194,17 +198,17 @@ table.score td {
   text-align:center;
   vertical-align:middle;
   color:#ffffff;
-  font-size:25px;
+  font-size:20px;
   font-weight:bold;
   box-sizing:content-box;
 }
 .info_body {
   position:absolute;
   top:30px; left:0px;
-  width:120px; height:50px;
+  width:120px; height:30px;
   text-align:center;
   vertical-align:middle;
-  font-size:34px;
+  font-size:25px;
   font-weight:bold;
   box-sizing:content-box;
 }
@@ -237,6 +241,10 @@ table.score td {
   border-bottom: 1px solid #000000;
   background-color:#000000;
 }
+#deck_label {
+  border-bottom: 1px solid #008080;
+  background-color:#008080;
+}
 
 /* ボタン */
 button#ok, button#cancel {
@@ -249,10 +257,10 @@ button#ok, button#cancel {
   left:30px;
 }
 button#ok {
-  top:300px;
+  top:270px;
 }
 button#cancel {
-  top:380px;
+  top:340px;
 }
 .disabled {
   color:#aaaaaa;
