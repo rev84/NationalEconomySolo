@@ -1,4 +1,4 @@
-class PrivateSpace extends SpaceBase
+class PrivateSpace extends CardSpace
   @DIV_ID = "private"
 
   # バルーンにつけるクラス
@@ -9,7 +9,6 @@ class PrivateSpace extends SpaceBase
   @STATUS_WORKED = 1
   @STATUS_SELLING = 2
 
-  @cards:[]
   # 建物の状態
   @status:[]
 
@@ -21,7 +20,6 @@ class PrivateSpace extends SpaceBase
 
   @init:->
     super()
-    @cards = []
     @status = []
     @sellingBox = []
     @cacheObj = {}
@@ -30,14 +28,6 @@ class PrivateSpace extends SpaceBase
   @resetStatus:->
     @status = []
     @status[index] = @STATUS_USABLE for index in [0...@cards.length]
-
-  # カード番号の取得
-  @getCardNum:(index)->
-    @cards[index]
-
-  # カードクラスの取得
-  @getCardClass:(index)->
-    return Card.getClass @getCardNum index
 
   # 使用可能か
   @isUsable:(index)->
@@ -85,19 +75,8 @@ class PrivateSpace extends SpaceBase
     @status = newStatus
     deletedCardNum
 
-  # 描画
-  @redraw:->
-    me = @getElement()
-
-    me.html('')
-    # バルーンも削除
-    $('.'+@BALLOON_CLASS_NAME).remove()
-    for index in [0...@cards.length]
-      e = @createElement index
-      me.append e if e isnt false
-
-  # ダブルクリック時
-  @doubleClickAction:(elem) ->
+  # ダブルクリック時アクションの上書き
+  @cardDoubleClickAction:(elem) ->
     # 通常時は労働者を派遣
     if Game.isClickable
       index = Number $(elem).attr('data-index')
@@ -107,75 +86,11 @@ class PrivateSpace extends SpaceBase
       index = Number $(elem).attr('data-index')
       Game.pushSellingBox index
 
-  # 要素作成
-  @createElement:(index)->
-    # なければ脱出
-    return false unless @cards[index]?
-
-    # カードのクラス
-    cardClass = @getCardClass index
-    # カード名
-    name = cardClass.getName()
-    # カテゴリ
-    cat = cardClass.getCategory()
-    # コスト
-    cost = cardClass.getCost()
-    # 売却価格
-    price = cardClass.getPrice()
-    # 得点
-    point = cardClass.getPoint()
-    # 説明文
-    desc = cardClass.getDescription()
-
-    # カードの外側
-    e = $('<div>').attr('data-index', index).addClass('card private')
-
-    # ヘッダ
-    # [コスト]カード名
-    costStr = if cardClass.isPublicOnly() then '' else '['+cost+']'
-    header = $('<span>').addClass('card_header').html(costStr+cardClass.getName())
-
-    # 画像
-    img = cardClass.getImageObj().addClass('card_image')
-
-    # フッタ
-    # カテゴリ
-    catStr = if cat? then '['+cat+']' else ''
-    categorySpan = $('<span>').addClass('card_footer card_category').html(catStr)
-    # 得点
-    pointStr = if cardClass.isPublicOnly() then '' else '[$'+point+']'
-    pointSpan = $('<span>').addClass('card_footer card_point').html(pointStr)
-
-    # 説明の吹き出し
-    catBalloon = if cat? then cat else 'なし'
-    balloonStr = """
-    #{desc}
-    --------------------
-    カテゴリ：#{catBalloon}
-    コスト：#{cost}
-    売却価格：#{price}
-    得点：#{point}
-    """.replace /\n/g, '<br>'
-
-    # darkTooltipはスマホに非対応。
-    unless (DeviceChecker.isTouchDevice)
-      e.attr('data-tooltip', balloonStr).darkTooltip(
-        addClass : @BALLOON_CLASS_NAME
-      )
-
-    # 労働者により使用不可
+  # 労働者により使用不可
+  @additionalCardAction:(elem, index)->
     if @status[index] is @STATUS_WORKED
-      e.addClass('card_used')
-      e.append $('<img>').attr('src', @IMG_WORKER).addClass('card_worker')
-
-    # クリックアクションを登録
-    DeviceChecker.setDoubleClickAction(e, PrivateSpace.doubleClickAction)
-
-    e.append header
-    e.append img
-    e.append categorySpan
-    e.append pointSpan
-    e
+      elem.addClass('card_used')
+      elem.append $('<img>').attr('src', @IMG_WORKER).addClass('card_worker')
 
   # 売れる建物があるか
   @isExistSellable:->
