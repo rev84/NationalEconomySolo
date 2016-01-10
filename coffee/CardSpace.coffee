@@ -1,5 +1,7 @@
 class CardSpace extends SpaceBase
 
+  # バルーンにつけるクラス
+  @BALLOON_CLASS_NAME = null
   # バルーンの出る方向。デフォルトは下。
   @BALLOON_GRAVITY = 'north'
 
@@ -93,12 +95,8 @@ class CardSpace extends SpaceBase
     得点：#{pointBalloon}
     """.replace /\n/g, '<br>'
 
-    # darkTooltipはスマホに非対応。
-    unless (DeviceChecker.isTouchDevice)
-      e.attr('data-tooltip', balloonStr).darkTooltip(
-        gravity : @BALLOON_GRAVITY
-        addClass : @BALLOON_CLASS_NAME
-        )
+    # ツールチップを生成
+    DeviceChecker.setTooltip(e, balloonStr, @BALLOON_CLASS_NAME, @BALLOON_GRAVITY)
 
     # クリックアクションを登録
     DeviceChecker.setLeftClickAction(e, @cardLeftClickAction)
