@@ -2,6 +2,15 @@ class DeviceChecker
 
   @isTouchDevice = device.mobile() || device.tablet()
 
+  @init:->
+    if @isTouchDevice
+      d = @doubleClickMessage()
+      msg = """
+      #{d}で労働者を派遣します。
+      """ +
+      '\nカードを長押しすると説明が見られます。'
+      LogSpace.addInfoInstant(msg)
+
   @srcHtml = =>
     if @isTouchDevice then './index-sm.html' else './index-pc.html'
 
@@ -44,12 +53,30 @@ class DeviceChecker
       $elem.on 'contextmenu', ->
         spaceAction($elem)
 
-  @setTooltip:($elem, balloonStr, tooltipClassName, gravity) ->
+  @setTooltip:($elem, balloonStr, placement) ->
     if @isTouchDevice
+      $elem.tooltip(
+        html: true
+        placement: placement
+        title: balloonStr
+        trigger: 'manual'
+      )
+      mc = new Hammer.Manager($elem[0], {
+        recognizers: [
+          [Hammer.Press, {time: 200}]
+        ]
+        })
+      mc.on('press', ->
+        $elem.tooltip('show')
+      )
+      mc.on('pressup', ->
+        $elem.tooltip('hide')
+      )
       return
     else
-      $elem.attr('data-tooltip', balloonStr).darkTooltip(
-        gravity : gravity
-        addClass : tooltipClassName
+      $elem.tooltip(
+        html: true
+        placement: 'auto top'
+        title: balloonStr
       )
       return

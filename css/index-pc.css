@@ -268,3 +268,20 @@ button#cancel {
 .no_display {
   display:none;
 }
+
+/* tooltipをDarkTooltip風に*/
+.tooltip {
+  font-size: 14px;
+  max-width: 150px;
+}
+.tooltip.in {
+  opacity: 0.9;
+}
+.tooltip-inner {
+  text-align: left;
+}
+#balloon-title {
+  border-bottom: dashed thin;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}

@@ -3,7 +3,7 @@ class CardSpace extends SpaceBase
   # バルーンにつけるクラス
   @BALLOON_CLASS_NAME = null
   # バルーンの出る方向。デフォルトは下。
-  @BALLOON_GRAVITY = 'north'
+  @TOOLTIP_PLACEMENT = 'bottom'
 
   # スペースにあるカード番号の配列
   @cards:[]
@@ -82,21 +82,10 @@ class CardSpace extends SpaceBase
     pointSpan = $('<span>').addClass('card_footer card_point').html(pointStr)
 
     # 説明の吹き出し
-    costBalloon = if cardClass.isPublicOnly() then '-' else cost
-    priceBalloon = if cardClass.isPublicOnly() then '-' else price
-    pointBalloon = if cardClass.isPublicOnly() then '-' else point
-    catBalloon = if cat? then cat else 'なし'
-    balloonStr = """
-    #{desc}
-    --------------------
-    カテゴリ：#{catBalloon}
-    コスト：#{costBalloon}
-    売却価格：#{priceBalloon}
-    得点：#{pointBalloon}
-    """.replace /\n/g, '<br>'
+    balloonStr = cardClass.getBalloonTitle() + cardClass.getBalloonInfo()
 
     # ツールチップを生成
-    DeviceChecker.setTooltip(e, balloonStr, @BALLOON_CLASS_NAME, @BALLOON_GRAVITY)
+    DeviceChecker.setTooltip(e, balloonStr, @TOOLTIP_PLACEMENT)
 
     # クリックアクションを登録
     DeviceChecker.setLeftClickAction(e, @cardLeftClickAction)

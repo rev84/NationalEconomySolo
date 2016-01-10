@@ -3,7 +3,7 @@ class HandSpace extends CardSpace
 
   # バルーンにつけるクラス
   @BALLOON_CLASS_NAME = 'balloon_hand'
-  @BALLOON_GRAVITY = 'south'
+  @TOOLTIP_PLACEMENT = 'top'
 
   # 選択状態
   @SELECT_NOT   = 0

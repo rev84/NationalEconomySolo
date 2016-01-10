@@ -320,3 +320,20 @@ button#cancel {}
 .no_display {
   display: none;
 }
+
+/* tooltipをDarkTooltip風に*/
+.tooltip {
+  font-size: 1.0rem;
+  max-width: 10rem;
+}
+.tooltip.in {
+  opacity: 0.9;
+}
+.tooltip-inner {
+  text-align: left;
+}
+#balloon-title {
+  border-bottom: dashed thin;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}

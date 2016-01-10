@@ -137,6 +137,25 @@ class CardBase
   @getImageObj:->
     $('<img>').attr 'src', @getImagePath()
 
+  @getBalloonTitle:->
+    desc = @DESCRIPTION
+    """<div id="balloon-title">#{desc}</div>""".replace /\n/g, '<br>'
+
+  @getBalloonInfo:->
+    costBalloon = if @isPublicOnly() then '-' else @COST
+    priceBalloon =
+      if @isPublicOnly() || @isInstitution() then '-'
+      else @PRICE
+    pointBalloon = if @isPublicOnly() then '-' else @getPoint()
+    catBalloon = if @CATEGORY then @CATEGORY else 'なし'
+    balloonInfo = '<div id="balloon-info">' +
+    """
+    カテゴリ：#{catBalloon}
+    コスト：#{costBalloon}
+    売却価格：#{priceBalloon}
+    得点：#{pointBalloon}
+    """.replace(/\n/g, '<br>') + '</div>'
+
 # No.01 採石場 一人用プレイの場合は使用しない
 
 # No.02 鉱山
