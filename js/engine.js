@@ -1572,30 +1572,6 @@ DeviceChecker = (function() {
 
 })();
 
-$(function() {
-  var srcCss, srcHtml;
-  if (DeviceChecker.isTouchDevice) {
-    srcHtml = './index-sm.html';
-    srcCss = './css/index-sm.css';
-  } else {
-    srcHtml = './index-pc.html';
-    srcCss = './css/index-pc.css';
-  }
-  return $.get(srcHtml, function(data) {
-    $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + srcCss + '">');
-    $('#game').append(data);
-    $('body').bind('contextmenu', function() {
-      return false;
-    });
-    return Game.gameStart();
-  });
-});
-
-window.onerror = function(message, url, lineNo) {
-  LogSpace.addScriptError(message, url, lineNo);
-  return true;
-};
-
 window.Game = (function() {
   function Game() {}
 
@@ -2167,7 +2143,9 @@ HandSpace = (function(superClass) {
         index = $(this).attr('data-index');
         return Game.handClickRight(Number(index));
       });
-      e.on('doubletap', function() {
+      e.on('touchend', function(ev) {
+        return ev.preventDefault();
+      }).on('doubletap', function() {
         index = $(this).attr('data-index');
         return Game.handDoubleClick(Number(index));
       });
@@ -2461,7 +2439,7 @@ PrivateSpace = (function(superClass) {
   };
 
   PrivateSpace.createElement = function(index) {
-    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costStr, desc, e, header, img, mc, name, point, pointSpan, pointStr, price;
+    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costStr, desc, e, header, img, name, point, pointSpan, pointStr, price;
     if (this.cards[index] == null) {
       return false;
     }
@@ -2492,8 +2470,9 @@ PrivateSpace = (function(superClass) {
       e.append($('<img>').attr('src', this.IMG_WORKER).addClass('card_worker'));
     }
     if (DeviceChecker.isTouchDevice) {
-      mc = new Hammer(e.get(0));
-      e.on('doubletap', function() {
+      e.on('touchend', function(ev) {
+        return ev.preventDefault();
+      }).hammer().on('doubletap', function() {
         if (Game.isClickable) {
           index = Number($(this).attr('data-index'));
           return Game.work('private', index);
@@ -2798,7 +2777,7 @@ PublicSpace = (function(superClass) {
   };
 
   PublicSpace.createElement = function(index) {
-    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costBalloon, costStr, desc, e, header, img, mc, name, point, pointBalloon, pointSpan, pointStr, price, priceBalloon;
+    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costBalloon, costStr, desc, e, header, img, name, point, pointBalloon, pointSpan, pointStr, price, priceBalloon;
     if (this.cards[index] == null) {
       return false;
     }
@@ -2840,8 +2819,9 @@ PublicSpace = (function(superClass) {
         e.append($('<img>').attr('src', this.IMG_DISABLER).addClass('card_worker'));
     }
     if (DeviceChecker.isTouchDevice) {
-      mc = new Hammer(e.get(0));
-      e.on('doubletap', function() {
+      e.on('touchend', function(ev) {
+        return ev.preventDefault();
+      }).hammer().on('doubletap', function() {
         index = Number($(this).attr('data-index'));
         return Game.work('public', index);
       });
@@ -3086,3 +3066,27 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
+
+$(function() {
+  var srcCss, srcHtml;
+  if (DeviceChecker.isTouchDevice) {
+    srcHtml = './index-sm.html';
+    srcCss = './css/index-sm.css';
+  } else {
+    srcHtml = './index-pc.html';
+    srcCss = './css/index-pc.css';
+  }
+  return $.get(srcHtml, function(data) {
+    $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + srcCss + '">');
+    $('#game').append(data);
+    $('body').bind('contextmenu', function() {
+      return false;
+    });
+    return Game.gameStart();
+  });
+});
+
+window.onerror = function(message, url, lineNo) {
+  LogSpace.addScriptError(message, url, lineNo);
+  return true;
+};

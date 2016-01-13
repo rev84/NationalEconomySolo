@@ -149,9 +149,12 @@ class HandSpace extends SpaceBase
         index = $(this).attr('data-index')
         Game.handClickRight Number index
       # ダブルクリックにする
-      e.on 'doubletap', ->
+      e.on('touchend', (ev) ->
+        ev.preventDefault()
+      ).on('doubletap', ->
         index = $(this).attr('data-index')
         Game.handDoubleClick Number index
+      )
     else
       e.on 'click', ->
         index = $(this).attr('data-index')

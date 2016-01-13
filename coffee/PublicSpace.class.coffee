@@ -153,10 +153,12 @@ class PublicSpace extends SpaceBase
 
     # ダブルクリック時には使用する
     if (DeviceChecker.isTouchDevice)
-      mc = new Hammer(e.get(0))
-      e.on 'doubletap', ->
+      e.on('touchend', (ev) ->
+        ev.preventDefault()
+      ).hammer().on('doubletap', ->
         index = Number $(this).attr('data-index')
         Game.work 'public', index
+      )
     else
       e.on 'dblclick', ->
         index = Number $(this).attr('data-index')
