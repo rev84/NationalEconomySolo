@@ -303,6 +303,21 @@ CardBase = (function() {
     return $('<img>').attr('src', this.getImagePath());
   };
 
+  CardBase.getBalloonTitle = function() {
+    var desc;
+    desc = this.DESCRIPTION;
+    return ("<div id=\"balloon-title\">" + desc + "</div>").replace(/\n/g, '<br>');
+  };
+
+  CardBase.getBalloonInfo = function() {
+    var balloonInfo, catBalloon, costBalloon, pointBalloon, priceBalloon;
+    costBalloon = this.isPublicOnly() ? '-' : this.COST;
+    priceBalloon = this.isPublicOnly() || this.isInstitution() ? '-' : this.PRICE;
+    pointBalloon = this.isPublicOnly() ? '-' : this.getPoint();
+    catBalloon = this.CATEGORY ? this.CATEGORY : 'なし';
+    return balloonInfo = '<div id="balloon-info">' + ("カテゴリ：" + catBalloon + "\nコスト：" + costBalloon + "\n売却価格：" + priceBalloon + "\n得点：" + pointBalloon).replace(/\n/g, '<br>') + '</div>';
+  };
+
   return CardBase;
 
 })();
@@ -1439,7 +1454,7 @@ CardSpace = (function(superClass) {
 
   CardSpace.BALLOON_CLASS_NAME = null;
 
-  CardSpace.BALLOON_GRAVITY = 'north';
+  CardSpace.TOOLTIP_PLACEMENT = 'bottom';
 
   CardSpace.cards = [];
 
@@ -1481,7 +1496,7 @@ CardSpace = (function(superClass) {
   };
 
   CardSpace.createElement = function(index) {
-    var balloonStr, cardClass, cat, catBalloon, catStr, categorySpan, cost, costBalloon, costStr, desc, e, header, img, name, point, pointBalloon, pointSpan, pointStr, price, priceBalloon;
+    var balloonStr, cardClass, cat, catStr, categorySpan, cost, costStr, desc, e, header, img, name, point, pointSpan, pointStr, price;
     if (this.cards[index] == null) {
       return false;
     }
@@ -1500,12 +1515,8 @@ CardSpace = (function(superClass) {
     categorySpan = $('<span>').addClass('card_footer card_category').html(catStr);
     pointStr = cardClass.isPublicOnly() ? '' : '[$' + point + ']';
     pointSpan = $('<span>').addClass('card_footer card_point').html(pointStr);
-    costBalloon = cardClass.isPublicOnly() ? '-' : cost;
-    priceBalloon = cardClass.isPublicOnly() ? '-' : price;
-    pointBalloon = cardClass.isPublicOnly() ? '-' : point;
-    catBalloon = cat != null ? cat : 'なし';
-    balloonStr = (desc + "\n--------------------\nカテゴリ：" + catBalloon + "\nコスト：" + costBalloon + "\n売却価格：" + priceBalloon + "\n得点：" + pointBalloon).replace(/\n/g, '<br>');
-    DeviceChecker.setTooltip(e, balloonStr, this.BALLOON_CLASS_NAME, this.BALLOON_GRAVITY);
+    balloonStr = cardClass.getBalloonTitle() + cardClass.getBalloonInfo();
+    DeviceChecker.setTooltip(e, balloonStr, this.TOOLTIP_PLACEMENT);
     DeviceChecker.setLeftClickAction(e, this.cardLeftClickAction);
     DeviceChecker.setRightClickAction(e, this.cardRightClickAction);
     DeviceChecker.setDoubleClickAction(e, this.cardDoubleClickAction);
@@ -1649,6 +1660,15 @@ DeviceChecker = (function() {
 
   DeviceChecker.isTouchDevice = device.mobile() || device.tablet();
 
+  DeviceChecker.init = function() {
+    var d, msg;
+    if (this.isTouchDevice) {
+      d = this.doubleClickMessage();
+      msg = (d + "で労働者を派遣します。") + '\nカードを長押しすると説明が見られます。';
+      return LogSpace.addInfoInstant(msg);
+    }
+  };
+
   DeviceChecker.srcHtml = function() {
     if (DeviceChecker.isTouchDevice) {
       return './index-sm.html';
@@ -1727,13 +1747,35 @@ DeviceChecker = (function() {
     }
   };
 
-  DeviceChecker.setTooltip = function($elem, balloonStr, tooltipClassName, gravity) {
+  DeviceChecker.setTooltip = function($elem, balloonStr, placement) {
+    var mc;
     if (this.isTouchDevice) {
-
+      $elem.tooltip({
+        html: true,
+        placement: placement,
+        title: balloonStr,
+        trigger: 'manual'
+      });
+      mc = new Hammer.Manager($elem[0], {
+        recognizers: [
+          [
+            Hammer.Press, {
+              time: 200
+            }
+          ]
+        ]
+      });
+      mc.on('press', function() {
+        return $elem.tooltip('show');
+      });
+      mc.on('pressup', function() {
+        return $elem.tooltip('hide');
+      });
     } else {
-      $elem.attr('data-tooltip', balloonStr).darkTooltip({
-        gravity: gravity,
-        addClass: tooltipClassName
+      $elem.tooltip({
+        html: true,
+        placement: 'auto top',
+        title: balloonStr
       });
     }
   };
@@ -2202,7 +2244,7 @@ HandSpace = (function(superClass) {
 
   HandSpace.BALLOON_CLASS_NAME = 'balloon_hand';
 
-  HandSpace.BALLOON_GRAVITY = 'south';
+  HandSpace.TOOLTIP_PLACEMENT = 'top';
 
   HandSpace.SELECT_NOT = 0;
 
