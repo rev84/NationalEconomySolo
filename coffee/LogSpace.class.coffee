@@ -22,34 +22,26 @@ class LogSpace extends SpaceBase
   # 固定の警告メッセージを表示
   @addFatal:(message)->
     e = $('<div>').addClass(@DIV_CLASS+' '+@DIV_FATAL_CLASS)
-    #img = $('<img>').attr('src', @IMG_INFO)
     msg = $('<span>').addClass(@MESSAGE_CLASS).html(message)
-    #@getElement().append(e.append(img).append(msg))
     @getElement().append(e.append(msg))
 
 
   # 固定の忠告メッセージを表示
   @addWarn:(message)->
     e = $('<div>').addClass(@DIV_CLASS+' '+@DIV_WARN_CLASS)
-    #img = $('<img>').attr('src', @IMG_WARN)
     msg = $('<span>').addClass(@MESSAGE_CLASS).html(message)
-    #@getElement().append(e.append(img).append(msg))
     @getElement().append(e.append(msg))
 
   # 固定の通常メッセージを表示
   @addInfo:(message)->
     e = $('<div>').addClass(@DIV_CLASS+' '+@DIV_INFO_CLASS)
-    #img = $('<img>').attr('src', @IMG_FATAL)
     msg = $('<span>').addClass(@MESSAGE_CLASS).html(message)
-    #@getElement().append(e.append(img).append(msg))
     @getElement().append(e.append(msg))
 
   # 徐々に消える警告メッセージを表示
   @addFatalInstant:(message, sec = 5)->
     e = $('<div>').addClass(@DIV_CLASS+' '+@DIV_FATAL_CLASS)
-    #img = $('<img>').attr('src', @IMG_INFO)
     msg = $('<span>').addClass(@MESSAGE_CLASS).html(message)
-    #@getElement().append(e.append(img).append(msg))
     @getElement().append(e.append(msg))
     e.fadeOut sec*1000
     setTimeout e.remove, sec*1000
@@ -57,9 +49,7 @@ class LogSpace extends SpaceBase
   # 徐々に消える忠告メッセージを表示
   @addWarnInstant:(message, sec = 5)->
     e = $('<div>').addClass(@DIV_CLASS+' '+@DIV_WARN_CLASS)
-    #img = $('<img>').attr('src', @IMG_WARN)
     msg = $('<span>').addClass(@MESSAGE_CLASS).html(message)
-    #@getElement().append(e.append(img).append(msg))
     @getElement().append(e.append(msg))
     e.fadeOut sec*1000
     setTimeout e.remove, sec*1000
@@ -67,9 +57,7 @@ class LogSpace extends SpaceBase
   # 徐々に消える通常メッセージを表示
   @addInfoInstant:(message, sec = 5)->
     e = $('<div>').addClass(@DIV_CLASS+' '+@DIV_INFO_CLASS)
-    #img = $('<img>').attr('src', @IMG_INFO)
     msg = $('<span>').addClass(@MESSAGE_CLASS).html(message)
-    #@getElement().append(e.append(img).append(msg))
     @getElement().append(e.append(msg))
     e.fadeOut sec*1000
     setTimeout e.remove, sec*1000

@@ -128,7 +128,7 @@ class CardBase
   # 得点を取得
   @getPoint:->
     @PRICE*2
-  
+
   # カードの画像パスを取得
   @getImagePath:->
     './img/card/'+@getNumber()+'.jpg'
@@ -136,6 +136,25 @@ class CardBase
   # カードのimgのjQueryオブジェクトを取得
   @getImageObj:->
     $('<img>').attr 'src', @getImagePath()
+
+  @getBalloonTitle:->
+    desc = @DESCRIPTION
+    """<div id="balloon-title">#{desc}</div>""".replace /\n/g, '<br>'
+
+  @getBalloonInfo:->
+    costBalloon = if @isPublicOnly() then '-' else @COST
+    priceBalloon =
+      if @isPublicOnly() || @isInstitution() then '-'
+      else @PRICE
+    pointBalloon = if @isPublicOnly() then '-' else @getPoint()
+    catBalloon = if @CATEGORY then @CATEGORY else 'なし'
+    balloonInfo = '<div id="balloon-info">' +
+    """
+    カテゴリ：#{catBalloon}
+    コスト：#{costBalloon}
+    売却価格：#{priceBalloon}
+    得点：#{pointBalloon}
+    """.replace(/\n/g, '<br>') + '</div>'
 
 # No.01 採石場 一人用プレイの場合は使用しない
 
@@ -400,7 +419,7 @@ class Card14 extends CardBase
     count = 0
     for index in [HandSpace.getAmount()-5...HandSpace.getAmount()]
       count++ if leftIndexs.in_array index
-    
+
     return "最後に引いた5枚のうちの4枚が選択されていません" if count isnt 4
 
     # 捨札4枚を捨てる
@@ -711,7 +730,7 @@ class Card30 extends CardBase
     else
       # カードを2枚引く
       Game.pullDeck 2
-    
+
     true
 
 # No.31 労働組合

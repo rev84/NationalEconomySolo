@@ -1,15 +1,9 @@
 $ ->
-  if(DeviceChecker.isTouchDevice)
-    srcHtml = './index-sm.html'
-    srcCss = './css/index-sm.css'
-  else
-    srcHtml = './index-pc.html'
-    srcCss = './css/index-pc.css'
-  $.get(srcHtml, (data) ->
-    $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + srcCss + '">')
+  $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + DeviceChecker.srcCss() + '">')
+  $('body').bind 'contextmenu', ->
+    false
+  $.get(DeviceChecker.srcHtml(), (data) ->
     $('#game').append(data)
-    $('body').bind 'contextmenu', ->
-      false
     Game.gameStart()
   )
 
