@@ -1784,6 +1784,22 @@ DeviceChecker = (function() {
 
 })();
 
+$(function() {
+  $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + DeviceChecker.srcCss() + '">');
+  $('body').bind('contextmenu', function() {
+    return false;
+  });
+  return $.get(DeviceChecker.srcHtml(), function(data) {
+    $('#game').append(data);
+    return Game.gameStart();
+  });
+});
+
+window.onerror = function(message, url, lineNo) {
+  LogSpace.addScriptError(message, url, lineNo);
+  return true;
+};
+
 window.Game = (function() {
   function Game() {}
 
@@ -1912,8 +1928,8 @@ window.Game = (function() {
         this.sellPrivate();
         return;
       } else {
-        message = '売る必要のない建物が含まれています。';
-        LogSpace.addFatalInstant(message);
+        message = "過剰売却ルールに違反する売り方です。売却をやり直して下さい。\n参考：<a href=\"http://spa-game.com/?p=4557\" target=\"_blank\">過剰売却ルール</a>".replace(/\n/g, '<br>');
+        LogSpace.addFatalInstant(message, 20);
         PrivateSpace.rollback();
         PrivateSpace.sellingBox = [];
         this.roundEnd();
@@ -2409,6 +2425,10 @@ LogSpace = (function(superClass) {
 
   LogSpace.DIV_CLASS = 'log';
 
+  LogSpace.DIV_NORMAL_CLASS = 'log_normal';
+
+  LogSpace.DIV_INSTANT_CLASS = 'log_instant';
+
   LogSpace.DIV_INFO_CLASS = 'log_info';
 
   LogSpace.DIV_WARN_CLASS = 'log_warn';
@@ -2431,26 +2451,26 @@ LogSpace = (function(superClass) {
   };
 
   LogSpace.removeAll = function() {
-    return $('.' + this.DIV_CLASS).remove();
+    return $('.' + this.DIV_NORMAL_CLASS).remove();
   };
 
   LogSpace.addFatal = function(message) {
     var e, msg;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_FATAL_CLASS);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_NORMAL_CLASS + ' ' + this.DIV_FATAL_CLASS);
     msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
     return this.getElement().append(e.append(msg));
   };
 
   LogSpace.addWarn = function(message) {
     var e, msg;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_WARN_CLASS);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_NORMAL_CLASS + ' ' + this.DIV_WARN_CLASS);
     msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
     return this.getElement().append(e.append(msg));
   };
 
   LogSpace.addInfo = function(message) {
     var e, msg;
-    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_INFO_CLASS);
+    e = $('<div>').addClass(this.DIV_CLASS + ' ' + this.DIV_NORMAL_CLASS + ' ' + this.DIV_INFO_CLASS);
     msg = $('<span>').addClass(this.MESSAGE_CLASS).html(message);
     return this.getElement().append(e.append(msg));
   };
@@ -3171,19 +3191,3 @@ Worker = (function(superClass) {
   return Worker;
 
 })(SpaceBase);
-
-$(function() {
-  $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + DeviceChecker.srcCss() + '">');
-  $('body').bind('contextmenu', function() {
-    return false;
-  });
-  return $.get(DeviceChecker.srcHtml(), function(data) {
-    $('#game').append(data);
-    return Game.gameStart();
-  });
-});
-
-window.onerror = function(message, url, lineNo) {
-  LogSpace.addScriptError(message, url, lineNo);
-  return true;
-};

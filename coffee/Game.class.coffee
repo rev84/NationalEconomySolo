@@ -250,8 +250,11 @@ class window.Game
         @sellPrivate()
         return
       else
-        message = '売る必要のない建物が含まれています。'
-        LogSpace.addFatalInstant(message)
+        message = """
+                  過剰売却ルールに違反する売り方です。売却をやり直して下さい。
+                  参考：<a href="http://spa-game.com/?p=4557" target="_blank">過剰売却ルール</a>
+                  """.replace /\n/g, '<br>'
+        LogSpace.addFatalInstant(message, 20)
         PrivateSpace.rollback()
         PrivateSpace.sellingBox = []
         @roundEnd()
