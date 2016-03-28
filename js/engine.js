@@ -1785,6 +1785,12 @@ DeviceChecker = (function() {
 })();
 
 $(function() {
+  var ua;
+  ua = window.navigator.userAgent.toLowerCase();
+  if (!(ua.indexOf("msie") === -1 && ua.indexOf("trident/7.0") === -1)) {
+    alert("Internet Explorer には対応しておりません。\nGoogle Chrome などのブラウザを使用して下さい。");
+    return;
+  }
   $('head link:last').after('<link rel="stylesheet" type="text/css" href="' + DeviceChecker.srcCss() + '">');
   $('body').bind('contextmenu', function() {
     return false;
